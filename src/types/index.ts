@@ -10,7 +10,7 @@ export interface LoginResponse {
 
 export interface EventMinDTO {
     eventID: number;
-    eventTitle: string;
+    title: string;
     startDate: string;
 }
 
