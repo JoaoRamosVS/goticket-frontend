@@ -28,7 +28,7 @@ export default function LoginPage() {
 
             const response = await api.login(loginData);
 
-            if(response.accessToken) {
+            if(response.accessToken && response.expiresIn) {
                 navigate('/dashboard');
             }
 
