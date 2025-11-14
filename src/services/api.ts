@@ -10,15 +10,6 @@ const goTicketApi = axios.create({
 
 const login = async (loginData: LoginRequest): Promise<LoginResponse> => {
     const response = await goTicketApi.post('/login', loginData);
-
-    if (response.status === 200) {
-        const { accessToken, expiresIn } = response.data;     
-        
-        const expirationTime = Date.now() + (expiresIn * 1000);
-        localStorage.setItem('tokenExpiration', expirationTime.toString());
-        localStorage.setItem('accessToken', accessToken);
-    }
-
     return response.data as LoginResponse;
 };
 

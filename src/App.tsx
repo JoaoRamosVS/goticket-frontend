@@ -2,27 +2,24 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import LoginPage from './components/LoginPage'
 import DashboardPage from './components/DashboardPage'
 import SessionWatcher from './components/SessionWatcher';
+import { useAuthStore } from './stores/authStore';
 
 function App() {
 
-  const isAuthenticated = () => Boolean(localStorage.getItem('accessToken'))
+  const isAuth = useAuthStore((state) => state.isAuth)
 
   return (
     <BrowserRouter>
       <SessionWatcher />
-
+      
       <Routes>
-				<Route
-					path="/"
+				<Route path="/"
 					element={
-						isAuthenticated() ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />
+						isAuth ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />
 					}
 				/>
-
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/dashboard" element={
-          isAuthenticated() ? <DashboardPage /> : <Navigate to="/login" replace />
-        } />
+        <Route path="/login" element={isAuth ? <Navigate to="/dashboard" replace /> : <LoginPage />}/>
+        <Route path="/dashboard" element={isAuth ? <DashboardPage /> : <Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
   )

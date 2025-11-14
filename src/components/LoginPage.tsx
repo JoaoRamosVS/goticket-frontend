@@ -3,8 +3,11 @@ import type { LoginRequest } from "../types";
 import api from "../services/api";
 import { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../stores/authStore";
 
 export default function LoginPage() {
+
+    const login = useAuthStore((state) => state.login)
 
     const navigate = useNavigate();
 
@@ -29,6 +32,9 @@ export default function LoginPage() {
             const response = await api.login(loginData);
 
             if(response.accessToken && response.expiresIn) {
+                const expirationTime = Date.now() + (response.expiresIn * 1000)
+
+                login(response.accessToken, expirationTime)
                 navigate('/dashboard');
             }
 

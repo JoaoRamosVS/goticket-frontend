@@ -1,7 +1,11 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAuthStore } from "../stores/authStore";
 
 const SessionWatcher = () => {
+  
+  const logout = useAuthStore((state) => state.logout);
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -18,15 +22,13 @@ const SessionWatcher = () => {
         const expirationTime = Number(expirationSorted);
 
         if (now >= expirationTime) {
-          localStorage.removeItem("tokenExpiration");
-          localStorage.removeItem("accessToken");
+          logout();
           navigate("/login");
         }
       }
     };
 
     const intervalID = setInterval(checkSession, 1000);
-
     checkSession();
 
     return () => clearInterval(intervalID);

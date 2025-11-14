@@ -1,28 +1,11 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import type { EventMinDTO, EventMinListDTO } from "../types";
+import TimeLeftCard from "./TimeLeftCard";
 
 const DashboardPage = (): React.ReactNode => {
 
     const [events, setEvents] = useState<EventMinListDTO | null>(null);
-    const [timeLeft, setTimeLeft] = useState<number>(0);
-
-    useEffect(() => {
-        const updateVisualTimer = () => {
-            const expirationSorted = localStorage.getItem('tokenExpiration');
-            if(!expirationSorted) setTimeLeft(0);
-
-            const now = Date.now();
-            const differenceTime = Number(expirationSorted) - now;
-
-            setTimeLeft(differenceTime > 0 ? Math.floor(differenceTime / 1000) : 0)
-        }
-
-        updateVisualTimer();
-        const timer = setInterval(updateVisualTimer, 1000)
-
-        return () => clearInterval(timer);
-    }, []);
 
     useEffect(() => {
         const getEvents = async () => {
@@ -36,7 +19,7 @@ const DashboardPage = (): React.ReactNode => {
         <>
             <h1 className="text-6xl font-bold my-8 text-center">Lista de Eventos</h1>
 
-            <div className="container mx-auto my-8 bg-emerald-800 text-white text-center font-semibold text-2xl p-4 rounded-full">Seu login expira em: {timeLeft} segundos</div>
+            <TimeLeftCard />
 
             <table className="container mx-auto my-8 table-fixed">
                 <thead>
