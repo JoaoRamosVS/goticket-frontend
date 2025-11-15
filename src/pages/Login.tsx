@@ -1,9 +1,10 @@
 import { useState } from "react";
 import type { LoginRequest } from "../types";
-import api from "../services/api";
 import { AxiosError } from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore";
+
+import userService from '../services/user/index'
 
 export default function Login() {
 
@@ -29,7 +30,7 @@ export default function Login() {
                 password
             };
 
-            const response = await api.login(loginData);
+            const response = await userService.login(loginData);
 
             if(response.accessToken && response.expiresIn) {
                 const expirationTime = Date.now() + (response.expiresIn * 1000)

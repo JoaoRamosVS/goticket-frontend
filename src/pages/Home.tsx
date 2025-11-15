@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import api from "../services/api";
 import type { EventMinDTO, EventMinListDTO, UserDTO } from "../types";
 import TimeLeftCard from "../components/TimeLeftCard";
 import { useAuthStore } from "../stores/authStore";
+
+import userService from '../services/user/index'
+import eventService from '../services/event/index'
 
 const Home = () => {
 
@@ -13,7 +15,7 @@ const Home = () => {
 
     useEffect(() => {
         const getEvents = async () => {
-            const eventsResponse: EventMinListDTO = await api.getEvents();
+            const eventsResponse: EventMinListDTO = await eventService.getEvents();
             setEvents(eventsResponse);
         }
         getEvents();
@@ -21,7 +23,7 @@ const Home = () => {
 
     useEffect(() => {
         const getUser = async () => {
-            const loggedUser: UserDTO = await api.getUser();
+            const loggedUser: UserDTO = await userService.getUser();
             setUser(loggedUser);
         }
         getUser();

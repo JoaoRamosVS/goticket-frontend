@@ -1,9 +1,10 @@
 import { useState } from "react";
 import type { ClientDTO } from "../types";
-import api from "../services/api";
 import { AxiosError } from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore";
+
+import clientService from '../services/client/index'
 
 
 const SignUp = () => {
@@ -36,7 +37,7 @@ const SignUp = () => {
         birthDate
       };
 
-      const response = await api.createClient(loginData);
+      const response = await clientService.createClient(loginData);
 
       if (response.accessToken && response.expiresIn) {
         const expirationTime = Date.now() + response.expiresIn * 1000;
