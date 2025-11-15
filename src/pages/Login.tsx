@@ -31,8 +31,6 @@ export default function Login() {
 
             const response = await api.login(loginData);
 
-            console.log(response)
-
             if(response.accessToken && response.expiresIn) {
                 const expirationTime = Date.now() + (response.expiresIn * 1000)
 
@@ -76,7 +74,7 @@ export default function Login() {
 
                 {loginError && <p className="text-red-500">{loginError}</p>}
             </form>
-            <p>Não possui uma conta? <Link to={'/cadastro'}>Cadastre-se</Link></p>
+            <p className="my-6">Não possui uma conta? <Link to={'/cadastro'} className="underline text-blue-400">Cadastre-se</Link></p>
         </div>
     )
 }
