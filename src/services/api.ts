@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { EventMinListDTO, LoginRequest, LoginResponse, UserDTO } from '../types';
+import type { EventMinListDTO, LoginRequest, LoginResponse, UserDTO, ClientDTO } from '../types';
 
 const goTicketApi = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
@@ -33,4 +33,10 @@ const getUser = async(): Promise<UserDTO> => {
     return response.data as UserDTO;
 }
 
-export default { login, getEvents, getUser };
+const createClient = async (clientData: ClientDTO): Promise<LoginResponse> => {
+    const response = await goTicketApi.post('/clients', clientData);
+
+    return response.data as LoginResponse;
+}
+
+export default { login, getEvents, getUser, createClient };
