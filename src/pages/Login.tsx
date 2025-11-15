@@ -59,6 +59,7 @@ export default function Login() {
                     placeholder="Email" 
                     value={email} 
                     onChange={(e) => setEmail(e.target.value)}
+                    required
                 />
 
                 <input className="border border-gray-300 rounded-md p-2"
@@ -66,6 +67,7 @@ export default function Login() {
                     placeholder="Password" 
                     value={password} 
                     onChange={(e) => setPassword(e.target.value)}
+                    required
                 />
 
                 <button type="submit" className="bg-blue-500 text-white rounded-md p-2 cursor-pointer" disabled={isLoading}>

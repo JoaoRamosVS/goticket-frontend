@@ -68,6 +68,7 @@ const SignUp = () => {
           type="email"
           placeholder="Email"
           value={email}
+          required
           onChange={(e) => setEmail(e.target.value)}
         />
 
@@ -76,6 +77,7 @@ const SignUp = () => {
           type="password"
           placeholder="Password"
           value={password}
+          required
           onChange={(e) => setPassword(e.target.value)}
         />
 
@@ -84,6 +86,7 @@ const SignUp = () => {
           type="text"
           placeholder="Nome completo"
           value={fullName}
+          required
           onChange={(e) => setFullName(e.target.value)}
         />
 
@@ -100,6 +103,7 @@ const SignUp = () => {
         <input
           className="border border-gray-300 rounded-md p-2"
           type="text"
+          required
           placeholder="Documento de identificação (CPF)"
           value={identityDocument}
           onChange={(e) => setIdentityDocument(e.target.value)}
@@ -108,6 +112,7 @@ const SignUp = () => {
         <input
           className="border border-gray-300 rounded-md p-2"
           type="date"
+          required
           placeholder="Data de nascimento"
           value={birthDate}
           onChange={(e) => setBirthDate(e.target.value)}
