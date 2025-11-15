@@ -28,3 +28,12 @@ export interface UserDTO {
     role: string;
     status: number;
 }
+
+export interface ClientDTO {
+    email: string;
+    password: string;
+    fullName: string;
+    sex: number;
+    identityDocument: string;
+    birthDate: string;
+}
