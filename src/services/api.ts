@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { EventMinListDTO, LoginRequest, LoginResponse } from '../types';
+import type { EventMinListDTO, LoginRequest, LoginResponse, UserDTO } from '../types';
 
 const goTicketApi = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
@@ -23,4 +23,14 @@ const getEvents = async (): Promise<EventMinListDTO> => {
     return response.data as EventMinListDTO;
 };
 
-export default { login, getEvents };
+const getUser = async(): Promise<UserDTO> => {
+    const response = await goTicketApi.get('/user', {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        }
+    });
+
+    return response.data as UserDTO;
+}
+
+export default { login, getEvents, getUser };

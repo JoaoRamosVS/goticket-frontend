@@ -21,3 +21,10 @@ export interface EventMinListDTO {
     totalElements: number;
     eventMinDTOList: EventMinDTO[];
 }
+
+export interface UserDTO {
+    userId: number;
+    email: string;
+    role: string;
+    status: number;
+}

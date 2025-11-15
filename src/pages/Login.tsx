@@ -2,10 +2,10 @@ import { useState } from "react";
 import type { LoginRequest } from "../types";
 import api from "../services/api";
 import { AxiosError } from "axios";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore";
 
-export default function LoginPage() {
+export default function Login() {
 
     const login = useAuthStore((state) => state.login)
 
@@ -30,6 +30,8 @@ export default function LoginPage() {
             };
 
             const response = await api.login(loginData);
+
+            console.log(response)
 
             if(response.accessToken && response.expiresIn) {
                 const expirationTime = Date.now() + (response.expiresIn * 1000)
@@ -74,6 +76,7 @@ export default function LoginPage() {
 
                 {loginError && <p className="text-red-500">{loginError}</p>}
             </form>
+            <p>Não possui uma conta? <Link to={'/cadastro'}>Cadastre-se</Link></p>
         </div>
     )
 }
