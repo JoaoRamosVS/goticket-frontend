@@ -2,11 +2,14 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import type { EventMinDTO, EventMinListDTO, UserDTO } from "../types";
 import TimeLeftCard from "../components/TimeLeftCard";
+import { useAuthStore } from "../stores/authStore";
 
-const Home = (): React.ReactNode => {
+const Home = () => {
 
     const [events, setEvents] = useState<EventMinListDTO | null>(null);
     const [user, setUser] = useState<UserDTO | null>(null);
+
+    const logout = useAuthStore((state) => state.logout);
 
     useEffect(() => {
         const getEvents = async () => {
@@ -25,9 +28,8 @@ const Home = (): React.ReactNode => {
     }, []);
 
     return (
-        <>
+        <div className="container mx-auto">
             <h1 className="text-6xl font-bold my-8 text-center">Lista de Eventos</h1>
-            <h1 className="text-6xl font-bold my-8 text-center">Seu ID: {user?.userId}</h1>
             <h1 className="text-6xl font-bold my-8 text-center">Seu Email: {user?.email}</h1>
 
             <TimeLeftCard />
@@ -62,7 +64,13 @@ const Home = (): React.ReactNode => {
                     )}
                 </tbody>
             </table>
-        </>
+
+            <button className="bg-red-500 hover:bg-red-800 text-white cursor-pointer font-bold py-2 px-4 rounded-full"
+                onClick={() => logout()}
+            >
+                Desconectar
+            </button>
+        </div>
     )
 }
 
