@@ -32,15 +32,9 @@ const Home = () => {
         logout();
     };
 
-    const getUserInitials = (email: string | undefined) => {
-        if (!email) return "U";
-        return email.charAt(0).toUpperCase();
-    };
-
     return (
         <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
             <div className="container mx-auto px-4 py-8 space-y-8">
-                {/* Header */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
@@ -62,7 +56,7 @@ const Home = () => {
 
                 <Separator />
 
-                {/* User Info Card */}
+
                 <Card className="shadow-md">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
@@ -77,7 +71,7 @@ const Home = () => {
                         <div className="flex items-center gap-4">
                             <Avatar className="size-16 border-2 border-primary/20">
                                 <AvatarFallback className="text-lg font-semibold bg-primary/10 text-primary">
-                                    {getUserInitials(user?.email)}
+                                    {user?.email.charAt(0).toUpperCase()}
                                 </AvatarFallback>
                             </Avatar>
                             <div className="flex-1 space-y-1">
@@ -93,10 +87,8 @@ const Home = () => {
                     </CardContent>
                 </Card>
 
-                {/* Session Timer */}
                 <TimeLeftCard />
 
-                {/* Events Table */}
                 <EventsTable />
             </div>
         </div>

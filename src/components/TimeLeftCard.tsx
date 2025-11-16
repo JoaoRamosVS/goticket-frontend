@@ -38,7 +38,7 @@ const TimeLeftCard = () => {
         }
     };
 
-    const isLowTime = timeLeft < 300; // Less than 5 minutes
+    const isLowTime = timeLeft < 60; // Less than 5 minutes
 
     return (
         <Card className={`border-2 transition-all ${isLowTime ? 'border-destructive shadow-lg shadow-destructive/20' : 'border-primary/50'}`}>
