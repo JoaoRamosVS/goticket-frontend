@@ -1,10 +1,14 @@
 import goTicketApi from "../api";
 import type { EventMinListDTO } from "../../types";
 
-const getEvents = async (): Promise<EventMinListDTO> => {
+const getEvents = async (page: number, pageSize: number): Promise<EventMinListDTO> => {
     const response = await goTicketApi.get('/events', {
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        },
+        params: {
+            page,
+            pageSize
         }
     });
 
