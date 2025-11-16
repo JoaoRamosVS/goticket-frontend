@@ -41,7 +41,7 @@ const TimeLeftCard = () => {
     const isLowTime = timeLeft < 60; // Less than 5 minutes
 
     return (
-        <Card className={`border-2 transition-all py-0 ${isLowTime ? 'border-destructive shadow-lg shadow-destructive/20' : 'border-primary/10'}`}>
+        <Card className={`border-2 transition-all py-0 ${isLowTime ? 'border-destructive/10 shadow-lg shadow-destructive' : 'border-primary/10'}`}>
             <CardContent className="flex items-center justify-between p-6">
                 <div className="flex items-center gap-3">
                     {isLowTime ? (
