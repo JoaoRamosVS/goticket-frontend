@@ -1,4 +1,7 @@
 import { useEffect, useState } from 'react'
+import { Clock, AlertCircle } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 
 const TimeLeftCard = () => {
 
@@ -21,10 +24,46 @@ const TimeLeftCard = () => {
         return () => clearInterval(timer);
     }, []);
 
+    const formatTime = (seconds: number) => {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+        
+        if (hours > 0) {
+            return `${hours}h ${minutes}m ${secs}s`;
+        } else if (minutes > 0) {
+            return `${minutes}m ${secs}s`;
+        } else {
+            return `${secs}s`;
+        }
+    };
+
+    const isLowTime = timeLeft < 300; // Less than 5 minutes
+
     return (
-        <div className="container mx-auto my-8 bg-emerald-800 text-white text-center font-semibold text-2xl p-4 rounded-full">
-            Seu login expira em: {timeLeft} segundos
-        </div>
+        <Card className={`border-2 transition-all ${isLowTime ? 'border-destructive shadow-lg shadow-destructive/20' : 'border-primary/50'}`}>
+            <CardContent className="flex items-center justify-between p-6">
+                <div className="flex items-center gap-3">
+                    {isLowTime ? (
+                        <AlertCircle className={`size-6 ${isLowTime ? 'text-destructive animate-pulse' : 'text-primary'}`} />
+                    ) : (
+                        <Clock className="size-6 text-primary" />
+                    )}
+                    <div>
+                        <p className="text-sm text-muted-foreground font-medium">Sessão expira em</p>
+                        <p className={`text-2xl font-bold ${isLowTime ? 'text-destructive' : 'text-foreground'}`}>
+                            {formatTime(timeLeft)}
+                        </p>
+                    </div>
+                </div>
+                <Badge 
+                    variant={isLowTime ? "destructive" : "secondary"}
+                    className="text-base px-4 py-2"
+                >
+                    {isLowTime ? 'Expirando em breve' : 'Ativo'}
+                </Badge>
+            </CardContent>
+        </Card>
     )
 }
 

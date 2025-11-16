@@ -3,8 +3,15 @@ import type { ClientDTO } from "../types";
 import { AxiosError } from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore";
+import { Mail, Lock, User, Calendar, FileText, Loader2 } from "lucide-react";
 
 import clientService from '../services/client/index'
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 
 const SignUp = () => {
@@ -43,7 +50,7 @@ const SignUp = () => {
         const expirationTime = Date.now() + response.expiresIn * 1000;
 
         login(response.accessToken, expirationTime);
-        navigate("/dashboard");
+        navigate("/home");
       }
     } catch (error) {
       if (
@@ -61,77 +68,149 @@ const SignUp = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <h1 className="text-2xl font-bold mb-4">Cadastro</h1>
-      <form className="flex flex-col gap-4" onSubmit={handleSignUpSubmit}>
-        <input
-          className="border border-gray-300 rounded-md p-2"
-          type="email"
-          placeholder="Email"
-          value={email}
-          required
-          onChange={(e) => setEmail(e.target.value)}
-        />
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-background via-muted/20 to-background p-4">
+      <Card className="w-full max-w-2xl shadow-lg">
+        <CardHeader className="space-y-1 text-center">
+          <CardTitle className="text-3xl font-bold tracking-tight">Criar conta</CardTitle>
+          <CardDescription className="text-base">
+            Preencha os dados abaixo para criar sua conta
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form className="space-y-4" onSubmit={handleSignUpSubmit}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="fullName">Nome completo</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-muted-foreground" />
+                  <Input
+                    id="fullName"
+                    type="text"
+                    placeholder="João Silva"
+                    value={fullName}
+                    required
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
 
-        <input
-          className="border border-gray-300 rounded-md p-2"
-          type="password"
-          placeholder="Password"
-          value={password}
-          required
-          onChange={(e) => setPassword(e.target.value)}
-        />
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="seu@email.com"
+                    value={email}
+                    required
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
 
-        <input
-          className="border border-gray-300 rounded-md p-2"
-          type="text"
-          placeholder="Nome completo"
-          value={fullName}
-          required
-          onChange={(e) => setFullName(e.target.value)}
-        />
+              <div className="space-y-2">
+                <Label htmlFor="password">Senha</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    required
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
 
-        <select
-            className="border border-gray-300 rounded-md p-2"
-            value={sex}
-            onChange={(e) => setSex(Number(e.target.value))}
-        >
-            <option value={3}>Não informado</option>
-            <option value={1}>Masculino</option>
-            <option value={2}>Feminino</option>
-        </select>
+              <div className="space-y-2">
+                <Label htmlFor="identityDocument">CPF</Label>
+                <div className="relative">
+                  <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-muted-foreground" />
+                  <Input
+                    id="identityDocument"
+                    type="text"
+                    required
+                    placeholder="000.000.000-00"
+                    value={identityDocument}
+                    onChange={(e) => setIdentityDocument(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
 
-        <input
-          className="border border-gray-300 rounded-md p-2"
-          type="text"
-          required
-          placeholder="Documento de identificação (CPF)"
-          value={identityDocument}
-          onChange={(e) => setIdentityDocument(e.target.value)}
-        />
+              <div className="space-y-2">
+                <Label htmlFor="birthDate">Data de nascimento</Label>
+                <div className="relative">
+                  <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-muted-foreground" />
+                  <Input
+                    id="birthDate"
+                    type="date"
+                    required
+                    value={birthDate}
+                    onChange={(e) => setBirthDate(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
 
-        <input
-          className="border border-gray-300 rounded-md p-2"
-          type="date"
-          required
-          placeholder="Data de nascimento"
-          value={birthDate}
-          onChange={(e) => setBirthDate(e.target.value)}
-        />
+              <div className="space-y-2">
+                <Label htmlFor="sex">Sexo</Label>
+                <Select
+                  value={sex.toString()}
+                  onValueChange={(value) => setSex(Number(value))}
+                >
+                  <SelectTrigger id="sex" className="w-full">
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="3">Não informado</SelectItem>
+                    <SelectItem value="1">Masculino</SelectItem>
+                    <SelectItem value="2">Feminino</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
 
-        <button
-          type="submit"
-          className="bg-blue-500 text-white rounded-md p-2 cursor-pointer"
-          disabled={isLoading}
-        >
-          {isLoading ? "Carregando..." : "Criar conta"}
-        </button>
+            {signUpError && (
+              <Alert variant="destructive">
+                <AlertDescription>{signUpError}</AlertDescription>
+              </Alert>
+            )}
 
-        {signUpError && <p className="text-red-500">{signUpError}</p>}
-      </form>
-      <p className="my-6">
-        Já possui uma conta? <Link to={"/login"} className="underline text-blue-400">Fazer Login</Link>
-      </p>
+            <Button 
+              type="submit" 
+              className="w-full" 
+              disabled={isLoading}
+              size="lg"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                  Carregando...
+                </>
+              ) : (
+                'Criar conta'
+              )}
+            </Button>
+          </form>
+        </CardContent>
+        <CardFooter className="flex flex-col space-y-4">
+          <div className="text-sm text-center text-muted-foreground">
+            Já possui uma conta?{" "}
+            <Link 
+              to={"/login"} 
+              className="font-medium text-primary hover:underline underline-offset-4"
+            >
+              Fazer Login
+            </Link>
+          </div>
+        </CardFooter>
+      </Card>
     </div>
   );
 };

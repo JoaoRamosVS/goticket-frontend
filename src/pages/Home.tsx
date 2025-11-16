@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { LogOut, User, Mail } from "lucide-react";
 
 import type { UserDTO } from "../types";
 
@@ -6,6 +7,11 @@ import TimeLeftCard from "../components/TimeLeftCard";
 import EventsTable from "../components/EventsTable";
 
 import { useAuthStore } from "../stores/authStore";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 
 import userService from "../services/user/index";
 
@@ -22,18 +28,77 @@ const Home = () => {
         getUser();
     }, []);
 
+    const handleLogout = () => {
+        logout();
+    };
+
+    const getUserInitials = (email: string | undefined) => {
+        if (!email) return "U";
+        return email.charAt(0).toUpperCase();
+    };
+
     return (
-        <div className="container mx-auto">
-            <h1 className="text-6xl font-bold my-8 text-center">
-                Lista de Eventos
-            </h1>
-            <h1 className="text-6xl font-bold my-8 text-center">
-                Seu Email: {user?.email}
-            </h1>
+        <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+            <div className="container mx-auto px-4 py-8 space-y-8">
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                        <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
+                            GoTicket Dashboard
+                        </h1>
+                        <p className="text-muted-foreground mt-2">
+                            Gerencie e visualize seus eventos
+                        </p>
+                    </div>
+                    <Button 
+                        variant="outline" 
+                        onClick={handleLogout}
+                        className="gap-2"
+                    >
+                        <LogOut className="size-4" />
+                        Sair
+                    </Button>
+                </div>
 
-            <TimeLeftCard />
+                <Separator />
 
-            <EventsTable />
+                {/* User Info Card */}
+                <Card className="shadow-md">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <User className="size-5 text-primary" />
+                            Informações do Usuário
+                        </CardTitle>
+                        <CardDescription>
+                            Dados da sua conta
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex items-center gap-4">
+                            <Avatar className="size-16 border-2 border-primary/20">
+                                <AvatarFallback className="text-lg font-semibold bg-primary/10 text-primary">
+                                    {getUserInitials(user?.email)}
+                                </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 space-y-1">
+                                <div className="flex items-center gap-2">
+                                    <Mail className="size-4 text-muted-foreground" />
+                                    <span className="font-medium">{user?.email || "Carregando..."}</span>
+                                </div>
+                                <Badge variant="secondary" className="mt-2">
+                                    Usuário autenticado
+                                </Badge>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Session Timer */}
+                <TimeLeftCard />
+
+                {/* Events Table */}
+                <EventsTable />
+            </div>
         </div>
     );
 };
