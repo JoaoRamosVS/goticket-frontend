@@ -105,7 +105,7 @@ const SignUp = () => {
                     placeholder="seu@email.com"
                     value={email}
                     required
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => setEmail(e.target.value.toLowerCase())}
                     className="pl-10"
                   />
                 </div>
