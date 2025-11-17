@@ -53,8 +53,8 @@ const Navbar = () => {
                                 <ShoppingCart className="size-4" />
                                 Minhas Compras
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
-                                <LogOut className="size-4" />
+                            <DropdownMenuItem className="cursor-pointer" variant="destructive" onClick={handleLogout}>
+                                <LogOut className="size-4 text-destructive" />
                                 Sair
                             </DropdownMenuItem>
                         </DropdownMenuContent>
