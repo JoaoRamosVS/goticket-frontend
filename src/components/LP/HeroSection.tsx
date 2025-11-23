@@ -72,8 +72,10 @@ const HeroSection = ({
 	return (
 		<section className="mt-24 lg:mt-16 min-h-11/12">
 			<div className="container grid items-center gap-10 lg:grid-cols-2 lg:gap-20 lg:mx-auto p-4 pb-16">
-				<div className="mx-auto flex flex-col items-center text-center md:ml-auto lg:max-w-3xl lg:items-start lg:text-left">
-					<h1 className="mb-12 text-pretty xl:leading-24 text-4xl font-black lg:text-6xl xl:text-7xl">
+				<div className="mx-auto flex flex-col items-center text-center md:ml-auto lg:max-w-3xl lg:items-start 
+					lg:text-left bg-card/50 backdrop-blur-3xl border border-white/30 p-8 rounded-4xl shadow-primary-foreground shadow-2xs"
+				>
+					<h1 className="mb-24 text-pretty xl:leading-24 text-4xl font-black lg:text-6xl xl:text-7xl">
 						{heading}
 					</h1>
 					<p className="text-muted-foreground mb-8 max-w-xl lg:text-xl">
@@ -137,7 +139,7 @@ const HeroSection = ({
 				</div>
 				<motion.div
 					animate={{
-						y: [0, 20, 0], // sobe 10px e volta
+						y: [0, -20, 0], // sobe 10px e volta
 					}}
 					transition={{
 						duration: 2, // tempo do ciclo completo
@@ -147,9 +149,9 @@ const HeroSection = ({
 					className="flex"
 				>
 					<img
-						src="https://cdn3d.iconscout.com/3d/premium/thumb/travel-ticket-3d-icon-png-download-5203266.png"
+						src="https://static.vecteezy.com/system/resources/previews/060/574/240/non_2x/light-blue-3d-calendar-icon-with-tick-mark-on-transparent-background-design-free-png.png"
 						alt="placeholder hero"
-						className="max-h-[600px] w-full rounded-md object-cover lg:max-h-[800px] drop-shadow-[0_10px_30px_var(--ring)]"
+						className="max-h-[600px] w-full rounded-md object-cover lg:max-h-[800px] scale-120"
 					/>
 				</motion.div>
 			</div>
