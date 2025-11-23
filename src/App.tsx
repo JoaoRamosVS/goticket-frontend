@@ -6,6 +6,7 @@ import Navbar from './components/Navbar';
 import SmoothScroll from './components/SmoothScroll';
 import { useAuthStore } from './stores/authStore';
 import SignUp from './pages/SignUp';
+import Index from './pages/Index';
 
 function App() {
 
@@ -15,13 +16,9 @@ function App() {
     <BrowserRouter>
       <SmoothScroll>
         <SessionWatcher />
-        {isAuth && <Navbar />}
+        <Navbar />
         <Routes>
-          <Route path="/"
-            element={
-              isAuth ? <Navigate to="/home" replace /> : <Navigate to="/login" replace />
-            }
-          />
+          <Route path="/" element={ <Index /> }/>
           <Route path="/login" element={isAuth ? <Navigate to="/home" replace /> : <Login />}/>
           <Route path="/cadastro" element={isAuth ? <Navigate to="/home" replace /> : <SignUp />} />
           <Route path="/home" element={isAuth ? <Home /> : <Navigate to="/login" replace />} />
