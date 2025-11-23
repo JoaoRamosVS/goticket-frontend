@@ -51,8 +51,9 @@ const Navbar = () => {
 					{isAuth ? (
 						<DropdownMenu modal={false}>
 							<DropdownMenuTrigger>
-								<Button className="rounded-full font-medium hover:bg-transparent hover:text-primary 
-									hover:border hover:border-primary"
+								<Button className="rounded-full font-medium border bg-linear-to-r from-primary to-[#2959b9] hover:text-primary 
+									hover:border-primary hover:bg-transparent hover:from-transparent hover:to-transparent
+									transition-all ease-out duration-500"
 								>
 									<Avatar className="size-5 bg-card rounded-full">
 										<AvatarFallback className="text-2xs font-semibold text-primary px-1">
