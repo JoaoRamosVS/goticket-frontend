@@ -5,6 +5,7 @@ import type { UserDTO } from "../types";
 
 import TimeLeftCard from "../components/TimeLeftCard";
 import EventsTable from "../components/EventsTable";
+import { ParallaxSectionShelf } from "@/components/LP/ParallaxSectionShelf";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -24,7 +25,7 @@ const Home = () => {
     }, []);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background pt-24">
+        <div className="min-h-screen bg-linear-to-br from-background via-muted/20 to-background pt-24">
             <div className="container mx-auto px-4 py-8 space-y-8">
                 <Card className="shadow-md">
                     <CardHeader>
