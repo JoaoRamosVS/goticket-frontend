@@ -36,16 +36,24 @@ const Navbar = () => {
 	return (
 		<nav className="fixed top-0 left-0 right-0 z-50 px-4 py-3">
 			<div className="container mx-auto">
-				<div className="flex items-center justify-between pl-6 pr-3 py-3 rounded-full bg-background/60 backdrop-blur-xl border border-primary-foreground/50 shadow-2xs">
+				<div className="flex items-center justify-between pl-6 pr-3 py-3 rounded-full bg-background/60 
+					backdrop-blur-xl border border-primary-foreground/50 shadow-2xs"
+				>
 					<div>
-						<Link to={'/'} className="text-2xl font-bold tracking-tight bg-linear-to-r from-foreground to-foreground/70 bg-clip-text">
-							GoTicket
+						<Link to={'/'} className="text-2xl font-bold flex gap-2 items-center tracking-tight 
+							bg-linear-to-r from-foreground to-foreground/70 bg-clip-text hover:scale-95 hover:gap-1
+							transition-all ease-out duration-300"
+						>
+							<img src="/GoTicketLogo.png" width={40} height={40} /> GoTicket
 						</Link>
 					</div>
+
 					{isAuth ? (
 						<DropdownMenu modal={false}>
 							<DropdownMenuTrigger>
-								<Button className="rounded-full font-medium hover:bg-transparent hover:text-primary hover:border hover:border-primary">
+								<Button className="rounded-full font-medium hover:bg-transparent hover:text-primary 
+									hover:border hover:border-primary"
+								>
 									<Avatar className="size-5 bg-card rounded-full">
 										<AvatarFallback className="text-2xs font-semibold text-primary px-1">
 											{user?.email
@@ -88,6 +96,7 @@ const Navbar = () => {
 							</Button>
 						</Link>
 					)}
+
 				</div>
 			</div>
 		</nav>
