@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const Navbar = () => {
 	const isAuth = useAuthStore((state) => state.isAuth);
@@ -33,8 +34,33 @@ const Navbar = () => {
 		getUser();
 	}, [isAuth]);
 
+	// Variantes de animação fadeInDown para a navbar
+	const navbarVariants = {
+		hidden: {
+			opacity: 0,
+			y: -80,
+			scale: 0.8,
+		},
+		visible: {
+			opacity: 1,
+			y: 0,
+			scale: 1,
+			transition: {
+				type: "spring" as const,
+				stiffness: 50,
+				damping: 15,
+				mass: 1,
+			},
+		},
+	};
+
 	return (
-		<nav className="fixed top-0 left-0 right-0 z-50 px-4 py-3">
+		<motion.nav
+			initial="hidden"
+			animate="visible"
+			variants={navbarVariants}
+			className="fixed top-0 left-0 right-0 z-50 px-4 py-3"
+		>
 			<div className="container mx-auto">
 				<div className="flex items-center justify-between pl-6 pr-3 py-3 rounded-full bg-background/60 
 					backdrop-blur-xl border border-primary-foreground/50 shadow-2xs"
@@ -100,7 +126,7 @@ const Navbar = () => {
 
 				</div>
 			</div>
-		</nav>
+		</motion.nav>
 	);
 };
 

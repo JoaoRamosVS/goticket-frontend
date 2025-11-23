@@ -69,10 +69,56 @@ const HeroSection = ({
 		],
 	},
 }: HeroSectionProps) => {
+	// Variantes de animação para a caixa de texto (esquerda)
+	const textVariants = {
+		hidden: {
+			opacity: 0,
+			scale: 0,
+			x: -50,
+		},
+		visible: {
+			opacity: 1,
+			scale: 1,
+			x: 0,
+			transition: {
+				type: "spring" as const,
+				stiffness: 80,
+				damping: 15,
+				mass: 1,
+				delay: 0.5
+			},
+		},
+	};
+
+	// Variantes de animação para a imagem (direita)
+	const imageVariants = {
+		hidden: {
+			opacity: 0,
+			scale: 0,
+			x: 50,
+		},
+		visible: {
+			opacity: 1,
+			scale: 1,
+			x: 0,
+			transition: {
+				type: "spring" as const,
+				stiffness: 80,
+				damping: 15,
+				mass: 1,
+				delay: 0.75,
+			},
+		},
+	};
+
 	return (
 		<section className="mt-24 lg:mt-16 min-h-11/12">
 			<div className="container grid items-center gap-10 lg:grid-cols-2 lg:gap-20 lg:mx-auto p-4">
-				<div className="mx-auto flex flex-col items-center text-center md:ml-auto lg:max-w-3xl lg:items-start 
+				<motion.div
+					initial="hidden"
+					animate="visible"
+					variants={textVariants}
+					className="mx-auto flex flex-col items-center text-center md:ml-auto lg:max-w-3xl lg:items-start 
 					lg:text-left"
 				>
 					<h1 className="mb-12 text-pretty xl:leading-24 text-4xl font-black lg:text-6xl xl:text-7xl">
@@ -136,16 +182,11 @@ const HeroSection = ({
 							</Button>
 						)}
 					</div>
-				</div>
+				</motion.div>
 				<motion.div
-					animate={{
-						y: [0, -20, 0], // sobe 10px e volta
-					}}
-					transition={{
-						duration: 2, // tempo do ciclo completo
-						ease: "easeInOut",
-						repeat: Infinity, // loop infinito
-					}}
+					initial="hidden"
+					animate="visible"
+					variants={imageVariants}
 					className="flex"
 				>
 					<img
