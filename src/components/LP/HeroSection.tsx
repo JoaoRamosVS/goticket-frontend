@@ -1,4 +1,5 @@
 import { ArrowUpRight, Star } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,7 @@ import { Link } from "react-router-dom";
 
 interface HeroSectionProps {
 	heading?: string;
+	headingSubTitle?: string;
 	description?: string;
 	buttons?: {
 		primary?: {
@@ -30,7 +32,8 @@ interface HeroSectionProps {
 }
 
 const HeroSection = ({
-	heading = "Seu ingresso aqui. Em 1 clique.",
+	heading = "Seu ingresso aqui.",
+	headingSubTitle = "Em 1 clique.",
 	description = "Esqueça burocracia, lentidão e plataformas confusas. Criamos a forma mais rápida, elegante e intuitiva de criar, vender e gerir ingressos: Tudo em uma experiência que parece mágica.",
 	buttons = {
 		primary: {
@@ -69,6 +72,39 @@ const HeroSection = ({
 		],
 	},
 }: HeroSectionProps) => {
+	const [displayedText, setDisplayedText] = useState("");
+	const [showCursor, setShowCursor] = useState(true);
+
+	useEffect(() => {
+		// Delay de 1 segundo antes de começar a escrever
+		const startDelay = setTimeout(() => {
+			let currentIndex = 0;
+			const fullText = headingSubTitle;
+
+			const typeInterval = setInterval(() => {
+				if (currentIndex < fullText.length) {
+					setDisplayedText(fullText.slice(0, currentIndex + 1));
+					currentIndex++;
+				} else {
+					clearInterval(typeInterval);
+					// Cursor continua piscando após terminar
+				}
+			}, 125);
+
+			return () => clearInterval(typeInterval);
+		}, 1000);
+
+		// Animação do cursor piscante
+		const cursorInterval = setInterval(() => {
+			setShowCursor((prev) => !prev);
+		}, 530);
+
+		return () => {
+			clearTimeout(startDelay);
+			clearInterval(cursorInterval);
+		};
+	}, [headingSubTitle]);
+
 	// Variantes de animação para a caixa de texto (esquerda)
 	const textVariants = {
 		hidden: {
@@ -90,30 +126,11 @@ const HeroSection = ({
 		},
 	};
 
-	// Variantes de animação para a imagem (direita)
-	const imageVariants = {
-		hidden: {
-			opacity: 0,
-			scale: 0,
-			x: 50,
-		},
-		visible: {
-			opacity: 1,
-			scale: 1,
-			x: 0,
-			transition: {
-				type: "spring" as const,
-				stiffness: 80,
-				damping: 15,
-				mass: 1,
-				delay: 0.75,
-			},
-		},
-	};
 
 	return (
 		<section className="mt-24 lg:mt-16 min-h-11/12">
 			<div className="container grid items-center gap-10 lg:grid-cols-2 lg:gap-20 lg:mx-auto p-4">
+				
 				<motion.div
 					initial="hidden"
 					animate="visible"
@@ -121,12 +138,30 @@ const HeroSection = ({
 					className="mx-auto flex flex-col items-center text-center md:ml-auto lg:max-w-3xl lg:items-start 
 					lg:text-left"
 				>
-					<h1 className="mb-12 text-pretty xl:leading-24 text-4xl font-black lg:text-6xl xl:text-7xl">
+					<h1 className="mb-2 text-pretty xl:leading-24 text-4xl font-black lg:text-6xl xl:text-7xl">
 						{heading}
 					</h1>
+
+					<h1 className="mb-8 text-4xl font-black lg:text-6xl xl:text-7xl">
+						<span className="bg-linear-to-r from-blue-600 via-cyan-500 to-primary bg-clip-text text-transparent">
+							{displayedText}
+						</span>
+						<span
+							className={`inline-block bg-cyan-500/40 bg-clip-text w-auto text-transparent ${
+								showCursor ? "opacity-100" : "opacity-0"
+							}`}
+							style={{
+								transition: "opacity 0.1s",
+							}}
+						>
+							|
+						</span>
+					</h1>
+
 					<p className="text-muted-foreground mb-8 max-w-xl lg:text-xl">
 						{description}
 					</p>
+
 					<div className="mb-12 flex w-fit flex-col items-center gap-4 sm:flex-row">
 						<span className="inline-flex items-center -space-x-4">
 							{reviews.avatars.map((avatar, index) => (
@@ -155,6 +190,7 @@ const HeroSection = ({
 							</p>
 						</div>
 					</div>
+
 					<div className="flex w-full flex-col justify-center gap-2 sm:flex-row lg:justify-start">
 						{buttons.primary && (
 							<Button
@@ -183,10 +219,49 @@ const HeroSection = ({
 						)}
 					</div>
 				</motion.div>
+
 				<motion.div
-					initial="hidden"
-					animate="visible"
-					variants={imageVariants}
+					initial={{
+						opacity: 0,
+						scale: 0,
+						x: 50,
+					}}
+					animate={{
+						opacity: 1,
+						scale: 1,
+						x: 0,
+						y: [0, -20, 0],
+					}}
+					transition={{
+						opacity: {
+							type: "spring" as const,
+							stiffness: 80,
+							damping: 15,
+							mass: 1,
+							delay: 0.75,
+						},
+						scale: {
+							type: "spring" as const,
+							stiffness: 80,
+							damping: 15,
+							mass: 1,
+							delay: 0.75,
+						},
+						x: {
+							type: "spring" as const,
+							stiffness: 80,
+							damping: 15,
+							mass: 1,
+							delay: 0.75,
+						},
+						y: {
+							duration: 2,
+							repeat: Infinity,
+							repeatType: "reverse" as const,
+							ease: "easeInOut",
+							delay: 1.5,
+						},
+					}}
 					className="flex"
 				>
 					<img
