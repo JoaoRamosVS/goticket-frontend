@@ -67,7 +67,7 @@ const FeaturesSection = () => {
   return (
     <section className="py-16 lg:py-24 px-4 relative overflow-hidden">
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent" />
+      <div className="absolute inset-0 bg-linear-to-b from-transparent via-primary/5 to-transparent" />
       
       <div className="container mx-auto max-w-7xl relative z-10">
         <motion.div
@@ -80,7 +80,7 @@ const FeaturesSection = () => {
           <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
             Funcionalidades
           </Badge>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 bg-gradient-to-r from-primary via-cyan-500 to-blue-700 bg-clip-text text-transparent">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 bg-linear-to-r from-primary via-cyan-500 to-blue-700 bg-clip-text text-transparent">
             Tudo que você precisa
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
@@ -103,7 +103,7 @@ const FeaturesSection = () => {
                   <CardHeader>
                     <motion.div
                       whileHover={{ scale: 1.1, rotate: 5 }}
-                      className="w-14 h-14 rounded-2xl bg-gradient-to-br p-3 mb-4 group-hover:shadow-lg group-hover:shadow-primary/30"
+                      className="w-14 h-14 rounded-2xl bg-linear-to-br p-3 mb-4 group-hover:shadow-lg group-hover:shadow-primary/30"
                       style={{
                         background: `linear-gradient(135deg, var(--primary), var(--secondary))`,
                       }}

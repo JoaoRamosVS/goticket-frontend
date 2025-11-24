@@ -59,7 +59,7 @@ const TestimonialsSection = () => {
   return (
     <section className="py-16 lg:py-24 px-4 relative overflow-hidden">
       {/* Background decoration */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent" />
+      <div className="absolute inset-0 bg-linear-to-b from-transparent via-primary/5 to-transparent" />
       
       <div className="container mx-auto max-w-7xl relative z-10">
         <motion.div
@@ -74,7 +74,7 @@ const TestimonialsSection = () => {
           </Badge>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6">
             O que nossos{" "}
-            <span className="bg-gradient-to-r from-primary via-cyan-400 to-blue-500 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-primary via-cyan-400 to-blue-500 bg-clip-text text-transparent">
               clientes dizem
             </span>
           </h2>

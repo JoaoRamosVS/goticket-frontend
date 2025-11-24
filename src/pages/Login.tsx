@@ -58,7 +58,7 @@ export default function Login() {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-background via-muted/20 to-background p-4">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-linear-to-br from-background via-muted/20 to-background p-4">
             <Card className="w-full max-w-md shadow-lg">
                 <CardHeader className="space-y-1 text-center">
                     <CardTitle className="text-3xl font-bold tracking-tight">Bem-vindo de volta</CardTitle>

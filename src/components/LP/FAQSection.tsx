@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, HelpCircle } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 const faqs = [
   {
@@ -48,7 +48,7 @@ const FAQSection = () => {
 
   return (
     <section className="py-16 lg:py-24 px-4 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent" />
+      <div className="absolute inset-0 bg-linear-to-b from-transparent via-primary/5 to-transparent" />
       
       <div className="container mx-auto max-w-4xl relative z-10">
         <motion.div
@@ -98,7 +98,7 @@ const FAQSection = () => {
                           rotate: openIndex === index ? 180 : 0,
                         }}
                         transition={{ duration: 0.3 }}
-                        className="flex-shrink-0"
+                        className="shrink-0"
                       >
                         <ChevronDown className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
                       </motion.div>

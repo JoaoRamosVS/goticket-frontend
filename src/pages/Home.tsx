@@ -5,7 +5,6 @@ import type { UserDTO } from "../types";
 
 import TimeLeftCard from "../components/TimeLeftCard";
 import EventsTable from "../components/EventsTable";
-import { ParallaxSectionShelf } from "@/components/LP/ParallaxSectionShelf";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";

@@ -7,7 +7,6 @@ import { Link } from "react-router-dom";
 const CTASection = () => {
   return (
     <section className="py-16 lg:py-24 px-4 relative overflow-hidden">
-      {/* Background gradient from transparent to blue */}
       <div className="absolute inset-0 bg-linear-to-b from-transparent via-primary/5 to-primary/60" />
       
       <div className="container mx-auto max-w-5xl relative z-10">
