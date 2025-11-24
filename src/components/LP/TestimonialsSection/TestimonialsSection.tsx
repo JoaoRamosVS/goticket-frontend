@@ -4,58 +4,17 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Star, Quote } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
-const testimonials = [
-  {
-    name: "Maria Silva",
-    role: "Organizadora de Eventos",
-    company: "Festival Tech",
-    image: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-1.webp",
-    rating: 5,
-    text: "A GoTicket transformou completamente como organizo meus eventos. A interface é intuitiva, o suporte é excepcional e as vendas aumentaram 300% desde que comecei a usar.",
-  },
-  {
-    name: "João Santos",
-    role: "CEO",
-    company: "Eventos Premium",
-    image: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-2.webp",
-    rating: 5,
-    text: "Nunca vi uma plataforma tão completa e fácil de usar. O sistema de analytics nos dá insights valiosos e o check-in digital economiza horas de trabalho.",
-  },
-  {
-    name: "Ana Costa",
-    role: "Produtora Cultural",
-    company: "Cultura Viva",
-    image: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-3.webp",
-    rating: 5,
-    text: "Como produtora de eventos culturais, preciso de algo confiável e profissional. A GoTicket superou todas as expectativas. Recomendo para qualquer tipo de evento!",
-  },
-  {
-    name: "Carlos Oliveira",
-    role: "Fundador",
-    company: "Startup Weekend",
-    image: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-4.webp",
-    rating: 5,
-    text: "A melhor decisão que tomamos foi migrar para a GoTicket. O processo é simples, os relatórios são detalhados e nossos participantes adoram a experiência.",
-  },
-  {
-    name: "Fernanda Lima",
-    role: "Diretora de Marketing",
-    company: "Mega Eventos",
-    image: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-5.webp",
-    rating: 5,
-    text: "A plataforma é incrível! Conseguimos gerenciar múltiplos eventos simultaneamente sem complicação. O suporte ao cliente é rápido e sempre resolve nossos problemas.",
-  },
-  {
-    name: "Roberto Alves",
-    role: "Organizador",
-    company: "Festival de Música",
-    image: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-1.webp",
-    rating: 5,
-    text: "O sistema de vendas é perfeito. Integração com pagamentos funcionou perfeitamente e o check-in no dia do evento foi super rápido. Nossos participantes ficaram impressionados!",
-  },
-];
+import type { TestimonialsSectionProps } from "./types";
+import { testimonialsSectionSchema } from "./schema";
+import { headerVariants, getCardVariants } from "./animations";
 
-const TestimonialsSection = () => {
+const TestimonialsSection = ({
+	badge = testimonialsSectionSchema.badge,
+	heading = testimonialsSectionSchema.heading,
+	headingHighlight = testimonialsSectionSchema.headingHighlight,
+	description = testimonialsSectionSchema.description,
+	testimonials = testimonialsSectionSchema.testimonials,
+}: TestimonialsSectionProps) => {
   return (
     <section className="py-16 lg:py-24 px-4 relative overflow-hidden">
       {/* Background decoration */}
@@ -63,23 +22,23 @@ const TestimonialsSection = () => {
       
       <div className="container mx-auto max-w-7xl relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial="hidden"
+          whileInView="visible"
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          variants={headerVariants}
           className="text-center mb-16"
         >
           <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
-            Depoimentos
+            {badge}
           </Badge>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6">
-            O que nossos{" "}
+            {heading}{" "}
             <span className="bg-linear-to-r from-primary via-cyan-400 to-blue-500 bg-clip-text text-transparent">
-              clientes dizem
+              {headingHighlight}
             </span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Diversos organizadores confiam na GoTicket para seus eventos
+            {description}
           </p>
         </motion.div>
 
@@ -87,10 +46,10 @@ const TestimonialsSection = () => {
           {testimonials.map((testimonial, index) => (
             <motion.div
               key={testimonial.name}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial="hidden"
+              whileInView="visible"
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              variants={getCardVariants(index)}
             >
               <Card className="h-full bg-card/50 backdrop-blur-3xl border border-white/30 p-6 hover:border-primary/10 transition-all duration-300 hover:shadow-sm hover:shadow-primary/20 hover:-translate-y-2 relative group">
                 {/* Quote icon decoration */}
