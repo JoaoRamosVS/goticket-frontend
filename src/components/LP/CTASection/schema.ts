@@ -1,7 +1,7 @@
 import type { CTASectionContent } from "./types";
 
 export const ctaSectionSchema: CTASectionContent = {
-	heading: "E ai, tá pronto para",
+	heading: "E aí, acha que tá pronto pra",
 	headingHighlight: "transformar",
 	description: "Junte-se a milhares de organizadores que já estão criando eventos incríveis com a GoTicket. Comece grátis hoje mesmo!",
 	primaryButton: {
