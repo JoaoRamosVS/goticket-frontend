@@ -57,7 +57,7 @@ const FAQSection = ({
               <Card className="bg-card/50 backdrop-blur-3xl shadow-lg py-2 border border-white/30 hover:border-primary/20 transition-all ease-in-out duration-500 overflow-hidden group">
                 <button
                   onClick={() => toggleFAQ(index)}
-                  className="w-full text-left"
+                  className="w-full text-left cursor-pointer"
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between gap-4">
