@@ -1,11 +1,11 @@
 import { useState } from "react";
-import type { ClientDTO } from "../types";
+import type { ClientDTO } from "@/types";
 import { AxiosError } from "axios";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuthStore } from "../stores/authStore";
+import { useAuthStore } from "@/stores/authStore";
 import { Mail, Lock, User, Calendar, FileText, Loader2 } from "lucide-react";
 
-import clientService from '../services/client/index'
+import clientService from "@/services/client/index"
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

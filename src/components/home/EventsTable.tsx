@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import type { EventMinDTO, EventMinListDTO } from "../types";
-import eventService from "../services/event/index";
+import type { EventMinDTO, EventMinListDTO } from "../../types";
+import eventService from "../../services/event/index";
 import { ChevronLeft, ChevronRight, Calendar, Hash, FileText } from "lucide-react";
 import {
 	Table,

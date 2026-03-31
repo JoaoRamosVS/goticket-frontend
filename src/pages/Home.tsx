@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import { User, Mail } from "lucide-react";
 
-import type { UserDTO } from "../types";
+import type { UserDTO } from "@/types";
 
-import TimeLeftCard from "../components/TimeLeftCard";
-import EventsTable from "../components/EventsTable";
+import TimeLeftCard from "@/components/home/TimeLeftCard";
+import EventsTable from "@/components/home/EventsTable";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
-import userService from "../services/user/index";
+import userService from "@/services/user/index";
 
 const Home = () => {
     const [user, setUser] = useState<UserDTO | null>(null);

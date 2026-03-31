@@ -1,5 +1,5 @@
-import goTicketApi from "../api";
-import type { EventMinListDTO } from "../../types";
+import goTicketApi from "@/services/api";
+import type { EventMinListDTO } from "@/types";
 
 const getEvents = async (page: number, pageSize: number): Promise<EventMinListDTO> => {
     const response = await goTicketApi.get('/events', {

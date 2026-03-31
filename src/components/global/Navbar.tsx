@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
-import { useAuthStore } from "../stores/authStore";
-import type { UserDTO } from "../types";
-import userService from "../services/user/index";
+import { useAuthStore } from "@/stores/authStore";
+import type { UserDTO } from "@/types";
+import userService from "@/services/user/index";
 
 import { Button } from "@/components/ui/button";
 import { LogIn, LogOut, ShoppingCart, User } from "lucide-react";

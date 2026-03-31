@@ -1,5 +1,5 @@
-import goTicketApi from "../api";
-import type { LoginRequest, LoginResponse, UserDTO } from "../../types";
+import goTicketApi from "@/services/api";
+import type { LoginRequest, LoginResponse, UserDTO } from "@/types";
 
 const login = async (loginData: LoginRequest): Promise<LoginResponse> => {
   const response = await goTicketApi.post("/login", loginData);

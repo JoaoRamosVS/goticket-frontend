@@ -1,11 +1,11 @@
 import { useState } from "react";
-import type { LoginRequest } from "../types";
+import type { LoginRequest } from "@/types";
 import { AxiosError } from "axios";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuthStore } from "../stores/authStore";
+import { useAuthStore } from "@/stores/authStore";
 import { Mail, Lock, Loader2 } from "lucide-react";
 
-import userService from '../services/user/index'
+import userService from "@/services/user/index"
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
