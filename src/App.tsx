@@ -15,7 +15,7 @@ function App() {
   return (
     <BrowserRouter>
       <SmoothScroll>
-        <SessionWatcher />
+        {/* <SessionWatcher /> */}
         <Navbar />
         <Routes>
           <Route path="/" element={ <Index /> }/>
