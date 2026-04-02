@@ -1,7 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import Login from '@/pages/Login'
 import Home from '@/pages/Home'
-import SessionWatcher from '@/components/global/SessionWatcher';
+// import SessionWatcher from '@/components/global/SessionWatcher';
 import Navbar from '@/components/global/Navbar';
 import SmoothScroll from '@/components/global/SmoothScroll';
 import { useAuthStore } from '@/stores/authStore';

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Globe, Phone, ArrowRight, Facebook, Instagram, Linkedin, Send } from "lucide-react";
 import { useState } from "react";
 
@@ -32,12 +32,16 @@ const SOCIALS = [
 ];
 
 const Footer = () => {
+
+    const location = useLocation();
+    if(location.pathname === "/") return null;
+
     const [email, setEmail] = useState("");
 
     return (
-        <footer className="relative w-full px-4 pb-6 pt-10 sm:px-8">
+        <footer className="relative w-full px-4 pb-6 pt-10 sm:px-8 bg-linear-to-b from-transparent via-primary/5 to-primary/60">
             <div
-                className="relative mx-auto max-w-7xl overflow-hidden rounded-[36px] border border-white/60 bg-white/30 backdrop-blur-2xl sm:rounded-[48px]"
+                className="relative mx-auto max-w-7xl overflow-hidden rounded-[36px] border border-white/60 bg-white/60 backdrop-blur-2xl sm:rounded-[48px]"
                 style={{
                     boxShadow:
                         "0 8px 40px -10px rgba(0,46,71,0.08), 0 2px 12px -4px rgba(0,46,71,0.05), inset 0 1px 0 0 rgba(255,255,255,0.8)",
@@ -80,7 +84,7 @@ const Footer = () => {
                 <div className="grid grid-cols-1 gap-10 px-8 py-10 sm:grid-cols-2 sm:px-12 lg:grid-cols-4">
                     {/* Links Rápidos */}
                     <div className="flex flex-col gap-4">
-                        <h4 className="text-base font-bold italic text-[#002233]">Links Rápidos</h4>
+                        <h4 className="text-base font-bold italic">Links Rápidos</h4>
                         <ul className="flex flex-col gap-2.5">
                             {QUICK_LINKS.map((link) => (
                                 <li key={link.label}>
@@ -97,7 +101,7 @@ const Footer = () => {
 
                     {/* Para Usuários */}
                     <div className="flex flex-col gap-4">
-                        <h4 className="text-base font-bold italic text-[#002233]">Para Usuários</h4>
+                        <h4 className="text-base font-bold italic">Para Usuários</h4>
                         <ul className="flex flex-col gap-2.5">
                             {USER_LINKS.map((link) => (
                                 <li key={link.label}>
@@ -114,7 +118,7 @@ const Footer = () => {
 
                     {/* Entre em Contato */}
                     <div className="flex flex-col gap-4">
-                        <h4 className="text-base font-bold italic text-[#002233]">Entre em Contato</h4>
+                        <h4 className="text-base font-bold italic">Entre em Contato</h4>
                         <div className="flex flex-col gap-3">
                             <a
                                 href="mailto:suporte@goticket.com.br"
@@ -148,13 +152,13 @@ const Footer = () => {
 
                     {/* Newsletter */}
                     <div className="flex flex-col gap-4">
-                        <h4 className="text-base font-bold italic text-[#002233]">
-                            Receba novidades<br />no seu email
+                        <h4 className="text-base font-bold italic">
+                            Receba novidades<br />através da nossa newsletter!
                         </h4>
                         <div className="flex flex-col gap-3">
                             <input
                                 type="email"
-                                placeholder="Email adanosso email"
+                                placeholder="Digite seu email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 className="rounded-xl border border-white/60 bg-white/50 px-4 py-2.5 text-sm text-[#002233] placeholder:text-[#5e6c87]/60 shadow-sm backdrop-blur-md outline-none transition-all duration-200 focus:border-primary/40 focus:ring-2 focus:ring-primary/15"
