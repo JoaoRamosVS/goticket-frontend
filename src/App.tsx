@@ -7,6 +7,7 @@ import SmoothScroll from '@/components/global/SmoothScroll';
 import { useAuthStore } from '@/stores/authStore';
 import SignUp from '@/pages/SignUp';
 import Index from '@/pages/Index';
+import Footer from '@/components/global/Footer';
 
 function App() {
 
@@ -17,12 +18,15 @@ function App() {
       <SmoothScroll>
         {/* <SessionWatcher /> */}
         <Navbar />
+        
         <Routes>
           <Route path="/" element={ <Index /> }/>
           <Route path="/login" element={isAuth ? <Navigate to="/home" replace /> : <Login />}/>
           <Route path="/cadastro" element={isAuth ? <Navigate to="/home" replace /> : <SignUp />} />
           <Route path="/home" element={isAuth ? <Home /> : <Navigate to="/login" replace />} />
         </Routes>
+        
+        <Footer />
       </SmoothScroll>
     </BrowserRouter>
   )

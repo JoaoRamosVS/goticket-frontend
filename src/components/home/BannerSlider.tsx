@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, MapPin, ChevronRight as ArrowIcon } from "lucide-react";
 
 type BannerItem = {
     id: number;
-    subtitle: string;
     title: string;
+    date: string;
+    location: string;
     cta: string;
     imageUrl: string;
 };
@@ -12,24 +13,27 @@ type BannerItem = {
 const BANNERS: BannerItem[] = [
     {
         id: 1,
-        subtitle: "Summer Festival",
-        title: "Os Melhores Eventos Estão Aqui. Não perca!",
-        cta: "Comprar Ingressos",
+        title: "GoTicket Music Festival – São Paulo",
+        date: "12 de Junho de 2024",
+        location: "Allianz Parque, São Paulo, SP",
+        cta: "Garanta seu ingresso",
         imageUrl:
             "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1600&q=80",
     },
     {
         id: 2,
-        subtitle: "Tech Conference",
-        title: "Conecte-se com as maiores inovações do mercado.",
+        title: "Tech Summit – Inovação e Futuro",
+        date: "25 de Julho de 2024",
+        location: "Expo Center Norte, São Paulo, SP",
         cta: "Ver Agenda",
         imageUrl:
             "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1600&q=80",
     },
     {
         id: 3,
-        subtitle: "Live Concert",
-        title: "Uma noite inesquecível com artistas incríveis.",
+        title: "Rock in Concert – Edição Especial",
+        date: "18 de Agosto de 2024",
+        location: "Pedreira Paulo Leminski, Curitiba, PR",
         cta: "Reservar Lugar",
         imageUrl:
             "https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=1600&q=80",
@@ -39,7 +43,7 @@ const BANNERS: BannerItem[] = [
 const TRANSITION_MS = 700;
 const AUTOPLAY_MS = 5500;
 const SLIDE_WIDTH_RATIO = 0.76;
-const GAP_PX = 16;
+const GAP_PX = 12;
 const DRAG_THRESHOLD_PX = 56;
 
 function getRealBannerIndex(currentIndex: number, total: number): number {
@@ -223,7 +227,7 @@ const BannerSlider = () => {
                 <div
                     ref={viewportRef}
                     className={`relative min-h-[280px] overflow-hidden py-6 sm:min-h-[320px] ${
-                        isDragging ? "cursor-grabbing touch-pan-y select-none" : "cursor-grab touch-pan-y"
+                        isDragging ? "touch-pan-y select-none" : "touch-pan-y"
                     }`}
                     onPointerDown={onPointerDown}
                     onPointerMove={onPointerMove}
@@ -253,31 +257,57 @@ const BannerSlider = () => {
                                                 : undefined,
                                         flex: "0 0 auto",
                                     }}
-                                    className={`relative min-h-[260px] overflow-hidden shadow-2xl sm:min-h-[620px] rounded-4xl bg-white/20 backdrop-blur-3xl ${
+                                    className={`relative min-h-[460px] overflow-hidden shadow-2xl sm:min-h-[620px] rounded-[32px] sm:rounded-[96px] bg-white/20 backdrop-blur-3xl ${
                                         isActive
                                             ? "z-1 scale-100 opacity-100 blur-0"
                                             : "z-0 scale-[0.96] opacity-55 blur-[2px]"
-                                    } transition-all duration-700 ease-out`}
+                                    } transition-all duration-700 ease-out hover:scale-95`}
                                 >
                                     <img
                                         src={banner.imageUrl}
                                         alt={banner.title}
-                                        className="absolute inset-0 size-full object-cover brightness-50 blur-xs"
+                                        className="absolute inset-0 size-full object-cover brightness-75"
                                         draggable={false}
                                     />
 
-                                    <p className="text-xs font-medium text-slate-800 sm:text-sm">
-                                        {banner.subtitle}
-                                    </p>
-                                    <h2 className="mx-auto mt-2 max-w-xl text-lg font-bold leading-tight text-slate-900 sm:text-2xl">
-                                        {banner.title}
-                                    </h2>
-                                    <button
-                                        type="button"
-                                        className="mt-3 rounded-full bg-white/80 px-5 py-2 text-xs font-semibold text-slate-800 shadow-sm transition-colors hover:bg-white sm:text-sm"
-                                    >
-                                        {banner.cta}
-                                    </button>
+                                    <div className="absolute inset-0 flex items-center justify-center p-6 sm:p-10">
+                                        <div
+                                            className="flex w-full max-w-xl flex-col gap-4 rounded-[28px] border border-white/16 px-7 py-6 sm:px-10 sm:py-8"
+                                            style={{
+                                                background: "rgba(255, 255, 255, 0.21)",
+                                                boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
+                                                backdropFilter: "blur(10px)",
+                                                WebkitBackdropFilter: "blur(10px)",
+                                            }}
+                                        >
+                                            <h2 className="text-lg font-bold leading-tight text-white drop-shadow-md sm:text-4xl">
+                                                {banner.title}
+                                            </h2>
+
+                                            <div className="flex flex-col gap-1.5">
+                                                <div className="flex items-center gap-2 text-sm sm:text-md text-white/85">
+                                                    <Calendar className="size-4 shrink-0" />
+                                                    <span>{banner.date}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2 text-sm sm:text-md text-white/85">
+                                                    <MapPin className="size-4 shrink-0" />
+                                                    <span>{banner.location}</span>
+                                                </div>
+                                            </div>
+
+                                            <button
+                                                type="button"
+                                                className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-xl px-4 md:px-12 py-2.5 text-md md:text-lg  font-bold text-white shadow-md transition-all duration-300 hover:brightness-110 hover:shadow-lg"
+                                                style={{
+                                                    background: "linear-gradient(135deg, #4db8e8 0%, #2a8fd4 50%, #1c6fb5 100%)",
+                                                    boxShadow: "0 4px 14px -3px rgba(42,143,212,0.45)",
+                                                }}
+                                            >
+                                                {banner.cta}
+                                                <ArrowIcon className="size-4" />
+                                            </button>
+                                        </div>
+                                    </div>
                                 </article>
                             );
                         })}
@@ -292,7 +322,7 @@ const BannerSlider = () => {
                     aria-label="Banner anterior"
                     onClick={goPrev}
                     disabled={isTransitioning}
-                    className="absolute top-1/2 left-0 z-3 -translate-y-1/2 rounded-full border border-white/40 bg-white/50 p-2.5 text-slate-800 shadow-md backdrop-blur-md transition hover:bg-white/70 disabled:opacity-40 sm:left-2"
+                    className="absolute cursor-pointer top-1/2 left-4 z-3 -translate-y-1/2 rounded-full border border-white/40 bg-white/50 p-2.5 text-slate-800 shadow-md backdrop-blur-md transition hover:bg-white/70 disabled:opacity-40 sm:left-10"
                 >
                     <ChevronLeft className="size-5" />
                 </button>
@@ -302,17 +332,17 @@ const BannerSlider = () => {
                     aria-label="Próximo banner"
                     onClick={goNext}
                     disabled={isTransitioning}
-                    className="absolute top-1/2 right-0 z-3 -translate-y-1/2 rounded-full border border-white/40 bg-white/50 p-2.5 text-slate-800 shadow-md backdrop-blur-md transition hover:bg-white/70 disabled:opacity-40 sm:right-2"
+                    className="absolute cursor-pointer top-1/2 right-4 z-3 -translate-y-1/2 rounded-full border border-white/40 bg-white/50 p-2.5 text-slate-800 shadow-md backdrop-blur-md transition hover:bg-white/70 disabled:opacity-40 sm:right-10"
                 >
                     <ChevronRight className="size-5" />
                 </button>
 
                 <div
-                    className="relative z-3 mt-6 flex items-center justify-center"
+                    className="absolute left-1/2 bottom-12 z-3 mt-6 flex items-center justify-center"
                     role="tablist"
                     aria-label="Slides do banner"
                 >
-                    <div className="flex items-center justify-center gap-2 py-1 px-4 bg-primary/10 backdrop-blur-3xl shadow-xl rounded-full">
+                    <div className="flex items-center justify-center gap-2 py-1 px-4 bg-primary/5 backdrop-blur-xl shadow-2xl rounded-full">
                     {BANNERS.map((banner, index) => {
                         const isActive = activeDotIndex === index;
 
@@ -326,7 +356,7 @@ const BannerSlider = () => {
                                 onClick={() => goToBanner(index)}
                                 className={`h-3 cursor-pointer rounded-full transition-all shadow-lg ${
                                     isActive
-                                        ? "w-8 bg-primary/40"
+                                        ? "w-8 bg-primary/70"
                                         : "w-3 bg-white"
                                 }`}
                             />
