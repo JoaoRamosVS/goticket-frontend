@@ -12,6 +12,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
+import decodeJwtPayload from "@/helpers/DecodeJWT";
+
 export default function Login() {
 
     const login = useAuthStore((state) => state.login)
@@ -40,8 +42,9 @@ export default function Login() {
 
             if(response.accessToken && response.expiresIn) {
                 const expirationTime = Date.now() + (response.expiresIn * 1000)
+                const decodedPayload = decodeJwtPayload(response.accessToken);
 
-                login(response.accessToken, expirationTime)
+                login(response.accessToken, expirationTime, decodedPayload.name as string);
                 navigate('/home');
             }
 

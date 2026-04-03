@@ -18,6 +18,7 @@ import { motion } from "framer-motion";
 
 const Navbar = () => {
 	const isAuth = useAuthStore((state) => state.isAuth);
+	const userFullName = useAuthStore((state) => state.userFullName);
 
 	const logout = useAuthStore((state) => state.logout);
 	const handleLogout = () => {
@@ -76,20 +77,20 @@ const Navbar = () => {
 
 					{isAuth ? (
 						<DropdownMenu modal={false}>
-							<DropdownMenuTrigger>
+							<DropdownMenuTrigger asChild={true}>
 								<Button className="rounded-full font-medium bg-linear-to-r from-primary to-[#2959b9] hover:text-primary 
 									hover:border hover:border-primary hover:bg-transparent hover:from-transparent hover:to-transparent
 									transition-all ease-out duration-500"
 								>
 									<Avatar className="size-5 bg-card rounded-full">
 										<AvatarFallback className="text-2xs font-semibold text-primary px-1">
-											{user?.email
+											{userFullName
 												.charAt(0)
 												.toUpperCase()}
 										</AvatarFallback>
 									</Avatar>
 									<span className="text-sm">
-										{user?.email}
+										{userFullName.split(' ')[0]}
 									</span>
 								</Button>
 							</DropdownMenuTrigger>
