@@ -28,6 +28,24 @@ const EVENTS: HighlightEvent[] = [
             "https://images.unsplash.com/photo-1507924538820-ede94a04019d?auto=format&fit=crop&w=800&q=80",
         minPrice: 45.0,
     },
+    {
+        id: 3,
+        title: "Festa Eletrônica com Top DJ",
+        date: "20 de abril de 2024",
+        location: "Green Valley, Balneário Camboriú, SC",
+        imageUrl:
+            "https://s2-oglobo.glbimg.com/rcWeBJ56Ic5JOb-hupn_JcNK0JM=/0x0:3078x2048/888x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_da025474c0c44edd99332dddb09cabe8/internal_photos/bs/2024/B/D/BkHWS5QSisLV5EBAeEYQ/47-fat-7644.jpg",
+        minPrice: 89.9,
+    },
+    {
+        id: 4,
+        title: "Peça: A Comédia do Ano",
+        date: "30 de abril de 2024",
+        location: "Teatro Municipal, Rio de Janeiro, RJ",
+        imageUrl:
+            "https://images.unsplash.com/photo-1507924538820-ede94a04019d?auto=format&fit=crop&w=800&q=80",
+        minPrice: 45.0,
+    },
 ];
 
 const HighlightEvents = () => {

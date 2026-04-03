@@ -270,26 +270,46 @@ const BannerSlider = () => {
                                         draggable={false}
                                     />
 
-                                    <div className="absolute inset-0 flex items-center justify-center p-6 sm:p-10">
+                                    {/* Progressive blur layers */}
+                                    {[
+                                        { blur: 1, stop: "90%" },
+                                        { blur: 2, stop: "75%" },
+                                        { blur: 4, stop: "60%" },
+                                        { blur: 8, stop: "45%" },
+                                        { blur: 16, stop: "32%" },
+                                        { blur: 24, stop: "52%" },
+                                    ].map((layer) => (
                                         <div
-                                            className="flex w-full max-w-xl flex-col gap-4 rounded-[28px] border border-white/16 px-7 py-6 sm:px-10 sm:py-8"
+                                            key={layer.blur}
+                                            className="pointer-events-none absolute inset-0"
                                             style={{
-                                                background: "rgba(255, 255, 255, 0.21)",
-                                                boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
-                                                backdropFilter: "blur(10px)",
-                                                WebkitBackdropFilter: "blur(10px)",
+                                                backdropFilter: `blur(${layer.blur}px)`,
+                                                WebkitBackdropFilter: `blur(${layer.blur}px)`,
+                                                maskImage: `linear-gradient(to right, black 0%, transparent ${layer.stop})`,
+                                                WebkitMaskImage: `linear-gradient(to right, black 0%, transparent ${layer.stop})`,
                                             }}
-                                        >
-                                            <h2 className="text-lg font-bold leading-tight text-white drop-shadow-md sm:text-4xl">
+                                        />
+                                    ))}
+
+                                    <div
+                                        className="pointer-events-none absolute inset-0"
+                                        style={{
+                                            background: "linear-gradient(to right, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.15) 35%, transparent 60%)",
+                                        }}
+                                    />
+
+                                    <div className="absolute inset-0 flex items-center justify-start p-8 sm:p-14 md:p-20">
+                                        <div className="flex max-w-lg flex-col gap-4">
+                                            <h2 className="text-2xl font-bold leading-tight text-white drop-shadow-lg sm:text-4xl md:text-5xl">
                                                 {banner.title}
                                             </h2>
 
                                             <div className="flex flex-col gap-1.5">
-                                                <div className="flex items-center gap-2 text-sm sm:text-md text-white/85">
+                                                <div className="flex items-center gap-2 text-sm text-white/90 drop-shadow-md sm:text-md">
                                                     <Calendar className="size-4 shrink-0" />
                                                     <span>{banner.date}</span>
                                                 </div>
-                                                <div className="flex items-center gap-2 text-sm sm:text-md text-white/85">
+                                                <div className="flex items-center gap-2 text-sm text-white/90 drop-shadow-md sm:text-md">
                                                     <MapPin className="size-4 shrink-0" />
                                                     <span>{banner.location}</span>
                                                 </div>
@@ -297,7 +317,7 @@ const BannerSlider = () => {
 
                                             <button
                                                 type="button"
-                                                className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-xl px-4 md:px-12 py-2.5 text-md md:text-lg  font-bold text-white shadow-md transition-all duration-300 hover:brightness-110 hover:shadow-lg"
+                                                className="mt-1 inline-flex w-fit cursor-pointer items-center gap-2 rounded-xl px-6 py-2.5 text-md font-bold text-white shadow-md transition-all duration-300 hover:brightness-110 hover:shadow-lg md:px-12 md:text-lg"
                                                 style={{
                                                     background: "linear-gradient(135deg, #4db8e8 0%, #2a8fd4 50%, #1c6fb5 100%)",
                                                     boxShadow: "0 4px 14px -3px rgba(42,143,212,0.45)",

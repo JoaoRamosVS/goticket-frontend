@@ -181,9 +181,9 @@ const Footer = () => {
                 </div>
 
                 {/* Bottom bar */}
-                <div className="border-t border-white/40 px-8 py-4 text-center sm:px-12">
+                <div className="px-8 py-4 text-center sm:px-12">
                     <p className="text-xs text-[#5e6c87]/70">
-                        Feito apaixonadamente por criadores e inovadores &copy; {new Date().getFullYear()} GoTicket
+                        &copy; {new Date().getFullYear()} GoTicket
                     </p>
                 </div>
             </div>
