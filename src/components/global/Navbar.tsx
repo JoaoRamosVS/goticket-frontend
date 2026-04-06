@@ -1,11 +1,9 @@
-import { useEffect, useState } from "react";
-
 import { useAuthStore } from "@/stores/authStore";
-import type { UserDTO } from "@/types";
-import userService from "@/services/user/index";
 
 import { Button } from "@/components/ui/button";
-import { LogIn, LogOut, ShoppingCart, User } from "lucide-react";
+import { LogIn, LogOut, Search, ShoppingCart, User } from "lucide-react";
+import { Input } from "@/components/ui/input";
+
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -21,19 +19,6 @@ const Navbar = () => {
 	const userFullName = useAuthStore((state) => state.userFullName);
 
 	const logout = useAuthStore((state) => state.logout);
-	const handleLogout = () => {
-		logout();
-	};
-
-	const [user, setUser] = useState<UserDTO | null>(null);
-
-	useEffect(() => {
-		const getUser = async () => {
-			const loggedUser: UserDTO = await userService.getUser();
-			setUser(loggedUser);
-		};
-		getUser();
-	}, [isAuth]);
 
 	// Variantes de animação fadeInDown para a navbar
 	const navbarVariants = {
@@ -63,7 +48,7 @@ const Navbar = () => {
 			className="fixed top-0 left-0 right-0 z-50 px-4 py-3"
 		>
 			<div className="container mx-auto">
-				<div className="flex items-center justify-between pl-6 pr-3 py-3 rounded-full bg-background/60 
+				<div className="flex items-center justify-between pl-6 pr-3 py-3 rounded-full bg-background/80 
 					backdrop-blur-xl border border-primary-foreground/50 shadow-2xs"
 				>
 					<div>
@@ -73,6 +58,17 @@ const Navbar = () => {
 						>
 							<img src="/GoTicketLogo.png" width={40} height={40} /> GoTicket
 						</Link>
+					</div>
+
+					<div className="mx-3 min-w-0 max-w-lg flex-1">
+						<div className="relative">
+							<Search className="z-3 pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-accent-foreground/70" strokeWidth={3} />
+							<Input
+								type="search"
+								placeholder="Buscar eventos, shows, festivais..."
+								className="h-9 w-full rounded-full border-primary-foreground/40 bg-background/50 pl-9 pr-3 shadow-md backdrop-blur-xl placeholder:text-accent-foreground/60"
+							/>
+						</div>
 					</div>
 
 					{isAuth ? (
@@ -106,7 +102,7 @@ const Navbar = () => {
 								<DropdownMenuItem
 									className="cursor-pointer"
 									variant="destructive"
-									onClick={handleLogout}
+									onClick={() => logout()}
 								>
 									<LogOut className="size-4 text-destructive" />
 									Sair
