@@ -39,7 +39,7 @@ const Footer = () => {
     const [email, setEmail] = useState("");
 
     return (
-        <footer className="relative w-full px-4 pb-6 pt-10 sm:px-8 bg-linear-to-b from-transparent via-primary/5 to-primary/60">
+        <footer className="relative w-full px-4 pb-6 pt-16 sm:px-8 bg-linear-to-b from-transparent via-primary/5 to-primary/60">
             <div
                 className="relative mx-auto max-w-7xl overflow-hidden rounded-[36px] border border-white/60 bg-white/60 backdrop-blur-2xl sm:rounded-[48px]"
                 style={{

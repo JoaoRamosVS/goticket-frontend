@@ -23,7 +23,7 @@ function App() {
           <Route path="/" element={ <Index /> }/>
           <Route path="/login" element={isAuth ? <Navigate to="/home" replace /> : <Login />}/>
           <Route path="/cadastro" element={isAuth ? <Navigate to="/home" replace /> : <SignUp />} />
-          <Route path="/home" element={isAuth ? <Home /> : <Navigate to="/login" replace />} />
+          <Route path="/home" element={<Home />} />
         </Routes>
         
         <Footer />

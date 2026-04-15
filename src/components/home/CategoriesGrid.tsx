@@ -75,9 +75,14 @@ const CategoryCard = ({ category }: { category: typeof CATEGORIES[0] }) => {
 const CategoriesGrid = () => {
   return (
     <section className="container mx-auto relative w-full px-2 py-16 sm:px-8 lg:px-4">
-        <h2 className="mb-10 text-center text-3xl tracking-wide font-extrabold sm:text-4xl md:text-5xl px-2">
-            O que você busca hoje?
-        </h2>
+        <div className="flex justify-between items-center w-full">
+            <h2 className="text-left text-3xl tracking-wide font-extrabold sm:text-3xl md:text-4xl px-2">
+                O que você busca hoje?
+            </h2>
+            <a href="/categories" className="text-muted-foreground text-lg text-left border-b border-muted-foreground/80">
+                Ver mais
+            </a>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 pt-8">
             {CATEGORIES.map((category) => (
                 <CategoryCard key={category.id} category={category} />
