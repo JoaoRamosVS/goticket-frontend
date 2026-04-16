@@ -4,7 +4,7 @@ import RegisterCallCTA from "@/components/home/RegisterCallCTA";
 import SearchBar from "@/components/home/SearchBar";
 import CategoriesGrid from "@/components/home/CategoriesGrid";
 import EventsCarousel from "@/components/home/EventsCarousel";
-import FAQSection from "@/components/LP/FAQSection/FAQSection";
+import FAQSection from "@/components/global/FAQSection/FAQSection";
 
 const Home = () => {
     return (

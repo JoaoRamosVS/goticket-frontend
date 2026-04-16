@@ -1,9 +1,9 @@
-import HeroSection from "@/components/LP/HeroSection"
-import FeaturesSection from "@/components/LP/FeaturesSection/FeaturesSection"
-import TestimonialsSection from "@/components/LP/TestimonialsSection/TestimonialsSection"
-import HowItWorksSection from "@/components/LP/HowItWorksSection/HowItWorksSection"
-import FAQSection from "@/components/LP/FAQSection/FAQSection"
-import CTASection from "@/components/LP/CTASection/CTASection"
+import HeroSection from "@/components/lp/HeroSection"
+import FeaturesSection from "@/components/lp/FeaturesSection/FeaturesSection"
+import TestimonialsSection from "@/components/lp/TestimonialsSection/TestimonialsSection"
+import HowItWorksSection from "@/components/lp/HowItWorksSection/HowItWorksSection"
+import FAQSection from "@/components/global/FAQSection/FAQSection"
+import CTASection from "@/components/lp/CTASection/CTASection"
 
 const Index = () => {
   return (

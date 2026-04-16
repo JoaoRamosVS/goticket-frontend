@@ -8,6 +8,7 @@ import { useAuthStore } from '@/stores/authStore';
 import SignUp from '@/pages/SignUp';
 import Index from '@/pages/Index';
 import Footer from '@/components/global/Footer';
+import EventPage from './pages/EventPage';
 
 function App() {
 
@@ -24,6 +25,7 @@ function App() {
           <Route path="/login" element={isAuth ? <Navigate to="/home" replace /> : <Login />}/>
           <Route path="/cadastro" element={isAuth ? <Navigate to="/home" replace /> : <SignUp />} />
           <Route path="/home" element={<Home />} />
+          <Route path="/evento" element={<EventPage />} />
         </Routes>
         
         <Footer />
