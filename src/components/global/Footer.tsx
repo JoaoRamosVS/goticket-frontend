@@ -34,7 +34,7 @@ const SOCIALS = [
 const Footer = () => {
 
     const location = useLocation();
-    if(location.pathname === "/") return null;
+    if(location.pathname === "/quem-somos") return null;
 
     const [email, setEmail] = useState("");
 
@@ -165,7 +165,7 @@ const Footer = () => {
                             />
                             <button
                                 type="button"
-                                className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-full px-8 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:scale-105 hover:brightness-110"
+                                className="inline-flex w-full justify-center cursor-pointer items-center gap-2 rounded-full px-8 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:scale-105 hover:brightness-110"
                                 style={{
                                     background:
                                         "linear-gradient(135deg, #4db8e8 0%, #2a8fd4 50%, #1c6fb5 100%)",

@@ -6,7 +6,7 @@ import Navbar from '@/components/global/Navbar';
 import SmoothScroll from '@/components/global/SmoothScroll';
 import { useAuthStore } from '@/stores/authStore';
 import SignUp from '@/pages/SignUp';
-import Index from '@/pages/Index';
+import QuemSomos from '@/pages/QuemSomos';
 import Footer from '@/components/global/Footer';
 import EventPage from './pages/EventPage';
 
@@ -21,11 +21,12 @@ function App() {
         <Navbar />
         
         <Routes>
-          <Route path="/" element={ <Index /> }/>
+          <Route path="/" element={ <Home /> }/>
           <Route path="/login" element={isAuth ? <Navigate to="/home" replace /> : <Login />}/>
           <Route path="/cadastro" element={isAuth ? <Navigate to="/home" replace /> : <SignUp />} />
           <Route path="/home" element={<Home />} />
           <Route path="/evento" element={<EventPage />} />
+          <Route path="/quem-somos" element={<QuemSomos />} />
         </Routes>
         
         <Footer />

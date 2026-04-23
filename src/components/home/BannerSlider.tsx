@@ -1,44 +1,19 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { ChevronLeft, ChevronRight, Calendar, MapPin, ChevronRight as ArrowIcon } from "lucide-react";
+import type { EventMinDTO } from "@/types";
+import {
+    formatEventDate,
+    formatEventLocation,
+    formatEventStartingPrice,
+    getEventMainImage,
+} from "@/helpers/events";
 
-type BannerItem = {
-    id: number;
-    title: string;
-    date: string;
-    location: string;
-    cta: string;
-    imageUrl: string;
+type BannerSliderProps = {
+    events: EventMinDTO[];
 };
 
-const BANNERS: BannerItem[] = [
-    {
-        id: 1,
-        title: "GoTicket Music Festival – São Paulo",
-        date: "12 de Junho de 2024",
-        location: "Allianz Parque, São Paulo, SP",
-        cta: "Garanta seu ingresso",
-        imageUrl:
-            "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1600&q=80",
-    },
-    {
-        id: 2,
-        title: "Tech Summit – Inovação e Futuro",
-        date: "25 de Julho de 2024",
-        location: "Expo Center Norte, São Paulo, SP",
-        cta: "Ver Agenda",
-        imageUrl:
-            "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1600&q=80",
-    },
-    {
-        id: 3,
-        title: "Rock in Concert – Edição Especial",
-        date: "18 de Agosto de 2024",
-        location: "Pedreira Paulo Leminski, Curitiba, PR",
-        cta: "Reservar Lugar",
-        imageUrl:
-            "https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=1600&q=80",
-    },
-];
+const MAX_BANNERS = 4;
+const BANNER_CTA = "Garanta seu ingresso a partir de ";
 
 const TRANSITION_MS = 700;
 const AUTOPLAY_MS = 5500;
@@ -47,15 +22,18 @@ const GAP_PX = 12;
 const DRAG_THRESHOLD_PX = 56;
 
 function getRealBannerIndex(currentIndex: number, total: number): number {
+    if (total <= 0) return 0;
     if (currentIndex === 0) return total - 1;
     if (currentIndex === total + 1) return 0;
     return currentIndex - 1;
 }
 
-const BannerSlider = () => {
+const BannerSlider = ({ events }: BannerSliderProps) => {
     const viewportRef = useRef<HTMLDivElement>(null);
     const dragStartXRef = useRef(0);
     const dragActiveRef = useRef(false);
+
+    const banners = useMemo(() => events.slice(0, MAX_BANNERS), [events]);
 
     const [viewportWidth, setViewportWidth] = useState(0);
     const [currentIndex, setCurrentIndex] = useState(1);
@@ -65,14 +43,14 @@ const BannerSlider = () => {
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
 
-    const slides = useMemo(
-        () => [
-            BANNERS[BANNERS.length - 1],
-            ...BANNERS,
-            BANNERS[0],
-        ],
-        []
-    );
+    const slides = useMemo(() => {
+        if (banners.length === 0) return [] as EventMinDTO[];
+        return [banners[banners.length - 1], ...banners, banners[0]];
+    }, [banners]);
+
+    useEffect(() => {
+        setCurrentIndex(1);
+    }, [banners.length]);
 
     useLayoutEffect(() => {
         const el = viewportRef.current;
@@ -97,41 +75,42 @@ const BannerSlider = () => {
 
     const trackTranslatePx = baseTranslatePx + dragX;
 
-    const activeDotIndex = getRealBannerIndex(currentIndex, BANNERS.length);
+    const activeDotIndex = getRealBannerIndex(currentIndex, banners.length);
+    const canSlide = banners.length > 1;
 
     const goNext = useCallback(() => {
-        if (isTransitioning) return;
+        if (isTransitioning || !canSlide) return;
         setIsTransitioning(true);
         setIsAnimating(true);
         setCurrentIndex((i) => i + 1);
-    }, [isTransitioning]);
+    }, [isTransitioning, canSlide]);
 
     const goPrev = useCallback(() => {
-        if (isTransitioning) return;
+        if (isTransitioning || !canSlide) return;
         setIsTransitioning(true);
         setIsAnimating(true);
         setCurrentIndex((i) => i - 1);
-    }, [isTransitioning]);
+    }, [isTransitioning, canSlide]);
 
     const goToBanner = useCallback(
         (bannerIndex: number) => {
-            if (isTransitioning) return;
+            if (isTransitioning || !canSlide) return;
             const target = bannerIndex + 1;
             if (target === currentIndex) return;
             setIsTransitioning(true);
             setIsAnimating(true);
             setCurrentIndex(target);
         },
-        [currentIndex, isTransitioning]
+        [currentIndex, isTransitioning, canSlide]
     );
 
     useEffect(() => {
-        if (isPaused) return;
+        if (isPaused || !canSlide) return;
         const id = window.setInterval(() => {
             goNext();
         }, AUTOPLAY_MS);
         return () => window.clearInterval(id);
-    }, [isPaused, goNext]);
+    }, [isPaused, goNext, canSlide]);
 
     useEffect(() => {
         if (!isTransitioning) return;
@@ -140,17 +119,16 @@ const BannerSlider = () => {
     }, [isTransitioning]);
 
     useEffect(() => {
-        if (currentIndex !== 0 && currentIndex !== BANNERS.length + 1) return;
+        if (banners.length === 0) return;
+        if (currentIndex !== 0 && currentIndex !== banners.length + 1) return;
 
         const id = window.setTimeout(() => {
             setIsAnimating(false);
-            setCurrentIndex(
-                currentIndex === 0 ? BANNERS.length : 1
-            );
+            setCurrentIndex(currentIndex === 0 ? banners.length : 1);
         }, TRANSITION_MS);
 
         return () => window.clearTimeout(id);
-    }, [currentIndex]);
+    }, [currentIndex, banners.length]);
 
     useEffect(() => {
         if (!isAnimating) {
@@ -246,10 +224,13 @@ const BannerSlider = () => {
                     >
                         {slides.map((banner, index) => {
                             const isActive = index === currentIndex;
+                            const imageUrl = getEventMainImage(banner);
+                            const formattedDate = formatEventDate(banner.startDate);
+                            const formattedLocation = formatEventLocation(banner);
 
                             return (
                                 <article
-                                    key={`${banner.id}-${index}`}
+                                    key={`${banner.eventID}-${index}`}
                                     style={{
                                         width:
                                             slideWidthPx > 0
@@ -264,7 +245,7 @@ const BannerSlider = () => {
                                     } transition-all duration-700 ease-out hover:scale-95`}
                                 >
                                     <img
-                                        src={banner.imageUrl}
+                                        src={imageUrl}
                                         alt={banner.title}
                                         className="absolute inset-0 size-full object-cover brightness-75"
                                         draggable={false}
@@ -305,26 +286,30 @@ const BannerSlider = () => {
                                             </h2>
 
                                             <div className="flex flex-col gap-1.5">
-                                                <div className="flex items-center gap-2 text-sm text-white/90 drop-shadow-md sm:text-md">
-                                                    <Calendar className="size-4 shrink-0" />
-                                                    <span>{banner.date}</span>
-                                                </div>
-                                                <div className="flex items-center gap-2 text-sm text-white/90 drop-shadow-md sm:text-md">
-                                                    <MapPin className="size-4 shrink-0" />
-                                                    <span>{banner.location}</span>
-                                                </div>
+                                                {formattedDate && (
+                                                    <div className="flex items-center gap-2 text-sm text-white/90 drop-shadow-md sm:text-md">
+                                                        <Calendar className="size-4 shrink-0" />
+                                                        <span>{formattedDate}</span>
+                                                    </div>
+                                                )}
+                                                {formattedLocation && (
+                                                    <div className="flex items-center gap-2 text-sm text-white/90 drop-shadow-md sm:text-md">
+                                                        <MapPin className="size-4 shrink-0" />
+                                                        <span>{formattedLocation}</span>
+                                                    </div>
+                                                )}
                                             </div>
 
                                             <button
                                                 type="button"
-                                                className="mt-1 inline-flex w-fit cursor-pointer items-center gap-2 rounded-xl px-6 py-2.5 text-md font-bold text-white shadow-md transition-all duration-300 hover:brightness-110 hover:shadow-lg md:px-12 md:text-lg"
+                                                className="mt-1 inline-flex w-fit cursor-pointer items-center justify-between text-left gap-2 rounded-xl px-6 py-2.5 text-md font-bold text-white shadow-md transition-all duration-300 hover:brightness-110 hover:shadow-lg md:px-10 md:text-lg"
                                                 style={{
                                                     background: "linear-gradient(135deg, #4db8e8 0%, #2a8fd4 50%, #1c6fb5 100%)",
                                                     boxShadow: "0 4px 14px -3px rgba(42,143,212,0.45)",
                                                 }}
                                             >
-                                                {banner.cta}
-                                                <ArrowIcon className="size-4" />
+                                                a partir de {formatEventStartingPrice(banner)}
+                                                <ArrowIcon className="size-4" strokeWidth={4} />
                                             </button>
                                         </div>
                                     </div>
@@ -337,53 +322,57 @@ const BannerSlider = () => {
                     <div className="pointer-events-none absolute inset-y-0 right-0 z-2 w-16 bg-linear-to-l from-background/80 via-background/20 to-transparent sm:w-24" />
                 </div>
 
-                <button
-                    type="button"
-                    aria-label="Banner anterior"
-                    onClick={goPrev}
-                    disabled={isTransitioning}
-                    className="absolute cursor-pointer top-1/2 left-4 z-3 -translate-y-1/2 rounded-full border border-white/40 bg-white/50 p-2.5 text-slate-800 shadow-md backdrop-blur-md transition hover:bg-white/70 disabled:opacity-40 sm:left-10"
-                >
-                    <ChevronLeft className="size-5" />
-                </button>
+                {canSlide && (
+                    <>
+                        <button
+                            type="button"
+                            aria-label="Banner anterior"
+                            onClick={goPrev}
+                            disabled={isTransitioning}
+                            className="absolute cursor-pointer top-1/2 left-4 z-3 -translate-y-1/2 rounded-full border border-white/40 bg-white/50 p-2.5 text-slate-800 shadow-md backdrop-blur-md transition hover:bg-white/70 disabled:opacity-40 sm:left-10"
+                        >
+                            <ChevronLeft className="size-5" />
+                        </button>
 
-                <button
-                    type="button"
-                    aria-label="Próximo banner"
-                    onClick={goNext}
-                    disabled={isTransitioning}
-                    className="absolute cursor-pointer top-1/2 right-4 z-3 -translate-y-1/2 rounded-full border border-white/40 bg-white/50 p-2.5 text-slate-800 shadow-md backdrop-blur-md transition hover:bg-white/70 disabled:opacity-40 sm:right-10"
-                >
-                    <ChevronRight className="size-5" />
-                </button>
+                        <button
+                            type="button"
+                            aria-label="Próximo banner"
+                            onClick={goNext}
+                            disabled={isTransitioning}
+                            className="absolute cursor-pointer top-1/2 right-4 z-3 -translate-y-1/2 rounded-full border border-white/40 bg-white/50 p-2.5 text-slate-800 shadow-md backdrop-blur-md transition hover:bg-white/70 disabled:opacity-40 sm:right-10"
+                        >
+                            <ChevronRight className="size-5" />
+                        </button>
 
-                <div
-                    className="absolute left-1/2 bottom-12 z-3 mt-6 flex items-center justify-center"
-                    role="tablist"
-                    aria-label="Slides do banner"
-                >
-                    <div className="flex items-center justify-center gap-2 py-1 px-4 bg-primary/5 backdrop-blur-xl shadow-2xl rounded-full">
-                    {BANNERS.map((banner, index) => {
-                        const isActive = activeDotIndex === index;
+                        <div
+                            className="absolute left-1/2 bottom-12 z-3 mt-6 flex items-center justify-center"
+                            role="tablist"
+                            aria-label="Slides do banner"
+                        >
+                            <div className="flex items-center justify-center gap-2 py-1 px-4 bg-primary/5 backdrop-blur-xl shadow-2xl rounded-full">
+                            {banners.map((banner, index) => {
+                                const isActive = activeDotIndex === index;
 
-                        return (
-                            <button
-                                key={banner.id}
-                                type="button"
-                                role="tab"
-                                aria-selected={isActive}
-                                aria-label={`Ir para o banner ${index + 1}`}
-                                onClick={() => goToBanner(index)}
-                                className={`h-3 cursor-pointer rounded-full transition-all shadow-lg ${
-                                    isActive
-                                        ? "w-8 bg-primary/70"
-                                        : "w-3 bg-white"
-                                }`}
-                            />
-                        );
-                    })}
-                    </div>
-                </div>
+                                return (
+                                    <button
+                                        key={banner.eventID}
+                                        type="button"
+                                        role="tab"
+                                        aria-selected={isActive}
+                                        aria-label={`Ir para o banner ${index + 1}`}
+                                        onClick={() => goToBanner(index)}
+                                        className={`h-3 cursor-pointer rounded-full transition-all shadow-lg ${
+                                            isActive
+                                                ? "w-8 bg-primary/70"
+                                                : "w-3 bg-white"
+                                        }`}
+                                    />
+                                );
+                            })}
+                            </div>
+                        </div>
+                    </>
+                )}
             </div>
         </section>
     );

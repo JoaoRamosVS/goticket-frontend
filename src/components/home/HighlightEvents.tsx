@@ -1,54 +1,18 @@
 import EventCardLarge from "@/components/ui/event-card-large";
+import type { EventMinDTO } from "@/types";
 
-type HighlightEvent = {
-    id: number;
+type HighlightEventsProps = {
     title: string;
-    date: string;
-    location: string;
-    imageUrl: string;
-    minPrice: number;
+    events: EventMinDTO[];
 };
 
-const EVENTS: HighlightEvent[] = [
-    {
-        id: 1,
-        title: "Festa Eletrônica com Top DJ",
-        date: "20 de abril de 2024",
-        location: "Green Valley, Balneário Camboriú, SC",
-        imageUrl:
-            "https://s2-oglobo.glbimg.com/rcWeBJ56Ic5JOb-hupn_JcNK0JM=/0x0:3078x2048/888x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_da025474c0c44edd99332dddb09cabe8/internal_photos/bs/2024/B/D/BkHWS5QSisLV5EBAeEYQ/47-fat-7644.jpg",
-        minPrice: 89.9,
-    },
-    {
-        id: 2,
-        title: "Peça: A Comédia do Ano",
-        date: "30 de abril de 2024",
-        location: "Teatro Municipal, Rio de Janeiro, RJ",
-        imageUrl:
-            "https://images.unsplash.com/photo-1507924538820-ede94a04019d?auto=format&fit=crop&w=800&q=80",
-        minPrice: 45.0,
-    },
-    {
-        id: 3,
-        title: "Festa Eletrônica com Top DJ",
-        date: "20 de abril de 2024",
-        location: "Green Valley, Balneário Camboriú, SC",
-        imageUrl:
-            "https://s2-oglobo.glbimg.com/rcWeBJ56Ic5JOb-hupn_JcNK0JM=/0x0:3078x2048/888x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_da025474c0c44edd99332dddb09cabe8/internal_photos/bs/2024/B/D/BkHWS5QSisLV5EBAeEYQ/47-fat-7644.jpg",
-        minPrice: 89.9,
-    },
-    {
-        id: 4,
-        title: "Peça: A Comédia do Ano",
-        date: "30 de abril de 2024",
-        location: "Teatro Municipal, Rio de Janeiro, RJ",
-        imageUrl:
-            "https://images.unsplash.com/photo-1507924538820-ede94a04019d?auto=format&fit=crop&w=800&q=80",
-        minPrice: 45.0,
-    },
-];
+const HIGHLIGHT_LIMIT = 4;
 
-const HighlightEvents = ({ title }: { title: string }) => {
+const HighlightEvents = ({ title, events }: HighlightEventsProps) => {
+    const highlights = events.slice(0, HIGHLIGHT_LIMIT);
+
+    if (highlights.length === 0) return null;
+
     return (
         <section className="container mx-auto relative w-full px-2 py-16 sm:px-8 lg:px-4">
             <div
@@ -64,8 +28,8 @@ const HighlightEvents = ({ title }: { title: string }) => {
             </h2>
 
             <div className="mx-auto grid grid-cols-1 gap-8 md:grid-cols-2 px-2 sm:px-0">
-                {EVENTS.map((event) => (
-                    <EventCardLarge event={event} />
+                {highlights.map((event) => (
+                    <EventCardLarge key={event.eventID} event={event} />
                 ))}
             </div>
         </section>

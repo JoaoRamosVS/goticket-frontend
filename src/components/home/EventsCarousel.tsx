@@ -1,90 +1,12 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import EventCard from "../ui/event-card";
+import type { EventMinDTO } from "@/types";
 
-type Event = {
-    id: number;
+type EventsCarouselProps = {
     title: string;
-    date: string;
-    location: string;
-    imageUrl: string;
-    minPrice: number;
-}
-
-const EVENTS: Event[] = [
-    {
-        id: 1,
-        title: "Festa Eletrônica com Top DJ",
-        date: "20 de abril de 2024",
-        location: "Green Valley, Balneário Camboriú, SC",
-        imageUrl:
-            "https://s2-oglobo.glbimg.com/rcWeBJ56Ic5JOb-hupn_JcNK0JM=/0x0:3078x2048/888x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_da025474c0c44edd99332dddb09cabe8/internal_photos/bs/2024/B/D/BkHWS5QSisLV5EBAeEYQ/47-fat-7644.jpg",
-        minPrice: 89.9,
-    },
-    {
-        id: 2,
-        title: "Peça: A Comédia do Ano",
-        date: "30 de abril de 2024",
-        location: "Teatro Municipal, Rio de Janeiro, RJ",
-        imageUrl:
-            "https://images.unsplash.com/photo-1507924538820-ede94a04019d?auto=format&fit=crop&w=800&q=80",
-        minPrice: 45.0,
-    },
-    {
-        id: 3,
-        title: "Festa Eletrônica com Top DJ",
-        date: "20 de abril de 2024",
-        location: "Green Valley, Balneário Camboriú, SC",
-        imageUrl:
-            "https://s2-oglobo.glbimg.com/rcWeBJ56Ic5JOb-hupn_JcNK0JM=/0x0:3078x2048/888x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_da025474c0c44edd99332dddb09cabe8/internal_photos/bs/2024/B/D/BkHWS5QSisLV5EBAeEYQ/47-fat-7644.jpg",
-        minPrice: 89.9,
-    },
-    {
-        id: 4,
-        title: "Peça: A Comédia do Ano",
-        date: "30 de abril de 2024",
-        location: "Teatro Municipal, Rio de Janeiro, RJ",
-        imageUrl:
-            "https://images.unsplash.com/photo-1507924538820-ede94a04019d?auto=format&fit=crop&w=800&q=80",
-        minPrice: 45.0,
-    },
-    {
-        id: 5,
-        title: "Festa Eletrônica com Top DJ",
-        date: "20 de abril de 2024",
-        location: "Green Valley, Balneário Camboriú, SC",
-        imageUrl:
-            "https://s2-oglobo.glbimg.com/rcWeBJ56Ic5JOb-hupn_JcNK0JM=/0x0:3078x2048/888x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_da025474c0c44edd99332dddb09cabe8/internal_photos/bs/2024/B/D/BkHWS5QSisLV5EBAeEYQ/47-fat-7644.jpg",
-        minPrice: 89.9,
-    },
-    {
-        id: 6,
-        title: "Peça: A Comédia do Ano",
-        date: "30 de abril de 2024",
-        location: "Teatro Municipal, Rio de Janeiro, RJ",
-        imageUrl:
-            "https://images.unsplash.com/photo-1507924538820-ede94a04019d?auto=format&fit=crop&w=800&q=80",
-        minPrice: 45.0,
-    },
-    {
-        id: 7,
-        title: "Festa Eletrônica com Top DJ",
-        date: "20 de abril de 2024",
-        location: "Green Valley, Balneário Camboriú, SC",
-        imageUrl:
-            "https://s2-oglobo.glbimg.com/rcWeBJ56Ic5JOb-hupn_JcNK0JM=/0x0:3078x2048/888x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_da025474c0c44edd99332dddb09cabe8/internal_photos/bs/2024/B/D/BkHWS5QSisLV5EBAeEYQ/47-fat-7644.jpg",
-        minPrice: 89.9,
-    },
-    {
-        id: 8,
-        title: "Peça: A Comédia do Ano",
-        date: "30 de abril de 2024",
-        location: "Teatro Municipal, Rio de Janeiro, RJ",
-        imageUrl:
-            "https://images.unsplash.com/photo-1507924538820-ede94a04019d?auto=format&fit=crop&w=800&q=80",
-        minPrice: 45.0,
-    },
-];
+    events: EventMinDTO[];
+};
 
 const GAP_PX = 20;
 const DRAG_THRESHOLD_PX = 56;
@@ -96,8 +18,8 @@ function getVisibleCount(width: number): number {
     return 4;
 }
 
-const EventsCarousel = ({ title }: { title: string }) => {
-    const total = EVENTS.length;
+const EventsCarousel = ({ title, events }: EventsCarouselProps) => {
+    const total = events.length;
 
     const viewportRef = useRef<HTMLDivElement>(null);
     const dragStartXRef = useRef(0);
@@ -270,9 +192,9 @@ const EventsCarousel = ({ title }: { title: string }) => {
                         willChange: isAnimating ? "transform" : "auto",
                     }}
                 >
-                    {EVENTS.map((event) => (
+                    {events.map((event) => (
                         <div
-                            key={event.id}
+                            key={event.eventID}
                             style={{
                                 width: cardWidthPx > 0 ? cardWidthPx : undefined,
                                 flex: "0 0 auto",

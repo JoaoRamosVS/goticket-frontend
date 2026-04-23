@@ -23,15 +23,15 @@ const ParallaxBanner = ({ image, title }: { image: string; title: string }) => {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full h-[60vh] overflow-hidden [clip-path:inset(0)]"
+      className="relative w-full h-[65vh] overflow-hidden [clip-path:inset(0)]"
     >
       <img
         src={image}
         alt={title}
-        className="fixed inset-0 w-full h-full object-cover brightness-75 -z-10 will-change-transform"
+        className="fixed inset-0 w-full h-[65vh] object-cover object-center brightness-85 -z-10 will-change-transform"
         style={{ transform: `scale(${scale})` }}
       />
-      <div className="absolute inset-0 backdrop-blur-xl mask-[linear-gradient(to_bottom,transparent_50%,black_100%)]" />
+      <div className="absolute inset-0 backdrop-blur-2xl mask-[linear-gradient(to_bottom,transparent_45%,black_100%)]" />
       <div className="absolute bottom-0 left-0 pl-16 pb-16 z-10">
         <h1 className="text-7xl font-extrabold text-white">{title}</h1>
       </div>

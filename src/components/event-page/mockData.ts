@@ -4,7 +4,7 @@ export const mockEvent: EventDetails = {
   id: "evt-001",
   title: "Lollapalooza Brasil 2026",
   image:
-    "https://www.showmetech.com.br/wp-content/uploads//2025/08/Veja-o-Lineup-do-Lollapalooza-Brasil-2026.webp",
+    "https://www.tangol.com/Fotos/Tours/festival-lollapalooza-brasil_38661_202501241522020.JPG",
   category: "Festival",
   description: `O maior festival de música do Brasil está de volta! O Lollapalooza Brasil 2026 promete ser a edição mais épica de todos os tempos, reunindo os maiores artistas nacionais e internacionais em três dias de pura energia.
 

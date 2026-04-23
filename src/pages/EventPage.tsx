@@ -3,9 +3,10 @@ import EventInfo from "@/components/event-page/EventInfo";
 import TicketSelector from "@/components/event-page/TicketSelector";
 import EventDescription from "@/components/event-page/EventDescription";
 import EventLocation from "@/components/event-page/EventLocation";
-import EventOrganizer from "@/components/event-page/EventOrganizer";
 import EventPolicies from "@/components/event-page/EventPolicies";
 import { mockEvent } from "@/components/event-page/mockData";
+import FaqSection from "@/components/global/FAQSection/FAQSection";
+import ShareAndSave from "@/components/event-page/ShareAndSave";
 
 const EventPage = () => {
   const event = mockEvent;
@@ -28,6 +29,7 @@ const EventPage = () => {
           </div>
 
           <aside className="hidden lg:flex flex-col gap-6">
+            <ShareAndSave />
             <EventInfo
               category={event.category}
               title={event.title}
@@ -59,6 +61,9 @@ const EventPage = () => {
           </button>
         </div>
       </div>
+
+      
+      <FaqSection />
     </>
   );
 };
