@@ -35,6 +35,62 @@ export interface EventMinListDTO {
     eventMinDTOList: EventMinDTO[];
 }
 
+export type EventVisibilityValue = "PUBLIC" | "PRIVATE";
+
+export type EventStatusName =
+    | "PENDING_APPROVAL"
+    | "APPROVED"
+    | "COMPLETED"
+    | "DECLINED"
+    | "CANCELED"
+    | "POSTPONED";
+
+export interface EventImageDTO {
+    eventImageID: number;
+    s3Key: string;
+    mainImage: boolean;
+}
+
+/**
+ * Representa o payload de `GET /events/{eventId}`.
+ * Espelha a entidade `tech.goticket.backendapi.event.Event`.
+ */
+export interface EventDetailDTO {
+    eventID: number;
+    title: string;
+    description: string;
+    ageRestriction: number;
+    salesStartDate: string | null;
+    startDate: string;
+    endDate: string;
+    approvalDate: string | null;
+    registerDate: string;
+    lastUpdateDate: string;
+    status: { statusID: number; name: EventStatusName };
+    eventVisibility: { visibilityID: number; name: EventVisibilityValue };
+    organizer: { userID: string; fullName?: string } | null;
+    venue: {
+        venueID: number;
+        name: string;
+        city: string;
+        state: string;
+    } | null;
+    images: EventImageDTO[];
+}
+
+/**
+ * Payload aceito pelo `PATCH /events/{eventId}` (merge-patch+json).
+ * A visibilidade é trocada no endpoint dedicado `/events/{eventId}/visibility`.
+ */
+export interface UpdateEventPayload {
+    title?: string;
+    description?: string;
+    ageRestriction?: number;
+    startDate?: string;
+    endDate?: string;
+    salesStartDate?: string | null;
+}
+
 export interface UserDTO {
     userId: number;
     email: string;
