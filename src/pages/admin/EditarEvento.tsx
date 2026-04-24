@@ -328,7 +328,7 @@ const EditarEvento = () => {
                     <GlassCard className="lg:col-span-2">
                         <SectionHeader
                             title="Informações gerais"
-                            description="Campos editáveis via PATCH /events/{id} (merge-patch+json)."
+                            description="Edite as informações e detalhes gerais do evento."
                         />
 
                         <div className="flex flex-col gap-4">
@@ -484,7 +484,7 @@ type GlassCardProps = {
 
 const GlassCard = ({ className = "", children }: GlassCardProps) => (
     <div
-        className={`rounded-3xl border border-white/70 bg-white/65 p-6 backdrop-blur-xl ${className}`}
+        className={`rounded-3xl border border-white/70 bg-white/15 p-6 backdrop-blur-xl shadow-xl  ${className}`}
         style={{
             boxShadow:
                 "0 8px 28px -10px rgba(0,46,71,0.12), inset 0 1px 0 0 rgba(255,255,255,0.85)",
@@ -529,7 +529,7 @@ const Field = ({ label, htmlFor, required, children }: FieldProps) => (
 );
 
 const baseInputClasses =
-    "w-full rounded-2xl border border-white/70 bg-white/70 px-4 py-2.5 text-sm text-[#00334d] placeholder:text-[#5e6c87]/60 backdrop-blur-xl outline-none transition-all duration-300 focus:border-[#2a8fd4]/50 focus:bg-white/90 focus:shadow-[0_0_0_4px_rgba(42,143,212,0.12)]";
+    "w-full rounded-2xl border border-white/70 bg-white/60 shadow-xs px-4 py-2.5 text-sm text-[#00334d] placeholder:text-[#5e6c87]/60 backdrop-blur-xl outline-none transition-all duration-300 focus:border-[#2a8fd4]/50 focus:bg-white/90 focus:shadow-[0_0_0_4px_rgba(42,143,212,0.12)]";
 
 const TextInput = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
     <input {...props} className={`${baseInputClasses} h-11 ${props.className ?? ""}`} />
@@ -540,7 +540,7 @@ const TextAreaInput = (
 ) => (
     <textarea
         {...props}
-        className={`${baseInputClasses} resize-y ${props.className ?? ""}`}
+        className={`${baseInputClasses} resize-y  ${props.className ?? ""}`}
     />
 );
 
@@ -582,7 +582,7 @@ const VisibilityCard = ({
         <GlassCard>
             <SectionHeader
                 title="Visibilidade"
-                description="Endpoint dedicado: PATCH /events/{id}/visibility."
+                description="Altere a visibilidade do evento para público ou privado."
             />
 
             <div className="flex gap-2">
@@ -703,21 +703,21 @@ type DangerCardProps = {
 
 const DangerCard = ({ isDeleting, onDelete }: DangerCardProps) => (
     <div
-        className="rounded-3xl border border-red-200/70 bg-red-50/60 p-6 backdrop-blur-xl"
+        className="rounded-3xl bg-red-50/30 p-6 backdrop-blur-xl"
         style={{
             boxShadow:
-                "0 8px 24px -12px rgba(255,50,50,0.18), inset 0 1px 0 0 rgba(255,255,255,0.7)",
+                "0 12px 24px -12px rgba(255,50,50,0.18), inset 0 1px 0 0 rgba(255,255,255,0.7)",
         }}
     >
-        <h2 className="text-lg font-bold text-red-600">Zona de perigo</h2>
+        <h2 className="text-lg font-bold text-red-600">Remoção de evento</h2>
         <p className="mt-0.5 text-xs text-red-500/80">
-            Exclusão permanente: DELETE /events/{"{id}"}.
+            Ao clicar no botão abaixo, o evento será excluído permanentemente.
         </p>
         <button
             type="button"
             onClick={onDelete}
             disabled={isDeleting}
-            className="mt-4 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-red-500 px-4 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:brightness-110 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
+            className="mt-4 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-red-500 px-4 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:brightness-110 hover:shadow-xl hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60"
             style={{
                 boxShadow:
                     "0 6px 18px -4px rgba(255,50,50,0.5), inset 0 1px 0 0 rgba(255,255,255,0.35)",
@@ -779,7 +779,7 @@ const ImagesPanel = ({ event, isUploading, onUpload }: ImagesPanelProps) => {
         <div>
             <SectionHeader
                 title="Imagens do evento"
-                description="Upload multipart para PATCH /events/{id}/images. A imagem marcada vira a principal."
+                description="Envie novas imagens ou selecione uma imagem existente para definir como principal."
             />
 
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_1.2fr]">
@@ -845,7 +845,7 @@ const ImagesPanel = ({ event, isUploading, onUpload }: ImagesPanelProps) => {
                                         <img
                                             src={previews[index]}
                                             alt={file.name}
-                                            className="aspect-square w-full object-cover"
+                                            className="aspect-square w-full object-cover shadow-2xl"
                                         />
                                         {mainIndex === index && (
                                             <span
@@ -915,7 +915,7 @@ const ImagesPanel = ({ event, isUploading, onUpload }: ImagesPanelProps) => {
                                     <img
                                         src={buildEventImageUrl(img.s3Key)}
                                         alt={`Imagem ${img.eventImageID}`}
-                                        className="aspect-square w-full object-cover"
+                                        className="aspect-square w-full object-cover shadow-2xl"
                                     />
                                     {img.mainImage && (
                                         <span

@@ -131,26 +131,16 @@ const Eventos = () => {
                 <div className="flex flex-col gap-3 px-5 pt-5 sm:flex-row sm:items-center sm:justify-between">
                     <div className="relative w-full sm:max-w-sm">
                         <Search
-                            className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#5e6c87]"
-                            strokeWidth={2.4}
+                            className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-primary/50 z-10"
+                            strokeWidth={3}
                         />
                         <input
                             type="search"
                             value={searchInput}
                             onChange={(e) => setSearchInput(e.target.value)}
                             placeholder="Buscar por nome ou ID"
-                            className="h-10 w-full rounded-2xl border border-white/70 bg-white/70 pl-10 pr-9 text-sm text-[#00334d] placeholder:text-[#5e6c87]/70 backdrop-blur-xl outline-none transition-all duration-300 focus:border-[#2a8fd4]/50 focus:bg-white/90 focus:shadow-[0_0_0_4px_rgba(42,143,212,0.12)]"
+                            className="h-10 w-full rounded-2xl border border-primary/20 bg-white/70 pl-10 pr-4 text-sm text-[#00334d] placeholder:text-[#5e6c87]/70 backdrop-blur-xl shadow-sm outline-none transition-all duration-300 focus:border-[#2a8fd4]/50 focus:bg-white/90 focus:shadow-[0_0_0_4px_rgba(42,143,212,0.12)]"
                         />
-                        {searchInput && (
-                            <button
-                                type="button"
-                                onClick={() => setSearchInput("")}
-                                className="absolute right-2.5 top-1/2 flex size-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-[#5e6c87] transition-all hover:bg-[#e5f1ff] hover:text-[#00334d]"
-                                aria-label="Limpar busca"
-                            >
-                                <X className="size-3.5" />
-                            </button>
-                        )}
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -160,20 +150,20 @@ const Eventos = () => {
                         <button
                             type="button"
                             onClick={() => loadEvents(page)}
-                            className="flex size-9 cursor-pointer items-center justify-center rounded-xl border border-white/70 bg-white/60 text-[#2a8fd4] transition-all duration-300 hover:bg-white hover:shadow-md"
+                            className="flex size-9 cursor-pointer items-center justify-center rounded-xl border border-white/70 bg-[#2a8fd4] text-white transition-all duration-300 hover:scale-90 shadow-xl"
                             aria-label="Recarregar"
                             title="Recarregar"
                         >
                             <RefreshCcw
                                 className={`size-4 ${isLoading ? "animate-spin" : ""}`}
-                                strokeWidth={2.4}
+                                strokeWidth={2.3}
                             />
                         </button>
                     </div>
                 </div>
 
                 <div className="mt-4 overflow-x-auto">
-                    <table className="w-full text-sm">
+                    <table className="w-full text-sm overflow-hidden">
                         <thead>
                             <tr className="border-y border-white/80 bg-linear-to-r from-[#e5f1ff]/60 to-transparent text-left">
                                 <Th className="pl-6">ID</Th>
@@ -278,14 +268,14 @@ const EventRow = ({ event, isDeleting, onEdit, onDelete }: EventRowProps) => {
     const formattedPrice = formatEventStartingPrice(event);
 
     return (
-        <tr className="border-b border-white/70 transition-colors hover:bg-white/60">
+        <tr className="border-b border-white/70 hover:bg-primary/5 hover:scale-[1.02] overflow-hidden transition-all duration-200">
             <td className="py-3 pl-6 pr-2 align-middle text-xs font-semibold text-[#5e6c87]">
                 #{event.eventID}
             </td>
             <td className="py-3 pr-4 align-middle">
                 <div className="flex items-center gap-3">
                     <div
-                        className="size-12 shrink-0 overflow-hidden rounded-xl border border-white/70 bg-white/60"
+                        className="size-12 shrink-0 overflow-hidden rounded-md border border-white/70 bg-white/60"
                         style={{
                             boxShadow:
                                 "0 4px 12px -4px rgba(0,46,71,0.18), inset 0 1px 0 0 rgba(255,255,255,0.7)",
