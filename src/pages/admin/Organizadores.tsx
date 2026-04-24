@@ -6,34 +6,35 @@ import {
     ChevronLeft,
     ChevronRight,
     Loader2,
+    Mail,
     MapPin,
     Pencil,
     RefreshCcw,
     Search,
     ShieldCheck,
     ShieldOff,
-    UserCircle2,
+    UserCog,
 } from "lucide-react";
 
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
 
-import venueService from "@/services/venue";
+import organizerService from "@/services/organizer";
 
-import type { VenueMinDTO } from "@/types";
+import type { OrganizerMinDTO } from "@/types";
 
 const PAGE_SIZE = 10;
 
-function formatLocation(venue: VenueMinDTO): string | null {
-    if (venue.city && venue.state) {
-        return `${venue.city}/${venue.state}`;
+function formatLocation(organizer: OrganizerMinDTO): string | null {
+    if (organizer.city && organizer.state) {
+        return `${organizer.city}/${organizer.state}`;
     }
-    return venue.city ?? venue.state ?? null;
+    return organizer.city ?? organizer.state ?? null;
 }
 
-const Espacos = () => {
+const Organizadores = () => {
     const navigate = useNavigate();
 
-    const [venues, setVenues] = useState<VenueMinDTO[]>([]);
+    const [organizers, setOrganizers] = useState<OrganizerMinDTO[]>([]);
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const [totalElements, setTotalElements] = useState(0);
@@ -41,15 +42,15 @@ const Espacos = () => {
     const [error, setError] = useState<string | null>(null);
     const [searchInput, setSearchInput] = useState("");
 
-    const loadVenues = useCallback(
+    const loadOrganizers = useCallback(
         (targetPage: number, signal?: AbortSignal) => {
             setIsLoading(true);
             setError(null);
 
-            return venueService
-                .listVenues(targetPage, PAGE_SIZE, signal)
+            return organizerService
+                .listOrganizers(targetPage, PAGE_SIZE, signal)
                 .then((data) => {
-                    setVenues(data.venueMinDTOList ?? []);
+                    setOrganizers(data.organizerMinDTOList ?? []);
                     setTotalPages(Math.max(1, data.totalPages ?? 1));
                     setTotalElements(data.totalElements ?? 0);
                 })
@@ -58,9 +59,9 @@ const Espacos = () => {
                     const message =
                         axios.isAxiosError(err) && err.response?.status === 401
                             ? "Sessão expirada. Faça login novamente."
-                            : "Não foi possível carregar os espaços.";
+                            : "Não foi possível carregar os organizadores.";
                     setError(message);
-                    setVenues([]);
+                    setOrganizers([]);
                 })
                 .finally(() => {
                     if (!signal?.aborted) setIsLoading(false);
@@ -71,27 +72,26 @@ const Espacos = () => {
 
     useEffect(() => {
         const controller = new AbortController();
-        loadVenues(page, controller.signal);
+        loadOrganizers(page, controller.signal);
         return () => controller.abort();
-    }, [page, loadVenues]);
+    }, [page, loadOrganizers]);
 
     const normalizedSearch = searchInput.trim().toLowerCase();
 
-    const filteredVenues = useMemo(() => {
-        if (!normalizedSearch) return venues;
-        return venues.filter((venue) => {
-            const idMatch = String(venue.venueID).toLowerCase().includes(normalizedSearch);
-            const nameMatch = venue.name?.toLowerCase().includes(normalizedSearch);
-            const legalMatch = venue.legalName?.toLowerCase().includes(normalizedSearch);
-            const cnpjMatch = venue.CNPJ?.toLowerCase().includes(normalizedSearch);
-            const organizerMatch = venue.organizerName?.toLowerCase().includes(normalizedSearch);
-            const cityMatch = venue.city?.toLowerCase().includes(normalizedSearch);
-            return idMatch || nameMatch || legalMatch || cnpjMatch || organizerMatch || cityMatch;
+    const filteredOrganizers = useMemo(() => {
+        if (!normalizedSearch) return organizers;
+        return organizers.filter((organizer) => {
+            const idMatch = String(organizer.userID).toLowerCase().includes(normalizedSearch);
+            const emailMatch = organizer.email?.toLowerCase().includes(normalizedSearch);
+            const nameMatch = organizer.organizerName?.toLowerCase().includes(normalizedSearch);
+            const legalMatch = organizer.legalName?.toLowerCase().includes(normalizedSearch);
+            const cnpjMatch = organizer.CNPJ?.toLowerCase().includes(normalizedSearch);
+            return idMatch || emailMatch || nameMatch || legalMatch || cnpjMatch;
         });
-    }, [venues, normalizedSearch]);
+    }, [organizers, normalizedSearch]);
 
-    const handleEdit = (venueId: number) => {
-        navigate(`/admin/espacos/${venueId}`);
+    const handleEdit = (userID: string) => {
+        navigate(`/admin/organizadores/${userID}`);
     };
 
     const rangeStart = totalElements === 0 ? 0 : page * PAGE_SIZE + 1;
@@ -100,9 +100,9 @@ const Espacos = () => {
     return (
         <div>
             <AdminPageHeader
-                icon={Building2}
-                title="Espaços"
-                description="Cadastre e gerencie os locais onde os eventos acontecem."
+                icon={UserCog}
+                title="Organizadores"
+                description="Gerencie produtores, permissões e eventos vinculados."
             />
 
             <div
@@ -122,18 +122,18 @@ const Espacos = () => {
                             type="search"
                             value={searchInput}
                             onChange={(e) => setSearchInput(e.target.value)}
-                            placeholder="Buscar por nome, CNPJ, organizador ou cidade"
+                            placeholder="Buscar por nome, CNPJ ou e-mail"
                             className="h-10 w-full rounded-2xl border border-primary/20 bg-white/70 pl-10 pr-4 text-sm text-[#00334d] placeholder:text-[#5e6c87]/70 backdrop-blur-xl shadow-sm outline-none transition-all duration-300 focus:border-[#2a8fd4]/50 focus:bg-white/90 focus:shadow-[0_0_0_4px_rgba(42,143,212,0.12)]"
                         />
                     </div>
 
                     <div className="flex items-center gap-2">
                         <span className="text-xs text-[#5e6c87]">
-                            {totalElements} espaço{totalElements === 1 ? "" : "s"} no total
+                            {totalElements} organizador{totalElements === 1 ? "" : "es"} no total
                         </span>
                         <button
                             type="button"
-                            onClick={() => loadVenues(page)}
+                            onClick={() => loadOrganizers(page)}
                             className="flex size-9 cursor-pointer items-center justify-center rounded-xl border border-white/70 bg-[#2a8fd4] text-white transition-all duration-300 hover:scale-90 shadow-xl"
                             aria-label="Recarregar"
                             title="Recarregar"
@@ -150,21 +150,21 @@ const Espacos = () => {
                     <table className="w-full text-sm overflow-hidden">
                         <thead>
                             <tr className="border-y border-white/80 bg-linear-to-r from-[#e5f1ff]/60 to-transparent text-left">
-                                <Th className="pl-6">Espaço</Th>
+                                <Th className="pl-6">Organizador</Th>
                                 <Th>CNPJ</Th>
-                                <Th>Organizador</Th>
+                                <Th>E-mail</Th>
                                 <Th>Localização</Th>
                                 <Th>Status</Th>
                                 <Th>Ações</Th>
                             </tr>
                         </thead>
                         <tbody>
-                            {isLoading && venues.length === 0 ? (
+                            {isLoading && organizers.length === 0 ? (
                                 <tr>
                                     <td colSpan={6} className="py-14 text-center">
                                         <div className="inline-flex items-center gap-2 text-sm text-[#5e6c87]">
                                             <Loader2 className="size-4 animate-spin" />
-                                            Carregando espaços...
+                                            Carregando organizadores...
                                         </div>
                                     </td>
                                 </tr>
@@ -174,19 +174,19 @@ const Espacos = () => {
                                         {error}
                                     </td>
                                 </tr>
-                            ) : filteredVenues.length === 0 ? (
+                            ) : filteredOrganizers.length === 0 ? (
                                 <tr>
                                     <td colSpan={6} className="py-14 text-center text-sm text-[#5e6c87]">
                                         {normalizedSearch
-                                            ? "Nenhum espaço corresponde à busca nesta página."
-                                            : "Nenhum espaço encontrado."}
+                                            ? "Nenhum organizador corresponde à busca nesta página."
+                                            : "Nenhum organizador encontrado."}
                                     </td>
                                 </tr>
                             ) : (
-                                filteredVenues.map((venue) => (
-                                    <VenueRow
-                                        key={venue.venueID}
-                                        venue={venue}
+                                filteredOrganizers.map((organizer) => (
+                                    <OrganizerRow
+                                        key={organizer.userID}
+                                        organizer={organizer}
                                         onEdit={handleEdit}
                                     />
                                 ))
@@ -236,14 +236,14 @@ const Espacos = () => {
     );
 };
 
-type VenueRowProps = {
-    venue: VenueMinDTO;
-    onEdit: (venueId: number) => void;
+type OrganizerRowProps = {
+    organizer: OrganizerMinDTO;
+    onEdit: (userID: string) => void;
 };
 
-const VenueRow = ({ venue, onEdit }: VenueRowProps) => {
-    const location = formatLocation(venue);
-    const isActive = venue.statusName === "ACTIVE";
+const OrganizerRow = ({ organizer, onEdit }: OrganizerRowProps) => {
+    const location = formatLocation(organizer);
+    const isActive = organizer.statusName === "ACTIVE";
 
     return (
         <tr className="border-b border-white/70 hover:bg-primary/5 hover:scale-[1.02] overflow-hidden transition-all duration-200">
@@ -262,26 +262,22 @@ const VenueRow = ({ venue, onEdit }: VenueRowProps) => {
                     </div>
                     <div className="min-w-0">
                         <p className="truncate text-sm font-bold text-[#00334d]">
-                            {venue.name}
+                            {organizer.organizerName}
                         </p>
                         <p className="truncate text-[11px] text-[#5e6c87]">
-                            {venue.legalName}
+                            {organizer.legalName}
                         </p>
                     </div>
                 </div>
             </td>
             <td className="py-3 pr-4 align-middle text-sm text-[#5e6c87] font-mono">
-                {venue.CNPJ || <span className="text-[#5e6c87]/60">—</span>}
+                {organizer.CNPJ || <span className="text-[#5e6c87]/60">—</span>}
             </td>
-            <td className="py-3 pr-4 align-middle text-sm text-[#00334d]">
-                {venue.organizerName ? (
-                    <span className="inline-flex items-center gap-1.5">
-                        <UserCircle2 className="size-3.5 text-[#2a8fd4]" />
-                        {venue.organizerName}
-                    </span>
-                ) : (
-                    <span className="text-[#5e6c87]/60">—</span>
-                )}
+            <td className="py-3 pr-4 align-middle">
+                <span className="inline-flex items-center gap-1.5 text-sm text-[#00334d]">
+                    <Mail className="size-3.5 text-[#2a8fd4]" />
+                    {organizer.email}
+                </span>
             </td>
             <td className="py-3 pr-4 align-middle text-sm text-[#5e6c87]">
                 {location ? (
@@ -313,7 +309,7 @@ const VenueRow = ({ venue, onEdit }: VenueRowProps) => {
                 <div className="flex items-center justify-start gap-2">
                     <button
                         type="button"
-                        onClick={() => onEdit(venue.venueID)}
+                        onClick={() => onEdit(organizer.userID)}
                         className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold text-white transition-all duration-300 hover:brightness-110 hover:shadow-lg"
                         style={{
                             background:
@@ -321,7 +317,7 @@ const VenueRow = ({ venue, onEdit }: VenueRowProps) => {
                             boxShadow:
                                 "0 4px 12px -3px rgba(42,143,212,0.45), inset 0 1px 0 0 rgba(255,255,255,0.35)",
                         }}
-                        title="Editar espaço"
+                        title="Editar organizador"
                     >
                         <Pencil className="size-3.5" strokeWidth={2.6} />
                         Editar
@@ -357,4 +353,4 @@ const PagerButton = ({
     </button>
 );
 
-export default Espacos;
+export default Organizadores;

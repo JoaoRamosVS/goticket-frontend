@@ -16,10 +16,14 @@ import Admin from '@/pages/Admin';
 import AdminDashboard from '@/pages/admin/Dashboard';
 import AdminEventos from '@/pages/admin/Eventos';
 import AdminEditarEvento from '@/pages/admin/EditarEvento';
-import AdminUsuarios from '@/pages/admin/Usuarios';
+import AdminClientes from '@/pages/admin/Clientes';
+import AdminEditarCliente from '@/pages/admin/EditarCliente';
+import AdminOrganizadores from '@/pages/admin/Organizadores';
+import AdminEditarOrganizador from '@/pages/admin/EditarOrganizador';
 import AdminVendas from '@/pages/admin/Vendas';
 import AdminConfiguracoes from '@/pages/admin/Configuracoes';
 import AdminEspacos from '@/pages/admin/Espacos';
+import AdminEditarEspaco from '@/pages/admin/EditarEspaco';
 
 function AppContent() {
   const isAuth = useAuthStore((state) => state.isAuth)
@@ -44,7 +48,11 @@ function AppContent() {
           <Route path="eventos" element={<AdminEventos />} />
           <Route path="eventos/:eventId" element={<AdminEditarEvento />} />
           <Route path="espacos" element={<AdminEspacos />} />
-          <Route path="usuarios" element={<AdminUsuarios />} />
+          <Route path="espacos/:venueId" element={<AdminEditarEspaco />} />
+          <Route path="clientes" element={<AdminClientes />} />
+          <Route path="clientes/:clientId" element={<AdminEditarCliente />} />
+          <Route path="organizadores" element={<AdminOrganizadores />} />
+          <Route path="organizadores/:organizerId" element={<AdminEditarOrganizador />} />
           <Route path="vendas" element={<AdminVendas />} />
           <Route path="configuracoes" element={<AdminConfiguracoes />} />
         </Route>

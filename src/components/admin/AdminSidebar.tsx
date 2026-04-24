@@ -3,6 +3,7 @@ import {
     LayoutDashboard,
     CalendarDays,
     Users,
+    UserCog,
     Settings,
     LogOut,
     ChevronRight,
@@ -22,7 +23,8 @@ type NavItem = {
 const NAV_ITEMS: NavItem[] = [
     { to: "/admin/eventos", label: "Eventos", icon: CalendarDays },
     { to: "/admin/espacos", label: "Espaços", icon: Building2 },
-    { to: "/admin/usuarios", label: "Usuários", icon: Users },
+    { to: "/admin/clientes", label: "Clientes", icon: Users },
+    { to: "/admin/organizadores", label: "Organizadores", icon: UserCog },
 ];
 
 const SECONDARY_ITEMS: NavItem[] = [

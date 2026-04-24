@@ -15,13 +15,16 @@ import {
 } from "lucide-react";
 
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
+
 import eventService from "@/services/event";
+
 import {
     formatEventDate,
     formatEventLocation,
     formatEventStartingPrice,
     getEventMainImage,
 } from "@/helpers/events";
+
 import type { EventMinDTO } from "@/types";
 
 const PAGE_SIZE = 10;
@@ -171,7 +174,7 @@ const Eventos = () => {
                                 <Th>Local</Th>
                                 <Th>Data</Th>
                                 <Th>Preço inicial</Th>
-                                <Th className="pr-6 text-right">Ações</Th>
+                                <Th>Ações</Th>
                             </tr>
                         </thead>
                         <tbody>
@@ -312,7 +315,7 @@ const EventRow = ({ event, isDeleting, onEdit, onDelete }: EventRowProps) => {
                 {formattedPrice ?? <span className="text-[#5e6c87]/60">—</span>}
             </td>
             <td className="py-3 pl-2 pr-6 align-middle">
-                <div className="flex items-center justify-end gap-2">
+                <div className="flex items-center justify-start gap-2">
                     <button
                         type="button"
                         onClick={() => onEdit(event.eventID)}

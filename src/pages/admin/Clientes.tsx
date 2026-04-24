@@ -2,38 +2,52 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
-    Building2,
     ChevronLeft,
     ChevronRight,
     Loader2,
+    Mail,
     MapPin,
     Pencil,
     RefreshCcw,
     Search,
     ShieldCheck,
     ShieldOff,
-    UserCircle2,
+    User,
+    Users,
 } from "lucide-react";
 
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
 
-import venueService from "@/services/venue";
+import clientService from "@/services/client";
 
-import type { VenueMinDTO } from "@/types";
+import type { ClientMinDTO } from "@/types";
 
 const PAGE_SIZE = 10;
 
-function formatLocation(venue: VenueMinDTO): string | null {
-    if (venue.city && venue.state) {
-        return `${venue.city}/${venue.state}`;
+function formatLocation(client: ClientMinDTO): string | null {
+    if (client.city && client.state) {
+        return `${client.city}/${client.state}`;
     }
-    return venue.city ?? venue.state ?? null;
+    return client.city ?? client.state ?? null;
 }
 
-const Espacos = () => {
+function formatBirthDate(birthDate: string | null): string | null {
+    if (!birthDate) return null;
+    const [year, month, day] = birthDate.split("-");
+    if (!year || !month || !day) return null;
+    return `${day}/${month}/${year}`;
+}
+
+function formatSex(sex: number | null): string {
+    if (sex === 1) return "Masculino";
+    if (sex === 2) return "Feminino";
+    return "—";
+}
+
+const Clientes = () => {
     const navigate = useNavigate();
 
-    const [venues, setVenues] = useState<VenueMinDTO[]>([]);
+    const [clients, setClients] = useState<ClientMinDTO[]>([]);
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const [totalElements, setTotalElements] = useState(0);
@@ -41,15 +55,15 @@ const Espacos = () => {
     const [error, setError] = useState<string | null>(null);
     const [searchInput, setSearchInput] = useState("");
 
-    const loadVenues = useCallback(
+    const loadClients = useCallback(
         (targetPage: number, signal?: AbortSignal) => {
             setIsLoading(true);
             setError(null);
 
-            return venueService
-                .listVenues(targetPage, PAGE_SIZE, signal)
+            return clientService
+                .listClients(targetPage, PAGE_SIZE, signal)
                 .then((data) => {
-                    setVenues(data.venueMinDTOList ?? []);
+                    setClients(data.clientMinDTOList ?? []);
                     setTotalPages(Math.max(1, data.totalPages ?? 1));
                     setTotalElements(data.totalElements ?? 0);
                 })
@@ -58,9 +72,9 @@ const Espacos = () => {
                     const message =
                         axios.isAxiosError(err) && err.response?.status === 401
                             ? "Sessão expirada. Faça login novamente."
-                            : "Não foi possível carregar os espaços.";
+                            : "Não foi possível carregar os clientes.";
                     setError(message);
-                    setVenues([]);
+                    setClients([]);
                 })
                 .finally(() => {
                     if (!signal?.aborted) setIsLoading(false);
@@ -71,27 +85,25 @@ const Espacos = () => {
 
     useEffect(() => {
         const controller = new AbortController();
-        loadVenues(page, controller.signal);
+        loadClients(page, controller.signal);
         return () => controller.abort();
-    }, [page, loadVenues]);
+    }, [page, loadClients]);
 
     const normalizedSearch = searchInput.trim().toLowerCase();
 
-    const filteredVenues = useMemo(() => {
-        if (!normalizedSearch) return venues;
-        return venues.filter((venue) => {
-            const idMatch = String(venue.venueID).toLowerCase().includes(normalizedSearch);
-            const nameMatch = venue.name?.toLowerCase().includes(normalizedSearch);
-            const legalMatch = venue.legalName?.toLowerCase().includes(normalizedSearch);
-            const cnpjMatch = venue.CNPJ?.toLowerCase().includes(normalizedSearch);
-            const organizerMatch = venue.organizerName?.toLowerCase().includes(normalizedSearch);
-            const cityMatch = venue.city?.toLowerCase().includes(normalizedSearch);
-            return idMatch || nameMatch || legalMatch || cnpjMatch || organizerMatch || cityMatch;
+    const filteredClients = useMemo(() => {
+        if (!normalizedSearch) return clients;
+        return clients.filter((client) => {
+            const idMatch = String(client.userID).toLowerCase().includes(normalizedSearch);
+            const emailMatch = client.email?.toLowerCase().includes(normalizedSearch);
+            const nameMatch = client.fullName?.toLowerCase().includes(normalizedSearch);
+            const cpfMatch = client.identityDocument?.toLowerCase().includes(normalizedSearch);
+            return idMatch || emailMatch || nameMatch || cpfMatch;
         });
-    }, [venues, normalizedSearch]);
+    }, [clients, normalizedSearch]);
 
-    const handleEdit = (venueId: number) => {
-        navigate(`/admin/espacos/${venueId}`);
+    const handleEdit = (userID: string) => {
+        navigate(`/admin/clientes/${userID}`);
     };
 
     const rangeStart = totalElements === 0 ? 0 : page * PAGE_SIZE + 1;
@@ -100,9 +112,9 @@ const Espacos = () => {
     return (
         <div>
             <AdminPageHeader
-                icon={Building2}
-                title="Espaços"
-                description="Cadastre e gerencie os locais onde os eventos acontecem."
+                icon={Users}
+                title="Clientes"
+                description="Gerencie contas, permissões e histórico de clientes."
             />
 
             <div
@@ -122,18 +134,18 @@ const Espacos = () => {
                             type="search"
                             value={searchInput}
                             onChange={(e) => setSearchInput(e.target.value)}
-                            placeholder="Buscar por nome, CNPJ, organizador ou cidade"
+                            placeholder="Buscar por nome, CPF ou e-mail"
                             className="h-10 w-full rounded-2xl border border-primary/20 bg-white/70 pl-10 pr-4 text-sm text-[#00334d] placeholder:text-[#5e6c87]/70 backdrop-blur-xl shadow-sm outline-none transition-all duration-300 focus:border-[#2a8fd4]/50 focus:bg-white/90 focus:shadow-[0_0_0_4px_rgba(42,143,212,0.12)]"
                         />
                     </div>
 
                     <div className="flex items-center gap-2">
                         <span className="text-xs text-[#5e6c87]">
-                            {totalElements} espaço{totalElements === 1 ? "" : "s"} no total
+                            {totalElements} cliente{totalElements === 1 ? "" : "s"} no total
                         </span>
                         <button
                             type="button"
-                            onClick={() => loadVenues(page)}
+                            onClick={() => loadClients(page)}
                             className="flex size-9 cursor-pointer items-center justify-center rounded-xl border border-white/70 bg-[#2a8fd4] text-white transition-all duration-300 hover:scale-90 shadow-xl"
                             aria-label="Recarregar"
                             title="Recarregar"
@@ -150,43 +162,44 @@ const Espacos = () => {
                     <table className="w-full text-sm overflow-hidden">
                         <thead>
                             <tr className="border-y border-white/80 bg-linear-to-r from-[#e5f1ff]/60 to-transparent text-left">
-                                <Th className="pl-6">Espaço</Th>
-                                <Th>CNPJ</Th>
-                                <Th>Organizador</Th>
+                                <Th className="pl-6">Cliente</Th>
+                                <Th>CPF</Th>
+                                <Th>E-mail</Th>
+                                <Th>Nascimento</Th>
                                 <Th>Localização</Th>
                                 <Th>Status</Th>
                                 <Th>Ações</Th>
                             </tr>
                         </thead>
                         <tbody>
-                            {isLoading && venues.length === 0 ? (
+                            {isLoading && clients.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="py-14 text-center">
+                                    <td colSpan={7} className="py-14 text-center">
                                         <div className="inline-flex items-center gap-2 text-sm text-[#5e6c87]">
                                             <Loader2 className="size-4 animate-spin" />
-                                            Carregando espaços...
+                                            Carregando clientes...
                                         </div>
                                     </td>
                                 </tr>
                             ) : error ? (
                                 <tr>
-                                    <td colSpan={6} className="py-14 text-center text-sm text-red-500">
+                                    <td colSpan={7} className="py-14 text-center text-sm text-red-500">
                                         {error}
                                     </td>
                                 </tr>
-                            ) : filteredVenues.length === 0 ? (
+                            ) : filteredClients.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="py-14 text-center text-sm text-[#5e6c87]">
+                                    <td colSpan={7} className="py-14 text-center text-sm text-[#5e6c87]">
                                         {normalizedSearch
-                                            ? "Nenhum espaço corresponde à busca nesta página."
-                                            : "Nenhum espaço encontrado."}
+                                            ? "Nenhum cliente corresponde à busca nesta página."
+                                            : "Nenhum cliente encontrado."}
                                     </td>
                                 </tr>
                             ) : (
-                                filteredVenues.map((venue) => (
-                                    <VenueRow
-                                        key={venue.venueID}
-                                        venue={venue}
+                                filteredClients.map((client) => (
+                                    <ClientRow
+                                        key={client.userID}
+                                        client={client}
                                         onEdit={handleEdit}
                                     />
                                 ))
@@ -236,14 +249,15 @@ const Espacos = () => {
     );
 };
 
-type VenueRowProps = {
-    venue: VenueMinDTO;
-    onEdit: (venueId: number) => void;
+type ClientRowProps = {
+    client: ClientMinDTO;
+    onEdit: (userID: string) => void;
 };
 
-const VenueRow = ({ venue, onEdit }: VenueRowProps) => {
-    const location = formatLocation(venue);
-    const isActive = venue.statusName === "ACTIVE";
+const ClientRow = ({ client, onEdit }: ClientRowProps) => {
+    const location = formatLocation(client);
+    const birth = formatBirthDate(client.birthDate);
+    const isActive = client.statusName === "ACTIVE";
 
     return (
         <tr className="border-b border-white/70 hover:bg-primary/5 hover:scale-[1.02] overflow-hidden transition-all duration-200">
@@ -258,30 +272,31 @@ const VenueRow = ({ venue, onEdit }: VenueRowProps) => {
                                 "0 4px 12px -3px rgba(42,143,212,0.45), inset 0 1px 0 0 rgba(255,255,255,0.35)",
                         }}
                     >
-                        <Building2 className="size-5" strokeWidth={2.4} />
+                        <User className="size-5" strokeWidth={2.4} />
                     </div>
                     <div className="min-w-0">
                         <p className="truncate text-sm font-bold text-[#00334d]">
-                            {venue.name}
+                            {client.fullName}
                         </p>
                         <p className="truncate text-[11px] text-[#5e6c87]">
-                            {venue.legalName}
+                            {formatSex(client.sex)}
                         </p>
                     </div>
                 </div>
             </td>
             <td className="py-3 pr-4 align-middle text-sm text-[#5e6c87] font-mono">
-                {venue.CNPJ || <span className="text-[#5e6c87]/60">—</span>}
-            </td>
-            <td className="py-3 pr-4 align-middle text-sm text-[#00334d]">
-                {venue.organizerName ? (
-                    <span className="inline-flex items-center gap-1.5">
-                        <UserCircle2 className="size-3.5 text-[#2a8fd4]" />
-                        {venue.organizerName}
-                    </span>
-                ) : (
+                {client.identityDocument || (
                     <span className="text-[#5e6c87]/60">—</span>
                 )}
+            </td>
+            <td className="py-3 pr-4 align-middle">
+                <span className="inline-flex items-center gap-1.5 text-sm text-[#00334d]">
+                    <Mail className="size-3.5 text-[#2a8fd4]" />
+                    {client.email}
+                </span>
+            </td>
+            <td className="py-3 pr-4 align-middle text-sm text-[#5e6c87]">
+                {birth ?? <span className="text-[#5e6c87]/60">—</span>}
             </td>
             <td className="py-3 pr-4 align-middle text-sm text-[#5e6c87]">
                 {location ? (
@@ -313,7 +328,7 @@ const VenueRow = ({ venue, onEdit }: VenueRowProps) => {
                 <div className="flex items-center justify-start gap-2">
                     <button
                         type="button"
-                        onClick={() => onEdit(venue.venueID)}
+                        onClick={() => onEdit(client.userID)}
                         className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold text-white transition-all duration-300 hover:brightness-110 hover:shadow-lg"
                         style={{
                             background:
@@ -321,7 +336,7 @@ const VenueRow = ({ venue, onEdit }: VenueRowProps) => {
                             boxShadow:
                                 "0 4px 12px -3px rgba(42,143,212,0.45), inset 0 1px 0 0 rgba(255,255,255,0.35)",
                         }}
-                        title="Editar espaço"
+                        title="Editar cliente"
                     >
                         <Pencil className="size-3.5" strokeWidth={2.6} />
                         Editar
@@ -357,4 +372,4 @@ const PagerButton = ({
     </button>
 );
 
-export default Espacos;
+export default Clientes;
