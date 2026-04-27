@@ -8,6 +8,7 @@ import {
     LogOut,
     ChevronRight,
     Building2,
+    Tags,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -22,6 +23,7 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
     { to: "/admin/eventos", label: "Eventos", icon: CalendarDays },
+    { to: "/admin/categorias", label: "Categorias", icon: Tags },
     { to: "/admin/espacos", label: "Espaços", icon: Building2 },
     { to: "/admin/clientes", label: "Clientes", icon: Users },
     { to: "/admin/organizadores", label: "Organizadores", icon: UserCog },

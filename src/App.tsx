@@ -24,6 +24,8 @@ import AdminVendas from '@/pages/admin/Vendas';
 import AdminConfiguracoes from '@/pages/admin/Configuracoes';
 import AdminEspacos from '@/pages/admin/Espacos';
 import AdminEditarEspaco from '@/pages/admin/EditarEspaco';
+import AdminCategorias from '@/pages/admin/Categorias';
+import AdminEditarCategoria from '@/pages/admin/EditarCategoria';
 
 function AppContent() {
   const isAuth = useAuthStore((state) => state.isAuth)
@@ -53,6 +55,8 @@ function AppContent() {
           <Route path="clientes/:clientId" element={<AdminEditarCliente />} />
           <Route path="organizadores" element={<AdminOrganizadores />} />
           <Route path="organizadores/:organizerId" element={<AdminEditarOrganizador />} />
+          <Route path="categorias" element={<AdminCategorias />} />
+          <Route path="categorias/:categoryId" element={<AdminEditarCategoria />} />
           <Route path="vendas" element={<AdminVendas />} />
           <Route path="configuracoes" element={<AdminConfiguracoes />} />
         </Route>

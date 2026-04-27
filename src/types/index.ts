@@ -52,6 +52,31 @@ export interface EventImageDTO {
 }
 
 /**
+ * Espelha `tech.goticket.backendapi.event.dto.EventCategoryDTO`
+ * (`GET /event-categories`).
+ */
+export interface EventCategoryDTO {
+    categoryId: number;
+    name: string;
+    slug: string;
+}
+
+/**
+ * Payload aceito pelo `PATCH /event-categories/{categoryId}` (merge-patch+json).
+ * O slug é gerado automaticamente pelo backend a partir do nome.
+ */
+export interface UpdateEventCategoryPayload {
+    name?: string;
+}
+
+/**
+ * Payload de criação utilizado em `POST /event-categories`.
+ */
+export interface CreateEventCategoryDTO {
+    name: string;
+}
+
+/**
  * Representa o payload de `GET /events/{eventId}`.
  * Espelha a entidade `tech.goticket.backendapi.event.Event`.
  */
@@ -68,6 +93,7 @@ export interface EventDetailDTO {
     lastUpdateDate: string;
     status: { statusID: number; name: EventStatusName };
     eventVisibility: { visibilityID: number; name: EventVisibilityValue };
+    category: EventCategoryDTO | null;
     organizer: { userID: string; fullName?: string } | null;
     venue: {
         venueID: number;
@@ -180,6 +206,7 @@ export interface UpdateEventPayload {
     startDate?: string;
     endDate?: string;
     salesStartDate?: string | null;
+    category?: { categoryId: number };
 }
 
 export type RoleValue = "ADMIN" | "ORGANIZER" | "CLIENT";

@@ -6,12 +6,14 @@ import {
     CheckCircle2,
     Eye,
     EyeOff,
+    Hash,
     ImagePlus,
     Info,
     Loader2,
     Pencil,
     Save,
     Star,
+    Tags,
     Trash2,
     Upload,
     X,
@@ -19,8 +21,10 @@ import {
 
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
 import eventService from "@/services/event";
+import eventCategoryService from "@/services/eventCategory";
 import { buildEventImageUrl } from "@/helpers/events";
 import type {
+    EventCategoryDTO,
     EventDetailDTO,
     EventVisibilityValue,
     UpdateEventPayload,
@@ -129,6 +133,10 @@ const EditarEvento = () => {
     const [event, setEvent] = useState<EventDetailDTO | null>(null);
     const [form, setForm] = useState<FormState>(EMPTY_FORM);
 
+    const [categories, setCategories] = useState<EventCategoryDTO[]>([]);
+    const [isLoadingCategories, setIsLoadingCategories] = useState(false);
+    const [isSavingCategory, setIsSavingCategory] = useState(false);
+
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [isTogglingVisibility, setIsTogglingVisibility] = useState(false);
@@ -169,6 +177,22 @@ const EditarEvento = () => {
         fetchEvent(controller.signal);
         return () => controller.abort();
     }, [fetchEvent]);
+
+    useEffect(() => {
+        const controller = new AbortController();
+        setIsLoadingCategories(true);
+        eventCategoryService
+            .listEventCategories(controller.signal)
+            .then((data) => setCategories(data ?? []))
+            .catch((err: unknown) => {
+                if (axios.isCancel(err)) return;
+                setCategories([]);
+            })
+            .finally(() => {
+                if (!controller.signal.aborted) setIsLoadingCategories(false);
+            });
+        return () => controller.abort();
+    }, []);
 
     useEffect(() => {
         if (!successMessage) return;
@@ -261,6 +285,31 @@ const EditarEvento = () => {
             );
         } finally {
             setIsUploadingImages(false);
+        }
+    };
+
+    const handleChangeCategory = async (nextCategoryId: number) => {
+        if (!event || !eventId) return;
+        if (event.category?.categoryId === nextCategoryId) return;
+
+        setIsSavingCategory(true);
+        setError(null);
+        try {
+            const updated = await eventService.updateEvent(eventId, {
+                category: { categoryId: nextCategoryId },
+            });
+            setEvent(updated);
+            setForm(eventToFormState(updated));
+            setSuccessMessage("Categoria do evento atualizada.");
+        } catch (err) {
+            setError(
+                getAxiosErrorMessage(
+                    err,
+                    "Não foi possível atualizar a categoria do evento."
+                )
+            );
+        } finally {
+            setIsSavingCategory(false);
         }
     };
 
@@ -454,6 +503,14 @@ const EditarEvento = () => {
                             current={event.eventVisibility?.name ?? "PRIVATE"}
                             isLoading={isTogglingVisibility}
                             onChange={handleToggleVisibility}
+                        />
+
+                        <CategoryCard
+                            current={event.category}
+                            categories={categories}
+                            isLoadingCategories={isLoadingCategories}
+                            isSaving={isSavingCategory}
+                            onChange={handleChangeCategory}
                         />
 
                         <MetadataCard event={event} />
@@ -652,6 +709,144 @@ const VisibilityButton = ({
     </button>
 );
 
+type CategoryCardProps = {
+    current: EventCategoryDTO | null;
+    categories: EventCategoryDTO[];
+    isLoadingCategories: boolean;
+    isSaving: boolean;
+    onChange: (categoryId: number) => void;
+};
+
+const CategoryCard = ({
+    current,
+    categories,
+    isLoadingCategories,
+    isSaving,
+    onChange,
+}: CategoryCardProps) => {
+    const [selected, setSelected] = useState<string>(
+        current ? String(current.categoryId) : ""
+    );
+
+    useEffect(() => {
+        setSelected(current ? String(current.categoryId) : "");
+    }, [current]);
+
+    const hasOptions = categories.length > 0;
+    const hasChange =
+        selected !== "" &&
+        Number(selected) !== (current?.categoryId ?? -1);
+
+    return (
+        <GlassCard>
+            <SectionHeader
+                title="Categoria"
+                description="Defina a categoria deste evento. Cada evento pode ter uma única categoria."
+            />
+
+            {current ? (
+                <div
+                    className="mb-4 flex items-center gap-3 rounded-2xl border border-white/70 bg-white/60 px-3 py-2.5"
+                    style={{
+                        boxShadow:
+                            "0 4px 14px -6px rgba(0,46,71,0.14), inset 0 1px 0 0 rgba(255,255,255,0.8)",
+                    }}
+                >
+                    <div
+                        className="flex size-10 shrink-0 items-center justify-center rounded-xl text-white"
+                        style={{
+                            background:
+                                "linear-gradient(135deg, #4db8e8 0%, #2a8fd4 50%, #1c6fb5 100%)",
+                            boxShadow:
+                                "0 4px 12px -3px rgba(42,143,212,0.45), inset 0 1px 0 0 rgba(255,255,255,0.35)",
+                        }}
+                    >
+                        <Tags className="size-4" strokeWidth={2.6} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-bold text-[#00334d]">
+                            {current.name}
+                        </p>
+                        <p className="inline-flex items-center gap-1 truncate text-[11px] text-[#5e6c87] font-mono">
+                            <Hash className="size-3" strokeWidth={2.6} />
+                            {current.slug}
+                        </p>
+                    </div>
+                </div>
+            ) : (
+                <div className="mb-4 rounded-2xl border border-dashed border-[#2a8fd4]/30 bg-white/40 p-3 text-center text-xs text-[#5e6c87]">
+                    Este evento ainda não possui categoria definida.
+                </div>
+            )}
+
+            <div className="flex flex-col gap-2">
+                <label
+                    htmlFor="categorySelect"
+                    className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#5e6c87]"
+                >
+                    Selecionar categoria
+                </label>
+                <select
+                    id="categorySelect"
+                    value={selected}
+                    disabled={
+                        isLoadingCategories || isSaving || !hasOptions
+                    }
+                    onChange={(e) => setSelected(e.target.value)}
+                    className="h-11 w-full cursor-pointer rounded-2xl border border-white/70 bg-white/60 px-4 text-sm text-[#00334d] backdrop-blur-xl shadow-xs outline-none transition-all duration-300 focus:border-[#2a8fd4]/50 focus:bg-white/90 focus:shadow-[0_0_0_4px_rgba(42,143,212,0.12)] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                    {!hasOptions && (
+                        <option value="" disabled>
+                            {isLoadingCategories
+                                ? "Carregando categorias..."
+                                : "Nenhuma categoria disponível"}
+                        </option>
+                    )}
+                    {hasOptions && (
+                        <>
+                            <option value="" disabled>
+                                Selecione uma categoria
+                            </option>
+                            {categories.map((category) => (
+                                <option
+                                    key={category.categoryId}
+                                    value={category.categoryId}
+                                >
+                                    {category.name}
+                                </option>
+                            ))}
+                        </>
+                    )}
+                </select>
+            </div>
+
+            <div className="mt-4 flex justify-end">
+                <button
+                    type="button"
+                    onClick={() => {
+                        if (selected !== "") onChange(Number(selected));
+                    }}
+                    disabled={!hasChange || isSaving}
+                    className="inline-flex cursor-pointer items-center gap-2 rounded-2xl px-4 py-2 text-sm font-bold text-white transition-all duration-300 hover:brightness-110 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
+                    style={{
+                        background:
+                            "linear-gradient(135deg, #4db8e8 0%, #2a8fd4 50%, #1c6fb5 100%)",
+                        boxShadow:
+                            "0 6px 18px -4px rgba(42,143,212,0.5), inset 0 1px 0 0 rgba(255,255,255,0.35)",
+                    }}
+                >
+                    {isSaving ? (
+                        <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                        <Save className="size-4" strokeWidth={2.6} />
+                    )}
+                    Aplicar categoria
+                </button>
+            </div>
+        </GlassCard>
+    );
+};
+
 type MetadataCardProps = {
     event: EventDetailDTO;
 };
@@ -661,6 +856,10 @@ const MetadataCard = ({ event }: MetadataCardProps) => (
         <SectionHeader title="Metadados" />
         <ul className="flex flex-col gap-2.5 text-sm">
             <MetaRow label="Status" value={event.status?.name ?? "—"} />
+            <MetaRow
+                label="Categoria"
+                value={event.category?.name ?? "—"}
+            />
             <MetaRow
                 label="Local"
                 value={
