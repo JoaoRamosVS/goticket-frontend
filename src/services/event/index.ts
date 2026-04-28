@@ -1,6 +1,7 @@
 import goTicketApi from "@/services/api";
 import type {
     EventDetailDTO,
+    EventImageOrderItemDTO,
     EventMinListDTO,
     EventVisibilityValue,
     UpdateEventPayload,
@@ -86,22 +87,29 @@ const updateEventVisibility = async (
 };
 
 /**
- * `PATCH /events/{eventId}/images` — upload multipart de imagens.
- * Anexa novas imagens ao evento e marca a de índice `mainImageIndex` como principal.
+ * `PUT /events/{eventId}/images` — substitui a galeria conforme `metadata` + arquivos `newImages`.
+ * `metadata` é um JSON serializado; cada item `existing` referencia `s3Key` já salvo;
+ * cada item `new` usa `fileIndex` apontando para a posição do arquivo em `newImages`.
  */
-const uploadEventImages = async (
+const replaceEventImages = async (
     eventId: number | string,
-    files: File[],
-    mainImageIndex: number = 0
+    metadata: EventImageOrderItemDTO[],
+    newImageFiles: File[]
 ): Promise<void> => {
     const formData = new FormData();
-    files.forEach((file) => formData.append("images", file));
-    formData.append("mainImageIndex", String(mainImageIndex));
+    formData.append("metadata", JSON.stringify(metadata));
+    newImageFiles.forEach((file) => formData.append("newImages", file));
 
-    await goTicketApi.patch(`/events/${eventId}/images`, formData, {
-        headers: authHeaders({
-            "Content-Type": "multipart/form-data",
-        }),
+    await goTicketApi.put(`/events/${eventId}/images`, formData, {
+        headers: authHeaders(),
+        transformRequest: [
+            (data, headers) => {
+                if (data instanceof FormData) {
+                    delete headers["Content-Type"];
+                }
+                return data;
+            },
+        ],
     });
 };
 
@@ -119,6 +127,6 @@ export default {
     getEventById,
     updateEvent,
     updateEventVisibility,
-    uploadEventImages,
+    replaceEventImages,
     deleteEvent,
 };

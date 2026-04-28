@@ -48,7 +48,18 @@ export type EventStatusName =
 export interface EventImageDTO {
     eventImageID: number;
     s3Key: string;
-    mainImage: boolean;
+    /** Ordem no backend; posição 0 = imagem principal. */
+    ordination?: number;
+}
+
+/**
+ * Item do JSON `metadata` em `PUT /events/{eventId}/images` (multipart).
+ * Espelha `tech.goticket.backendapi.event.dto.EventImageOrderItemDTO`.
+ */
+export interface EventImageOrderItemDTO {
+    type: "existing" | "new";
+    s3Key?: string | null;
+    fileIndex?: number | null;
 }
 
 /**

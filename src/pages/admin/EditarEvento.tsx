@@ -6,6 +6,7 @@ import {
     CheckCircle2,
     Eye,
     EyeOff,
+    GripVertical,
     Hash,
     ImagePlus,
     Info,
@@ -26,6 +27,8 @@ import { buildEventImageUrl } from "@/helpers/events";
 import type {
     EventCategoryDTO,
     EventDetailDTO,
+    EventImageDTO,
+    EventImageOrderItemDTO,
     EventVisibilityValue,
     UpdateEventPayload,
 } from "@/types";
@@ -116,6 +119,38 @@ function buildPatchPayload(
     return payload;
 }
 
+function sortEventImages(images: EventImageDTO[]): EventImageDTO[] {
+    return [...images].sort((a, b) => {
+        const oa = a.ordination ?? a.eventImageID;
+        const ob = b.ordination ?? b.eventImageID;
+        return oa - ob;
+    });
+}
+
+function moveItem<T>(arr: T[], from: number, to: number): T[] {
+    if (
+        from === to ||
+        from < 0 ||
+        to < 0 ||
+        from >= arr.length ||
+        to >= arr.length
+    ) {
+        return [...arr];
+    }
+    const next = [...arr];
+    const [item] = next.splice(from, 1);
+    next.splice(to, 0, item);
+    return next;
+}
+
+function reorderWithMainFirst<T>(items: T[], mainIndex: number): T[] {
+    if (items.length === 0) return [];
+    const clamped = Math.min(Math.max(mainIndex, 0), items.length - 1);
+    const main = items[clamped];
+    const rest = items.filter((_, i) => i !== clamped);
+    return [main, ...rest];
+}
+
 function getAxiosErrorMessage(err: unknown, fallback: string): string {
     if (axios.isAxiosError(err)) {
         const data = err.response?.data as
@@ -141,6 +176,7 @@ const EditarEvento = () => {
     const [isSaving, setIsSaving] = useState(false);
     const [isTogglingVisibility, setIsTogglingVisibility] = useState(false);
     const [isUploadingImages, setIsUploadingImages] = useState(false);
+    const [isSavingImageOrder, setIsSavingImageOrder] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
     const [error, setError] = useState<string | null>(null);
@@ -265,11 +301,29 @@ const EditarEvento = () => {
     };
 
     const handleUploadImages = async (files: File[], mainIndex: number) => {
-        if (!eventId || files.length === 0) return;
+        if (!eventId || !event || files.length === 0) return;
         setIsUploadingImages(true);
         setError(null);
         try {
-            await eventService.uploadEventImages(eventId, files, mainIndex);
+            const orderedNew = reorderWithMainFirst(files, mainIndex);
+            const sortedExisting = sortEventImages(event.images ?? []);
+            const metadata: EventImageOrderItemDTO[] = [
+                ...sortedExisting.map((img) => ({
+                    type: "existing" as const,
+                    s3Key: img.s3Key,
+                    fileIndex: null,
+                })),
+                ...orderedNew.map((_, idx) => ({
+                    type: "new" as const,
+                    s3Key: null,
+                    fileIndex: idx,
+                })),
+            ];
+            await eventService.replaceEventImages(
+                eventId,
+                metadata,
+                orderedNew
+            );
             await fetchEvent();
             setSuccessMessage(
                 files.length === 1
@@ -285,6 +339,33 @@ const EditarEvento = () => {
             );
         } finally {
             setIsUploadingImages(false);
+        }
+    };
+
+    const handleSaveImageOrder = async (orderedS3Keys: string[]) => {
+        if (!eventId || orderedS3Keys.length === 0) return;
+        setIsSavingImageOrder(true);
+        setError(null);
+        try {
+            const metadata: EventImageOrderItemDTO[] = orderedS3Keys.map(
+                (s3Key) => ({
+                    type: "existing" as const,
+                    s3Key,
+                    fileIndex: null,
+                })
+            );
+            await eventService.replaceEventImages(eventId, metadata, []);
+            await fetchEvent();
+            setSuccessMessage("Ordem das imagens atualizada.");
+        } catch (err) {
+            setError(
+                getAxiosErrorMessage(
+                    err,
+                    "Não foi possível salvar a ordem das imagens."
+                )
+            );
+        } finally {
+            setIsSavingImageOrder(false);
         }
     };
 
@@ -525,7 +606,9 @@ const EditarEvento = () => {
                         <ImagesPanel
                             event={event}
                             isUploading={isUploadingImages}
+                            isSavingOrder={isSavingImageOrder}
                             onUpload={handleUploadImages}
+                            onSaveOrder={handleSaveImageOrder}
                         />
                     </GlassCard>
                 </div>
@@ -935,13 +1018,49 @@ const DangerCard = ({ isDeleting, onDelete }: DangerCardProps) => (
 type ImagesPanelProps = {
     event: EventDetailDTO;
     isUploading: boolean;
+    isSavingOrder: boolean;
     onUpload: (files: File[], mainIndex: number) => void;
+    onSaveOrder: (orderedS3Keys: string[]) => void | Promise<void>;
 };
 
-const ImagesPanel = ({ event, isUploading, onUpload }: ImagesPanelProps) => {
+const DRAG_MIME = "application/x-goticket-image-index";
+
+const ImagesPanel = ({
+    event,
+    isUploading,
+    isSavingOrder,
+    onUpload,
+    onSaveOrder,
+}: ImagesPanelProps) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const [pending, setPending] = useState<File[]>([]);
     const [mainIndex, setMainIndex] = useState(0);
+
+    const serverOrderFingerprint = useMemo(
+        () =>
+            sortEventImages(event.images ?? [])
+                .map((i) => i.s3Key)
+                .join("\0"),
+        [event.images]
+    );
+
+    const [orderedImages, setOrderedImages] = useState<EventImageDTO[]>(() =>
+        sortEventImages(event.images ?? [])
+    );
+    const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
+
+    useEffect(() => {
+        setOrderedImages(sortEventImages(event.images ?? []));
+    }, [serverOrderFingerprint]);
+
+    const savedKeys = useMemo(
+        () => sortEventImages(event.images ?? []).map((i) => i.s3Key),
+        [event.images]
+    );
+    const draftKeys = orderedImages.map((i) => i.s3Key);
+    const orderDirty =
+        savedKeys.length !== draftKeys.length ||
+        savedKeys.some((k, i) => k !== draftKeys[i]);
 
     const previews = useMemo(
         () => pending.map((file) => URL.createObjectURL(file)),
@@ -953,6 +1072,35 @@ const ImagesPanel = ({ event, isUploading, onUpload }: ImagesPanelProps) => {
             previews.forEach((url) => URL.revokeObjectURL(url));
         };
     }, [previews]);
+
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+    };
+
+    const handleDragStart =
+        (index: number) => (e: React.DragEvent<HTMLDivElement>) => {
+            e.dataTransfer.setData(DRAG_MIME, String(index));
+            e.dataTransfer.effectAllowed = "move";
+            setDraggingIndex(index);
+        };
+
+    const handleDragEnd = () => {
+        setDraggingIndex(null);
+    };
+
+    const handleDropAt =
+        (toIndex: number) => (e: React.DragEvent<HTMLDivElement>) => {
+            e.preventDefault();
+            const raw = e.dataTransfer.getData(DRAG_MIME);
+            const from = Number(raw);
+            if (!Number.isFinite(from)) {
+                setDraggingIndex(null);
+                return;
+            }
+            setOrderedImages((prev) => moveItem(prev, from, toIndex));
+            setDraggingIndex(null);
+        };
 
     const handleFiles = (files: FileList | null) => {
         if (!files || files.length === 0) return;
@@ -974,14 +1122,19 @@ const ImagesPanel = ({ event, isUploading, onUpload }: ImagesPanelProps) => {
         clearPending();
     };
 
+    const handleSaveOrderClick = async () => {
+        if (!orderDirty || orderedImages.length === 0) return;
+        await onSaveOrder(orderedImages.map((img) => img.s3Key));
+    };
+
     return (
         <div>
             <SectionHeader
                 title="Imagens do evento"
-                description="Envie novas imagens ou selecione uma imagem existente para definir como principal."
+                description="Envie novas imagens (a marcada como principal fica na 1ª posição) ou reordene as existentes e salve em lote."
             />
 
-            <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_1.2fr]">
+            <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_minmax(0,1.4fr)]">
                 <div
                     className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-[#2a8fd4]/40 bg-linear-to-br from-[#e5f1ff]/40 to-white/30 p-6 text-center backdrop-blur-xl"
                 >
@@ -1096,27 +1249,79 @@ const ImagesPanel = ({ event, isUploading, onUpload }: ImagesPanelProps) => {
                     )}
                 </div>
 
-                <div>
-                    <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.14em] text-[#5e6c87]">
-                        Imagens existentes ({event.images?.length ?? 0})
-                    </p>
-                    {event.images && event.images.length > 0 ? (
-                        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
-                            {event.images.map((img) => (
+                <div className="flex min-h-0 flex-col gap-4">
+                    <div className="flex flex-wrap items-start justify-between gap-3 border-b border-white/60 pb-4">
+                        <div className="min-w-0 flex-1">
+                            <p className="mb-1 text-[11px] font-bold uppercase tracking-[0.14em] text-[#5e6c87]">
+                                Ordenação ({orderedImages.length})
+                            </p>
+                            <p className="text-xs text-[#5e6c87]">
+                                Arraste para a área principal (1ª posição) ou
+                                reordene as demais. Nada é enviado ao servidor
+                                até você clicar em salvar.
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={handleSaveOrderClick}
+                            disabled={
+                                !orderDirty ||
+                                orderedImages.length === 0 ||
+                                isSavingOrder
+                            }
+                            className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:brightness-110 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-40"
+                            style={{
+                                background:
+                                    "linear-gradient(135deg, #4db8e8 0%, #2a8fd4 50%, #1c6fb5 100%)",
+                                boxShadow:
+                                    "0 6px 18px -4px rgba(42,143,212,0.5), inset 0 1px 0 0 rgba(255,255,255,0.35)",
+                            }}
+                        >
+                            {isSavingOrder ? (
+                                <Loader2 className="size-4 animate-spin" />
+                            ) : (
+                                <Save className="size-4" strokeWidth={2.6} />
+                            )}
+                            Salvar ordem
+                        </button>
+                    </div>
+
+                    {orderedImages.length === 0 ? (
+                        <div className="rounded-2xl border border-dashed border-[#2a8fd4]/30 bg-white/40 p-6 text-center text-xs text-[#5e6c87]">
+                            Este evento ainda não possui imagens cadastradas.
+                        </div>
+                    ) : (
+                        <>
+                            <div>
+                                <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[#5e6c87]">
+                                    Imagem principal
+                                </p>
                                 <div
-                                    key={img.eventImageID}
-                                    className="relative overflow-hidden rounded-2xl border border-white/70 bg-white/60"
-                                    style={{
-                                        boxShadow:
-                                            "0 4px 14px -6px rgba(0,46,71,0.14), inset 0 1px 0 0 rgba(255,255,255,0.8)",
-                                    }}
+                                    onDragOver={handleDragOver}
+                                    onDrop={handleDropAt(0)}
+                                    className="relative min-h-[160px] rounded-4xl py-8 transition-colors shadow-2xs"
                                 >
-                                    <img
-                                        src={buildEventImageUrl(img.s3Key)}
-                                        alt={`Imagem ${img.eventImageID}`}
-                                        className="aspect-square w-full object-cover shadow-2xl"
-                                    />
-                                    {img.mainImage && (
+                                    <div
+                                        draggable
+                                        onDragStart={handleDragStart(0)}
+                                        onDragEnd={handleDragEnd}
+                                        className={`group relative mx-auto max-w-[220px] cursor-grab overflow-hidden rounded-xl shadow-2xl bg-white/60 active:cursor-grabbing ${
+                                            draggingIndex === 0 ? "opacity-50" : ""
+                                        }`}
+                                    >
+                                        <GripVertical
+                                            className="pointer-events-none absolute left-1.5 top-1.5 z-10 size-4 text-white drop-shadow-md"
+                                            strokeWidth={2.4}
+                                            aria-hidden
+                                        />
+                                        <img
+                                            src={buildEventImageUrl(
+                                                orderedImages[0].s3Key
+                                            )}
+                                            alt="Principal"
+                                            className="aspect-square w-full object-cover"
+                                            draggable={false}
+                                        />
                                         <span
                                             className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-bold uppercase text-white"
                                             style={{
@@ -1127,14 +1332,54 @@ const ImagesPanel = ({ event, isUploading, onUpload }: ImagesPanelProps) => {
                                             <Star className="size-3" />
                                             Principal
                                         </span>
-                                    )}
+                                    </div>
                                 </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="rounded-2xl border border-dashed border-[#2a8fd4]/30 bg-white/40 p-6 text-center text-xs text-[#5e6c87]">
-                            Este evento ainda não possui imagens cadastradas.
-                        </div>
+                            </div>
+
+                            {orderedImages.length > 1 && (
+                                <div>
+                                    <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[#5e6c87]">
+                                        Demais imagens
+                                    </p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {orderedImages
+                                            .slice(1)
+                                            .map((img, sliceIdx) => {
+                                                const index = sliceIdx + 1;
+                                                return (
+                                                    <div
+                                                        key={img.s3Key}
+                                                        draggable
+                                                        onDragStart={handleDragStart(
+                                                            index
+                                                        )}
+                                                        onDragEnd={handleDragEnd}
+                                                        onDragOver={handleDragOver}
+                                                        onDrop={handleDropAt(
+                                                            index
+                                                        )}
+                                                        className="group relative w-[calc(50%-0.25rem)] cursor-grab overflow-hidden rounded-xl shadow-2xl bg-white/60 sm:w-[calc(15%-0.34rem)] active:cursor-grabbing"
+                                                    >
+                                                        <GripVertical
+                                                            className="pointer-events-none absolute left-1 top-1 z-10 size-3.5 text-white drop-shadow-md"
+                                                            strokeWidth={2.4}
+                                                            aria-hidden
+                                                        />
+                                                        <img
+                                                            src={buildEventImageUrl(
+                                                                img.s3Key
+                                                            )}
+                                                            alt={`Imagem ${img.eventImageID}`}
+                                                            className="aspect-square w-full object-cover"
+                                                            draggable={false}
+                                                        />
+                                                    </div>
+                                                );
+                                            })}
+                                    </div>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </div>
