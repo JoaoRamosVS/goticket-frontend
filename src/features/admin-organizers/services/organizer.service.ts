@@ -1,11 +1,11 @@
 import goTicketApi from "@/services/api";
+import type { LoginResponse } from "@/types";
 import type {
     CreateOrganizerDTO,
-    LoginResponse,
     OrganizerDetailDTO,
     OrganizerListDTO,
     UpdateOrganizerPayload,
-} from "@/types";
+} from "@/features/admin-organizers/types/organizer.types";
 
 function authHeaders(extra?: Record<string, string>): Record<string, string> {
     const accessToken = localStorage.getItem("accessToken");

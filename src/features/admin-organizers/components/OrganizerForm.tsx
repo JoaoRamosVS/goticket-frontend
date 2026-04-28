@@ -1,25 +1,15 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import {
-    ArrowLeft,
     CheckCircle2,
     Info,
     Loader2,
-    Pencil,
     Save,
     ShieldCheck,
     ShieldOff,
 } from "lucide-react";
-
-import AdminPageHeader from "@/components/admin/AdminPageHeader";
-import organizerService from "@/services/organizer";
 import type {
     OrganizerDetailDTO,
-    StatusDTO,
     StatusValue,
-    UpdateOrganizerPayload,
-} from "@/types";
+} from "@/features/admin-organizers/types/organizer.types";
 
 type FormState = {
     email: string;
@@ -35,262 +25,39 @@ type FormState = {
     zipCode: string;
 };
 
-const EMPTY_FORM: FormState = {
-    email: "",
-    organizerName: "",
-    legalName: "",
-    CNPJ: "",
-    streetAddress: "",
-    streetAddressNumber: "",
-    neighborhood: "",
-    city: "",
-    state: "",
-    country: "",
-    zipCode: "",
+type OrganizerFormProps = {
+    organizer: OrganizerDetailDTO | null;
+    form: FormState;
+    isLoading: boolean;
+    isSaving: boolean;
+    isTogglingStatus: boolean;
+    error: string | null;
+    successMessage: string | null;
+    hasChanges: boolean;
+    onFieldChange: <K extends keyof FormState>(
+        field: K
+    ) => (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onSave: () => void;
+    onReset: () => void;
+    onToggleStatus: (value: StatusValue) => void;
 };
 
-const STATUS_OPTIONS: Record<StatusValue, { statusID: number; name: StatusValue }> = {
-    ACTIVE: { statusID: 1, name: "ACTIVE" },
-    INACTIVE: { statusID: 2, name: "INACTIVE" },
-};
-
-function organizerToFormState(org: OrganizerDetailDTO): FormState {
-    return {
-        email: org.email ?? "",
-        organizerName: org.organizerName ?? "",
-        legalName: org.legalName ?? "",
-        CNPJ: org.CNPJ ?? "",
-        streetAddress: org.streetAddress ?? "",
-        streetAddressNumber: org.streetAddressNumber ?? "",
-        neighborhood: org.neighborhood ?? "",
-        city: org.city ?? "",
-        state: org.state ?? "",
-        country: org.country ?? "",
-        zipCode: org.zipCode ?? "",
-    };
-}
-
-function normalizeOptional(value: string): string | null {
-    const trimmed = value.trim();
-    return trimmed.length === 0 ? null : trimmed;
-}
-
-function buildPatchPayload(
-    form: FormState,
-    original: OrganizerDetailDTO
-): UpdateOrganizerPayload {
-    const payload: UpdateOrganizerPayload = {};
-
-    if (form.email.trim() !== (original.email ?? "")) {
-        payload.email = form.email.trim();
-    }
-    if (form.organizerName.trim() !== (original.organizerName ?? "")) {
-        payload.organizerName = form.organizerName.trim();
-    }
-    if (form.legalName.trim() !== (original.legalName ?? "")) {
-        payload.legalName = form.legalName.trim();
-    }
-    if (form.CNPJ.trim() !== (original.CNPJ ?? "")) {
-        payload.CNPJ = form.CNPJ.trim();
-    }
-
-    const addressFields: Array<
-        keyof Pick<
-            FormState,
-            | "streetAddress"
-            | "streetAddressNumber"
-            | "neighborhood"
-            | "city"
-            | "state"
-            | "country"
-            | "zipCode"
-        >
-    > = [
-        "streetAddress",
-        "streetAddressNumber",
-        "neighborhood",
-        "city",
-        "state",
-        "country",
-        "zipCode",
-    ];
-
-    addressFields.forEach((field) => {
-        const next = normalizeOptional(form[field]);
-        const current = (original[field] as string | null) ?? null;
-        if (next !== current) {
-            (payload as Record<string, unknown>)[field] = next;
-        }
-    });
-
-    return payload;
-}
-
-function getAxiosErrorMessage(err: unknown, fallback: string): string {
-    if (axios.isAxiosError(err)) {
-        const data = err.response?.data as
-            | { message?: string; error?: string }
-            | undefined;
-        return data?.message ?? data?.error ?? err.message ?? fallback;
-    }
-    return fallback;
-}
-
-const EditarOrganizador = () => {
-    const navigate = useNavigate();
-    const { organizerId } = useParams<{ organizerId: string }>();
-
-    const [organizer, setOrganizer] = useState<OrganizerDetailDTO | null>(null);
-    const [form, setForm] = useState<FormState>(EMPTY_FORM);
-
-    const [isLoading, setIsLoading] = useState(true);
-    const [isSaving, setIsSaving] = useState(false);
-    const [isTogglingStatus, setIsTogglingStatus] = useState(false);
-
-    const [error, setError] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
-    const fetchOrganizer = useCallback(
-        (signal?: AbortSignal) => {
-            if (!organizerId) return;
-            setIsLoading(true);
-            setError(null);
-
-            return organizerService
-                .getOrganizerById(organizerId, signal)
-                .then((data) => {
-                    setOrganizer(data);
-                    setForm(organizerToFormState(data));
-                })
-                .catch((err: unknown) => {
-                    if (axios.isCancel(err)) return;
-                    setError(
-                        getAxiosErrorMessage(
-                            err,
-                            "Organizador não encontrado."
-                        )
-                    );
-                    setOrganizer(null);
-                })
-                .finally(() => {
-                    if (!signal?.aborted) setIsLoading(false);
-                });
-        },
-        [organizerId]
-    );
-
-    useEffect(() => {
-        const controller = new AbortController();
-        fetchOrganizer(controller.signal);
-        return () => controller.abort();
-    }, [fetchOrganizer]);
-
-    useEffect(() => {
-        if (!successMessage) return;
-        const id = window.setTimeout(() => setSuccessMessage(null), 3500);
-        return () => window.clearTimeout(id);
-    }, [successMessage]);
-
-    const patchPayload = useMemo(() => {
-        if (!organizer) return {};
-        return buildPatchPayload(form, organizer);
-    }, [form, organizer]);
-
-    const hasChanges = Object.keys(patchPayload).length > 0;
-
-    const handleFieldChange =
-        <K extends keyof FormState>(field: K) =>
-        (e: React.ChangeEvent<HTMLInputElement>) => {
-            setForm((prev) => ({ ...prev, [field]: e.target.value }));
-        };
-
-    const handleSave = async () => {
-        if (!organizer || !organizerId || !hasChanges) return;
-        setIsSaving(true);
-        setError(null);
-        try {
-            const updated = await organizerService.updateOrganizer(
-                organizerId,
-                patchPayload
-            );
-            setOrganizer(updated);
-            setForm(organizerToFormState(updated));
-            setSuccessMessage("Organizador atualizado com sucesso.");
-        } catch (err) {
-            setError(
-                getAxiosErrorMessage(
-                    err,
-                    "Não foi possível atualizar o organizador."
-                )
-            );
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
-    const handleReset = () => {
-        if (organizer) setForm(organizerToFormState(organizer));
-    };
-
-    const handleToggleStatus = async (next: StatusValue) => {
-        if (!organizer || !organizerId) return;
-        if (organizer.status?.name === next) return;
-
-        setIsTogglingStatus(true);
-        setError(null);
-        try {
-            const updated = await organizerService.updateOrganizer(
-                organizerId,
-                { status: STATUS_OPTIONS[next] as StatusDTO }
-            );
-            setOrganizer(updated);
-            setForm(organizerToFormState(updated));
-            setSuccessMessage(
-                next === "ACTIVE"
-                    ? "Organizador reativado."
-                    : "Organizador desativado."
-            );
-        } catch (err) {
-            setError(
-                getAxiosErrorMessage(
-                    err,
-                    "Não foi possível alterar o status."
-                )
-            );
-        } finally {
-            setIsTogglingStatus(false);
-        }
-    };
-
+export const OrganizerForm = ({
+    organizer,
+    form,
+    isLoading,
+    isSaving,
+    isTogglingStatus,
+    error,
+    successMessage,
+    hasChanges,
+    onFieldChange,
+    onSave,
+    onReset,
+    onToggleStatus,
+}: OrganizerFormProps) => {
     return (
-        <div>
-            <div className="mb-4 flex items-center gap-2">
-                <button
-                    type="button"
-                    onClick={() => navigate("/admin/organizadores")}
-                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-white/70 bg-white/60 px-3 py-1.5 text-xs font-semibold text-[#00334d] transition-all duration-300 hover:bg-white hover:shadow-md"
-                >
-                    <ArrowLeft className="size-3.5" strokeWidth={2.6} />
-                    Voltar para organizadores
-                </button>
-            </div>
-
-            <AdminPageHeader
-                icon={Pencil}
-                title={
-                    organizer
-                        ? `Editar: ${organizer.organizerName}`
-                        : "Editar organizador"
-                }
-                description={
-                    organizer
-                        ? `ID ${organizer.userID} · última atualização ${new Date(
-                              organizer.lastUpdateDate
-                          ).toLocaleString("pt-BR")}`
-                        : "Carregando detalhes do organizador..."
-                }
-            />
-
+        <>
             {error && <Banner variant="error" message={error} />}
             {successMessage && (
                 <Banner variant="success" message={successMessage} />
@@ -319,7 +86,7 @@ const EditarOrganizador = () => {
                                     id="email"
                                     type="email"
                                     value={form.email}
-                                    onChange={handleFieldChange("email")}
+                                    onChange={onFieldChange("email")}
                                     placeholder="contato@organizador.com"
                                 />
                             </Field>
@@ -333,7 +100,7 @@ const EditarOrganizador = () => {
                                     <TextInput
                                         id="organizerName"
                                         value={form.organizerName}
-                                        onChange={handleFieldChange(
+                                        onChange={onFieldChange(
                                             "organizerName"
                                         )}
                                         placeholder="Nome comercial"
@@ -347,7 +114,7 @@ const EditarOrganizador = () => {
                                     <TextInput
                                         id="legalName"
                                         value={form.legalName}
-                                        onChange={handleFieldChange("legalName")}
+                                        onChange={onFieldChange("legalName")}
                                         placeholder="Razão social registrada"
                                     />
                                 </Field>
@@ -357,7 +124,7 @@ const EditarOrganizador = () => {
                                 <TextInput
                                     id="CNPJ"
                                     value={form.CNPJ}
-                                    onChange={handleFieldChange("CNPJ")}
+                                    onChange={onFieldChange("CNPJ")}
                                     placeholder="00.000.000/0000-00"
                                     maxLength={18}
                                 />
@@ -379,7 +146,7 @@ const EditarOrganizador = () => {
                                         <TextInput
                                             id="streetAddress"
                                             value={form.streetAddress}
-                                            onChange={handleFieldChange(
+                                            onChange={onFieldChange(
                                                 "streetAddress"
                                             )}
                                             placeholder="Rua, Avenida..."
@@ -392,7 +159,7 @@ const EditarOrganizador = () => {
                                         <TextInput
                                             id="streetAddressNumber"
                                             value={form.streetAddressNumber}
-                                            onChange={handleFieldChange(
+                                            onChange={onFieldChange(
                                                 "streetAddressNumber"
                                             )}
                                             placeholder="Nº"
@@ -409,7 +176,7 @@ const EditarOrganizador = () => {
                                         <TextInput
                                             id="neighborhood"
                                             value={form.neighborhood}
-                                            onChange={handleFieldChange(
+                                            onChange={onFieldChange(
                                                 "neighborhood"
                                             )}
                                         />
@@ -418,7 +185,7 @@ const EditarOrganizador = () => {
                                         <TextInput
                                             id="zipCode"
                                             value={form.zipCode}
-                                            onChange={handleFieldChange(
+                                            onChange={onFieldChange(
                                                 "zipCode"
                                             )}
                                             placeholder="00000-000"
@@ -431,21 +198,21 @@ const EditarOrganizador = () => {
                                         <TextInput
                                             id="city"
                                             value={form.city}
-                                            onChange={handleFieldChange("city")}
+                                            onChange={onFieldChange("city")}
                                         />
                                     </Field>
                                     <Field label="Estado" htmlFor="state">
                                         <TextInput
                                             id="state"
                                             value={form.state}
-                                            onChange={handleFieldChange("state")}
+                                            onChange={onFieldChange("state")}
                                         />
                                     </Field>
                                     <Field label="País" htmlFor="country">
                                         <TextInput
                                             id="country"
                                             value={form.country}
-                                            onChange={handleFieldChange(
+                                            onChange={onFieldChange(
                                                 "country"
                                             )}
                                         />
@@ -457,7 +224,7 @@ const EditarOrganizador = () => {
                         <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
                             <button
                                 type="button"
-                                onClick={handleReset}
+                                onClick={onReset}
                                 disabled={!hasChanges || isSaving}
                                 className="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-white/70 bg-white/60 px-4 py-2 text-sm font-semibold text-[#00334d] transition-all duration-300 hover:bg-white hover:shadow-md disabled:cursor-not-allowed disabled:opacity-40"
                             >
@@ -465,7 +232,7 @@ const EditarOrganizador = () => {
                             </button>
                             <button
                                 type="button"
-                                onClick={handleSave}
+                                onClick={onSave}
                                 disabled={!hasChanges || isSaving}
                                 className="inline-flex cursor-pointer items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:brightness-110 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
                                 style={{
@@ -489,14 +256,14 @@ const EditarOrganizador = () => {
                         <StatusCard
                             current={organizer.status?.name ?? "ACTIVE"}
                             isLoading={isTogglingStatus}
-                            onChange={handleToggleStatus}
+                            onChange={onToggleStatus}
                         />
 
                         <MetadataCard organizer={organizer} />
                     </div>
                 </div>
             )}
-        </div>
+        </>
     );
 };
 
@@ -723,5 +490,3 @@ const MetaRow = ({ label, value, mono }: MetaRowProps) => (
         </span>
     </li>
 );
-
-export default EditarOrganizador;
