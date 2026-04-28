@@ -1,25 +1,15 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import {
-    ArrowLeft,
     CheckCircle2,
     Info,
     Loader2,
-    Pencil,
     Save,
     ShieldCheck,
     ShieldOff,
 } from "lucide-react";
-
-import AdminPageHeader from "@/components/admin/AdminPageHeader";
-import clientService from "@/services/client";
 import type {
     ClientDetailDTO,
-    StatusDTO,
     StatusValue,
-    UpdateClientPayload,
-} from "@/types";
+} from "@/features/admin-clients/types/client.types";
 
 type FormState = {
     email: string;
@@ -36,261 +26,39 @@ type FormState = {
     zipCode: string;
 };
 
-const EMPTY_FORM: FormState = {
-    email: "",
-    fullName: "",
-    sex: "1",
-    identityDocument: "",
-    birthDate: "",
-    streetAddress: "",
-    streetAddressNumber: "",
-    neighborhood: "",
-    city: "",
-    state: "",
-    country: "",
-    zipCode: "",
+type ClientFormProps = {
+    client: ClientDetailDTO | null;
+    form: FormState;
+    isLoading: boolean;
+    isSaving: boolean;
+    isTogglingStatus: boolean;
+    error: string | null;
+    successMessage: string | null;
+    hasChanges: boolean;
+    onFieldChange: <K extends keyof FormState>(
+        field: K
+    ) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+    onSave: () => void;
+    onReset: () => void;
+    onToggleStatus: (value: StatusValue) => void;
 };
 
-const STATUS_OPTIONS: Record<StatusValue, { statusID: number; name: StatusValue }> = {
-    ACTIVE: { statusID: 1, name: "ACTIVE" },
-    INACTIVE: { statusID: 2, name: "INACTIVE" },
-};
-
-function clientToFormState(client: ClientDetailDTO): FormState {
-    return {
-        email: client.email ?? "",
-        fullName: client.fullName ?? "",
-        sex: String(client.sex ?? 1),
-        identityDocument: client.identityDocument ?? "",
-        birthDate: client.birthDate ?? "",
-        streetAddress: client.streetAddress ?? "",
-        streetAddressNumber: client.streetAddressNumber ?? "",
-        neighborhood: client.neighborhood ?? "",
-        city: client.city ?? "",
-        state: client.state ?? "",
-        country: client.country ?? "",
-        zipCode: client.zipCode ?? "",
-    };
-}
-
-function normalizeOptional(value: string): string | null {
-    const trimmed = value.trim();
-    return trimmed.length === 0 ? null : trimmed;
-}
-
-function buildPatchPayload(
-    form: FormState,
-    original: ClientDetailDTO
-): UpdateClientPayload {
-    const payload: UpdateClientPayload = {};
-
-    if (form.email.trim() !== (original.email ?? "")) {
-        payload.email = form.email.trim();
-    }
-    if (form.fullName.trim() !== (original.fullName ?? "")) {
-        payload.fullName = form.fullName.trim();
-    }
-
-    const sexValue = Number(form.sex);
-    if (Number.isFinite(sexValue) && sexValue !== original.sex) {
-        payload.sex = sexValue;
-    }
-
-    if (form.identityDocument.trim() !== (original.identityDocument ?? "")) {
-        payload.identityDocument = form.identityDocument.trim();
-    }
-
-    if (form.birthDate !== (original.birthDate ?? "")) {
-        payload.birthDate = form.birthDate;
-    }
-
-    const addressFields: Array<
-        keyof Pick<
-            FormState,
-            | "streetAddress"
-            | "streetAddressNumber"
-            | "neighborhood"
-            | "city"
-            | "state"
-            | "country"
-            | "zipCode"
-        >
-    > = [
-        "streetAddress",
-        "streetAddressNumber",
-        "neighborhood",
-        "city",
-        "state",
-        "country",
-        "zipCode",
-    ];
-
-    addressFields.forEach((field) => {
-        const next = normalizeOptional(form[field]);
-        const current = (original[field] as string | null) ?? null;
-        if (next !== current) {
-            (payload as Record<string, unknown>)[field] = next;
-        }
-    });
-
-    return payload;
-}
-
-function getAxiosErrorMessage(err: unknown, fallback: string): string {
-    if (axios.isAxiosError(err)) {
-        const data = err.response?.data as
-            | { message?: string; error?: string }
-            | undefined;
-        return data?.message ?? data?.error ?? err.message ?? fallback;
-    }
-    return fallback;
-}
-
-const EditarCliente = () => {
-    const navigate = useNavigate();
-    const { clientId } = useParams<{ clientId: string }>();
-
-    const [client, setClient] = useState<ClientDetailDTO | null>(null);
-    const [form, setForm] = useState<FormState>(EMPTY_FORM);
-
-    const [isLoading, setIsLoading] = useState(true);
-    const [isSaving, setIsSaving] = useState(false);
-    const [isTogglingStatus, setIsTogglingStatus] = useState(false);
-
-    const [error, setError] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
-    const fetchClient = useCallback(
-        (signal?: AbortSignal) => {
-            if (!clientId) return;
-            setIsLoading(true);
-            setError(null);
-
-            return clientService
-                .getClientById(clientId, signal)
-                .then((data) => {
-                    setClient(data);
-                    setForm(clientToFormState(data));
-                })
-                .catch((err: unknown) => {
-                    if (axios.isCancel(err)) return;
-                    setError(
-                        getAxiosErrorMessage(err, "Cliente não encontrado.")
-                    );
-                    setClient(null);
-                })
-                .finally(() => {
-                    if (!signal?.aborted) setIsLoading(false);
-                });
-        },
-        [clientId]
-    );
-
-    useEffect(() => {
-        const controller = new AbortController();
-        fetchClient(controller.signal);
-        return () => controller.abort();
-    }, [fetchClient]);
-
-    useEffect(() => {
-        if (!successMessage) return;
-        const id = window.setTimeout(() => setSuccessMessage(null), 3500);
-        return () => window.clearTimeout(id);
-    }, [successMessage]);
-
-    const patchPayload = useMemo(() => {
-        if (!client) return {};
-        return buildPatchPayload(form, client);
-    }, [form, client]);
-
-    const hasChanges = Object.keys(patchPayload).length > 0;
-
-    const handleFieldChange =
-        <K extends keyof FormState>(field: K) =>
-        (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-            setForm((prev) => ({ ...prev, [field]: e.target.value }));
-        };
-
-    const handleSave = async () => {
-        if (!client || !clientId || !hasChanges) return;
-        setIsSaving(true);
-        setError(null);
-        try {
-            const updated = await clientService.updateClient(
-                clientId,
-                patchPayload
-            );
-            setClient(updated);
-            setForm(clientToFormState(updated));
-            setSuccessMessage("Cliente atualizado com sucesso.");
-        } catch (err) {
-            setError(
-                getAxiosErrorMessage(
-                    err,
-                    "Não foi possível atualizar o cliente."
-                )
-            );
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
-    const handleReset = () => {
-        if (client) setForm(clientToFormState(client));
-    };
-
-    const handleToggleStatus = async (next: StatusValue) => {
-        if (!client || !clientId) return;
-        if (client.status?.name === next) return;
-
-        setIsTogglingStatus(true);
-        setError(null);
-        try {
-            const updated = await clientService.updateClient(clientId, {
-                status: STATUS_OPTIONS[next] as StatusDTO,
-            });
-            setClient(updated);
-            setForm(clientToFormState(updated));
-            setSuccessMessage(
-                next === "ACTIVE" ? "Cliente reativado." : "Cliente desativado."
-            );
-        } catch (err) {
-            setError(
-                getAxiosErrorMessage(
-                    err,
-                    "Não foi possível alterar o status."
-                )
-            );
-        } finally {
-            setIsTogglingStatus(false);
-        }
-    };
-
+export const ClientForm = ({
+    client,
+    form,
+    isLoading,
+    isSaving,
+    isTogglingStatus,
+    error,
+    successMessage,
+    hasChanges,
+    onFieldChange,
+    onSave,
+    onReset,
+    onToggleStatus,
+}: ClientFormProps) => {
     return (
-        <div>
-            <div className="mb-4 flex items-center gap-2">
-                <button
-                    type="button"
-                    onClick={() => navigate("/admin/clientes")}
-                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-white/70 bg-white/60 px-3 py-1.5 text-xs font-semibold text-[#00334d] transition-all duration-300 hover:bg-white hover:shadow-md"
-                >
-                    <ArrowLeft className="size-3.5" strokeWidth={2.6} />
-                    Voltar para clientes
-                </button>
-            </div>
-
-            <AdminPageHeader
-                icon={Pencil}
-                title={client ? `Editar: ${client.fullName}` : "Editar cliente"}
-                description={
-                    client
-                        ? `ID ${client.userID} · última atualização ${new Date(
-                              client.lastUpdateDate
-                          ).toLocaleString("pt-BR")}`
-                        : "Carregando detalhes do cliente..."
-                }
-            />
-
+        <>
             {error && <Banner variant="error" message={error} />}
             {successMessage && (
                 <Banner variant="success" message={successMessage} />
@@ -319,7 +87,7 @@ const EditarCliente = () => {
                                     id="email"
                                     type="email"
                                     value={form.email}
-                                    onChange={handleFieldChange("email")}
+                                    onChange={onFieldChange("email")}
                                     placeholder="cliente@email.com"
                                 />
                             </Field>
@@ -332,7 +100,7 @@ const EditarCliente = () => {
                                 <TextInput
                                     id="fullName"
                                     value={form.fullName}
-                                    onChange={handleFieldChange("fullName")}
+                                    onChange={onFieldChange("fullName")}
                                     placeholder="Nome completo"
                                 />
                             </Field>
@@ -342,7 +110,7 @@ const EditarCliente = () => {
                                     <TextInput
                                         id="identityDocument"
                                         value={form.identityDocument}
-                                        onChange={handleFieldChange(
+                                        onChange={onFieldChange(
                                             "identityDocument"
                                         )}
                                         placeholder="000.000.000-00"
@@ -358,14 +126,14 @@ const EditarCliente = () => {
                                         id="birthDate"
                                         type="date"
                                         value={form.birthDate}
-                                        onChange={handleFieldChange("birthDate")}
+                                        onChange={onFieldChange("birthDate")}
                                     />
                                 </Field>
                                 <Field label="Sexo" htmlFor="sex" required>
                                     <SelectInput
                                         id="sex"
                                         value={form.sex}
-                                        onChange={handleFieldChange("sex")}
+                                        onChange={onFieldChange("sex")}
                                     >
                                         <option value="1">Masculino</option>
                                         <option value="2">Feminino</option>
@@ -389,7 +157,7 @@ const EditarCliente = () => {
                                         <TextInput
                                             id="streetAddress"
                                             value={form.streetAddress}
-                                            onChange={handleFieldChange(
+                                            onChange={onFieldChange(
                                                 "streetAddress"
                                             )}
                                             placeholder="Rua, Avenida..."
@@ -402,7 +170,7 @@ const EditarCliente = () => {
                                         <TextInput
                                             id="streetAddressNumber"
                                             value={form.streetAddressNumber}
-                                            onChange={handleFieldChange(
+                                            onChange={onFieldChange(
                                                 "streetAddressNumber"
                                             )}
                                             placeholder="Nº"
@@ -419,7 +187,7 @@ const EditarCliente = () => {
                                         <TextInput
                                             id="neighborhood"
                                             value={form.neighborhood}
-                                            onChange={handleFieldChange(
+                                            onChange={onFieldChange(
                                                 "neighborhood"
                                             )}
                                         />
@@ -428,7 +196,7 @@ const EditarCliente = () => {
                                         <TextInput
                                             id="zipCode"
                                             value={form.zipCode}
-                                            onChange={handleFieldChange(
+                                            onChange={onFieldChange(
                                                 "zipCode"
                                             )}
                                             placeholder="00000-000"
@@ -441,21 +209,21 @@ const EditarCliente = () => {
                                         <TextInput
                                             id="city"
                                             value={form.city}
-                                            onChange={handleFieldChange("city")}
+                                            onChange={onFieldChange("city")}
                                         />
                                     </Field>
                                     <Field label="Estado" htmlFor="state">
                                         <TextInput
                                             id="state"
                                             value={form.state}
-                                            onChange={handleFieldChange("state")}
+                                            onChange={onFieldChange("state")}
                                         />
                                     </Field>
                                     <Field label="País" htmlFor="country">
                                         <TextInput
                                             id="country"
                                             value={form.country}
-                                            onChange={handleFieldChange(
+                                            onChange={onFieldChange(
                                                 "country"
                                             )}
                                         />
@@ -467,7 +235,7 @@ const EditarCliente = () => {
                         <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
                             <button
                                 type="button"
-                                onClick={handleReset}
+                                onClick={onReset}
                                 disabled={!hasChanges || isSaving}
                                 className="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-white/70 bg-white/60 px-4 py-2 text-sm font-semibold text-[#00334d] transition-all duration-300 hover:bg-white hover:shadow-md disabled:cursor-not-allowed disabled:opacity-40"
                             >
@@ -475,7 +243,7 @@ const EditarCliente = () => {
                             </button>
                             <button
                                 type="button"
-                                onClick={handleSave}
+                                onClick={onSave}
                                 disabled={!hasChanges || isSaving}
                                 className="inline-flex cursor-pointer items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:brightness-110 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
                                 style={{
@@ -499,14 +267,14 @@ const EditarCliente = () => {
                         <StatusCard
                             current={client.status?.name ?? "ACTIVE"}
                             isLoading={isTogglingStatus}
-                            onChange={handleToggleStatus}
+                            onChange={onToggleStatus}
                         />
 
                         <MetadataCard client={client} />
                     </div>
                 </div>
             )}
-        </div>
+        </>
     );
 };
 
@@ -736,5 +504,3 @@ const MetaRow = ({ label, value, mono }: MetaRowProps) => (
         </span>
     </li>
 );
-
-export default EditarCliente;

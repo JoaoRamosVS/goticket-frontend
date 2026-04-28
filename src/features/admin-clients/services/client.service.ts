@@ -3,9 +3,9 @@ import type {
     ClientDTO,
     ClientDetailDTO,
     ClientListDTO,
-    LoginResponse,
+    ClientLoginResponse,
     UpdateClientPayload,
-} from "@/types";
+} from "@/features/admin-clients/types/client.types";
 
 function authHeaders(extra?: Record<string, string>): Record<string, string> {
     const accessToken = localStorage.getItem("accessToken");
@@ -19,9 +19,9 @@ function authHeaders(extra?: Record<string, string>): Record<string, string> {
 /**
  * `POST /clients` — cadastro público de um novo cliente.
  */
-const createClient = async (clientData: ClientDTO): Promise<LoginResponse> => {
+const createClient = async (clientData: ClientDTO): Promise<ClientLoginResponse> => {
     const response = await goTicketApi.post("/clients", clientData);
-    return response.data as LoginResponse;
+    return response.data as ClientLoginResponse;
 };
 
 /**
