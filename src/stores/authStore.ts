@@ -4,7 +4,7 @@ import decodeJwtPayload from '@/helpers/DecodeJWT';
 interface AuthState {
   isAuth: boolean;
   userFullName: string;
-  login: (token: string, expiration: number, userFullName: string) => void;
+  login: (accessToken: string, refreshToken: string, expiration: number, userFullName: string) => void;
   logout: () => void;
 }
 
@@ -23,14 +23,16 @@ export const useAuthStore = create<AuthState>((set) => ({
   isAuth: Boolean(localStorage.getItem('accessToken')),
   userFullName: getNameFromStoredToken(),
 
-  login: (token, expirationTime, userFullName) => {
+  login: (token, refreshToken, expirationTime, userFullName) => {
       localStorage.setItem('accessToken', token);
+      localStorage.setItem('refreshToken', refreshToken);
       localStorage.setItem('tokenExpiration', expirationTime.toString());
       set({isAuth: true, userFullName: userFullName})
   },
 
   logout: () => {
       localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
       localStorage.removeItem('tokenExpiration');
       set({isAuth : false})
   },

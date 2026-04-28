@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { LoginRequest } from "@/types";
+import type { LoginRequest, LoginResponse } from "@/types";
 import { AxiosError } from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/stores/authStore";
@@ -38,14 +38,14 @@ export default function Login() {
                 password
             };
 
-            const response = await userService.login(loginData);
+            const response: LoginResponse = await userService.login(loginData);
 
-            if(response.accessToken && response.expiresIn) {
+            if(response.accessToken && response.expiresIn && response.refreshToken) {
                 const expirationTime = Date.now() + (response.expiresIn * 1000)
                 const decodedPayload = decodeJwtPayload(response.accessToken);
 
-                login(response.accessToken, expirationTime, decodedPayload.name as string);
-                navigate('/home');
+                login(response.accessToken, response.refreshToken, expirationTime, decodedPayload.name as string);
+                navigate('/');
             }
 
         } catch (error) {
