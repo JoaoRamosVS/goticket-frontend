@@ -1,9 +1,9 @@
-import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom'
 
 // import SessionWatcher from '@/components/global/SessionWatcher';
-import Navbar from '@/components/global/Navbar';
+import Navbar from '@/components/layout/Navbar';
 import SmoothScroll from '@/components/global/SmoothScroll';
-import Footer from '@/components/global/Footer';
+import Footer from '@/components/layout/Footer';
 
 import { useAuthStore } from '@/stores/authStore';
 
@@ -12,7 +12,7 @@ import Home from '@/pages/Home'
 import SignUp from '@/pages/SignUp';
 import QuemSomos from '@/pages/QuemSomos';
 import EventPage from '@/pages/EventPage';
-import Admin from '@/pages/Admin';
+import AdminLayout from '@/layouts/AdminLayout';
 import AdminDashboard from '@/pages/admin/Dashboard';
 
 import AdminEventos from '@/pages/admin/eventos/EventosList';
@@ -50,7 +50,7 @@ function AppContent() {
         <Route path="/home" element={<Home />} />
         <Route path="/evento" element={<EventPage />} />
         <Route path="/quem-somos" element={<QuemSomos />} />
-        <Route path="/admin" element={<Admin />}>
+        <Route path="/admin" element={<AdminLayout><Outlet /></AdminLayout>}>
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="eventos" element={<AdminEventos />} />

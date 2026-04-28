@@ -1,6 +1,6 @@
 import { CalendarDays } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import AdminPageHeader from "@/components/admin/AdminPageHeader";
+import AdminPageHeader from "@/components/layout/AdminPageHeader";
 import { EventsTable } from "@/features/admin-events/components/EventsTable";
 import { useAdminEvents } from "@/features/admin-events/hooks/useAdminEvents";
 

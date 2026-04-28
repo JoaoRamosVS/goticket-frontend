@@ -6,7 +6,7 @@ import {
     DollarSign,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import AdminPageHeader from "@/components/admin/AdminPageHeader";
+import AdminPageHeader from "@/components/layout/AdminPageHeader";
 
 type StatCardData = {
     label: string;

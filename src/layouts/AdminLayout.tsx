@@ -1,7 +1,12 @@
-import { Outlet } from "react-router-dom";
-import AdminSidebar from "@/components/admin/AdminSidebar";
+import type { ReactNode } from "react";
 
-const Admin = () => {
+import AdminSidebar from "@/components/layout/AdminSidebar";
+
+type AdminLayoutProps = {
+    children: ReactNode;
+};
+
+const AdminLayout = ({ children }: AdminLayoutProps) => {
     return (
         <div className="relative min-h-screen">
             <div
@@ -23,11 +28,11 @@ const Admin = () => {
                             "0 12px 40px -14px rgba(0,46,71,0.14), 0 2px 8px -2px rgba(0,46,71,0.06), inset 0 1px 0 0 rgba(255,255,255,0.75)",
                     }}
                 >
-                    <Outlet />
+                    {children}
                 </div>
             </main>
         </div>
     );
 };
 
-export default Admin;
+export default AdminLayout;

@@ -1,6 +1,6 @@
 import { ArrowLeft, Pencil } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import AdminPageHeader from "@/components/admin/AdminPageHeader";
+import AdminPageHeader from "@/components/layout/AdminPageHeader";
 import { ClientForm } from "@/features/admin-clients/components/ClientForm";
 import { useClientForm } from "@/features/admin-clients/hooks/useClientForm";
 

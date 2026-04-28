@@ -1,5 +1,5 @@
 import { LineChart } from "lucide-react";
-import AdminPageHeader from "@/components/admin/AdminPageHeader";
+import AdminPageHeader from "@/components/layout/AdminPageHeader";
 
 const Vendas = () => {
     return (
