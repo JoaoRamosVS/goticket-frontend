@@ -1,23 +1,9 @@
 import { Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import type { TicketType } from "@/features/event-details/types/event-details.types";
-
-interface TicketSelectorProps {
-  tickets: TicketType[];
-}
-
-function formatCurrency(value: number) {
-  return value.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  });
-}
+import { formatCurrency } from "@/features/event-details/utils/helpers";
+import type { TicketSelectorProps } from "@/features/event-details/types/event-details.types";
 
 const TicketSelector = ({ tickets }: TicketSelectorProps) => {
   return (

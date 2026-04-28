@@ -42,7 +42,7 @@ function AppContent() {
         <Route path="/login" element={isAuth ? <Navigate to="/home" replace /> : <Login />} />
         <Route path="/cadastro" element={isAuth ? <Navigate to="/home" replace /> : <SignUp />} />
         <Route path="/home" element={<Home />} />
-        <Route path="/evento" element={<MainLayout><EventPage /></MainLayout>} />
+        <Route path="/evento/:eventId" element={<MainLayout><EventPage /></MainLayout>} />
         <Route path="/quem-somos" element={<QuemSomos />} />
         <Route path="/admin" element={<AdminLayout><Outlet /></AdminLayout>}>
           <Route index element={<Navigate to="dashboard" replace />} />

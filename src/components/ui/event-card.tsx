@@ -91,7 +91,7 @@ const EventCard = ({ event }: EventCardProps) => {
                     boxShadow:
                         "0 4px 14px -3px rgba(42,143,212,0.45), 0 1px 3px rgba(42,143,212,0.2)",
                 }}
-                onClick={() => navigate(`/evento`)}
+                onClick={() => navigate(`/evento/${event.eventID}`)}
             >
                 {formattedPrice
                     ? `Preços a partir de ${formattedPrice}`
@@ -103,4 +103,5 @@ const EventCard = ({ event }: EventCardProps) => {
 };
 
 export default EventCard;
+
 

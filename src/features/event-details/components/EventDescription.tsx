@@ -1,10 +1,6 @@
 import { Info } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-interface EventDescriptionProps {
-  description: string;
-  lineup?: string[];
-}
+import type { EventDescriptionProps } from "@/features/event-details/types/event-details.types";
 
 const EventDescription = ({ description }: EventDescriptionProps) => {
 

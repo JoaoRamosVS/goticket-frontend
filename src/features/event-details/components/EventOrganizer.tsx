@@ -1,15 +1,8 @@
 import { Star, Users, CalendarCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { EventOrganizerInfo } from "@/features/event-details/types/event-details.types";
+import type { EventOrganizerProps } from "@/features/event-details/types/event-details.types";
+import { formatNumber } from "@/features/event-details/utils/helpers";
 
-interface EventOrganizerProps {
-  organizer: EventOrganizerInfo;
-}
-
-function formatNumber(n: number) {
-  if (n >= 1000) return `${(n / 1000).toFixed(1).replace(".0", "")}k`;
-  return n.toString();
-}
 
 const EventOrganizer = ({ organizer }: EventOrganizerProps) => {
   return (

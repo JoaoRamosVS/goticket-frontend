@@ -68,7 +68,7 @@ const EventCardLarge = ({ event }: EventCardLargeProps) => {
 
                     <button
                         type="button"
-                        onClick={() => navigate(`/evento`)}
+                        onClick={() => navigate(`/evento/${event.eventID}`)}
                         className="inline-flex cursor-pointer items-center gap-2 rounded-xl px-8 py-2.5 text-sm font-bold text-white shadow-2xl transition-all duration-300 hover:brightness-110 hover:shadow-lg"
                         style={{
                             background:
@@ -87,4 +87,5 @@ const EventCardLarge = ({ event }: EventCardLargeProps) => {
 };
 
 export default EventCardLarge;
+
 

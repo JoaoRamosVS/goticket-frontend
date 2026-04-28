@@ -1,16 +1,5 @@
-import {
-  ShieldCheck,
-  RefreshCw,
-  Camera,
-  UtensilsCrossed,
-  Accessibility,
-  IdCard,
-} from "lucide-react";
-import type { EventPolicy } from "@/features/event-details/types/event-details.types";
-
-interface EventPoliciesProps {
-  policies: EventPolicy[];
-}
+import { ShieldCheck, RefreshCw, Camera, UtensilsCrossed, Accessibility, IdCard } from "lucide-react";
+import type { EventPoliciesProps } from "@/features/event-details/types/event-details.types";
 
 const iconMap = {
   age: ShieldCheck,
