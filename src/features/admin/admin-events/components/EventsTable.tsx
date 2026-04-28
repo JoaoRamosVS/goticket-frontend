@@ -13,7 +13,7 @@ import {
     formatEventLocation,
     formatEventStartingPrice,
     getEventMainImage,
-} from "@/helpers/events";
+} from "@/utils/events";
 import type { EventMinDTO } from "@/features/admin/admin-events/types/event.types";
 
 type EventsTableProps = {
@@ -306,3 +306,4 @@ const PagerButton = ({
         {children}
     </button>
 );
+

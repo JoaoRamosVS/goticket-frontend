@@ -1,7 +1,7 @@
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
 
-// import SessionWatcher from '@/components/global/SessionWatcher';
-import SmoothScroll from '@/components/global/SmoothScroll';
+// import SessionWatcher from '@/components/shared/SessionWatcher';
+import SmoothScroll from '@/components/shared/SmoothScroll';
 import MainLayout from '@/layouts/MainLayout';
 
 import { useAuthStore } from '@/stores/authStore';
@@ -10,7 +10,7 @@ import Login from '@/pages/auth/Login'
 import Home from '@/pages/public/Home'
 import SignUp from '@/pages/auth/SignUp';
 import QuemSomos from '@/pages/public/QuemSomos';
-import EventPage from '@/pages/EventPage';
+import EventPage from '@/pages/public/EventPage';
 import AdminLayout from '@/layouts/AdminLayout';
 import AdminDashboard from '@/pages/admin/Dashboard';
 
@@ -74,3 +74,4 @@ function App() {
 }
 
 export default App
+

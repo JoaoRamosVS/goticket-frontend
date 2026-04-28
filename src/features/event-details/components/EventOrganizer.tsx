@@ -1,6 +1,6 @@
 import { Star, Users, CalendarCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { EventOrganizerInfo } from "./types";
+import type { EventOrganizerInfo } from "@/features/event-details/types/event-details.types";
 
 interface EventOrganizerProps {
   organizer: EventOrganizerInfo;
@@ -64,3 +64,4 @@ const EventOrganizer = ({ organizer }: EventOrganizerProps) => {
 };
 
 export default EventOrganizer;
+

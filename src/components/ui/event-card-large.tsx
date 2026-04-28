@@ -6,7 +6,7 @@ import {
     formatEventLocation,
     formatEventStartingPrice,
     getEventMainImage,
-} from "@/helpers/events";
+} from "@/utils/events";
 
 type EventCardLargeProps = {
     event: EventMinDTO;
@@ -87,3 +87,4 @@ const EventCardLarge = ({ event }: EventCardLargeProps) => {
 };
 
 export default EventCardLarge;
+

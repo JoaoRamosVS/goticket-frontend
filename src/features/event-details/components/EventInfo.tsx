@@ -3,7 +3,7 @@ import {
   Clock,
   MapPin,
 } from "lucide-react";
-import type { EventDate, EventVenue } from "./types";
+import type { EventDate, EventVenue } from "@/features/event-details/types/event-details.types";
 
 interface EventInfoProps {
   category: string;
@@ -81,3 +81,4 @@ const EventInfo = ({
 };
 
 export default EventInfo;
+

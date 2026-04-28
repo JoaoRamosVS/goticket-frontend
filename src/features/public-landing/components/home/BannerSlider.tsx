@@ -6,7 +6,7 @@ import {
     formatEventLocation,
     formatEventStartingPrice,
     getEventMainImage,
-} from "@/helpers/events";
+} from "@/utils/events";
 
 type BannerSliderProps = {
     events: EventMinDTO[];
@@ -379,3 +379,4 @@ const BannerSlider = ({ events }: BannerSliderProps) => {
 };
 
 export default BannerSlider;
+

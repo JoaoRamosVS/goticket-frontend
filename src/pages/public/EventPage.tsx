@@ -1,12 +1,12 @@
-import ParallaxBanner from "@/components/event-page/ParallaxBanner";
-import EventInfo from "@/components/event-page/EventInfo";
-import TicketSelector from "@/components/event-page/TicketSelector";
-import EventDescription from "@/components/event-page/EventDescription";
-import EventLocation from "@/components/event-page/EventLocation";
-import EventPolicies from "@/components/event-page/EventPolicies";
-import { mockEvent } from "@/components/event-page/mockData";
+import ParallaxBanner from "@/features/event-details/components/ParallaxBanner";
+import EventInfo from "@/features/event-details/components/EventInfo";
+import TicketSelector from "@/features/event-details/components/TicketSelector";
+import EventDescription from "@/features/event-details/components/EventDescription";
+import EventLocation from "@/features/event-details/components/EventLocation";
+import EventPolicies from "@/features/event-details/components/EventPolicies";
+import { mockEvent } from "@/features/event-details/utils/mockData";
 import FaqSection from "@/features/public-landing/components/FAQSection/FAQSection";
-import ShareAndSave from "@/components/event-page/ShareAndSave";
+import ShareAndSave from "@/features/event-details/components/ShareAndSave";
 
 const EventPage = () => {
   const event = mockEvent;
@@ -69,3 +69,4 @@ const EventPage = () => {
 };
 
 export default EventPage;
+

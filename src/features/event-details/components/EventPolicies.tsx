@@ -6,7 +6,7 @@ import {
   Accessibility,
   IdCard,
 } from "lucide-react";
-import type { EventPolicy } from "./types";
+import type { EventPolicy } from "@/features/event-details/types/event-details.types";
 
 interface EventPoliciesProps {
   policies: EventPolicy[];
@@ -58,3 +58,4 @@ const EventPolicies = ({ policies }: EventPoliciesProps) => {
 };
 
 export default EventPolicies;
+

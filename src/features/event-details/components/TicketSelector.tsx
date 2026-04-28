@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import type { TicketType } from "./types";
+import type { TicketType } from "@/features/event-details/types/event-details.types";
 
 interface TicketSelectorProps {
   tickets: TicketType[];
@@ -76,3 +76,4 @@ const TicketSelector = ({ tickets }: TicketSelectorProps) => {
 };
 
 export default TicketSelector;
+

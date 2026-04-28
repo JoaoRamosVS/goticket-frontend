@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import authService from "@/features/auth/services/auth.service";
 import type { LoginRequest, LoginResponse } from "@/features/auth/types/auth.types";
 import { useAuthStore } from "@/stores/authStore";
-import decodeJwtPayload from "@/helpers/DecodeJWT";
+import decodeJwtPayload from "@/utils/DecodeJWT";
 
 const useLogin = () => {
     const login = useAuthStore((state) => state.login);
@@ -68,3 +68,4 @@ const useLogin = () => {
 };
 
 export default useLogin;
+

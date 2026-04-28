@@ -6,7 +6,7 @@ import {
     formatEventLocation,
     formatEventStartingPrice,
     getEventMainImage,
-} from "@/helpers/events";
+} from "@/utils/events";
 
 type EventCardProps = {
     event: EventMinDTO;
@@ -103,3 +103,4 @@ const EventCard = ({ event }: EventCardProps) => {
 };
 
 export default EventCard;
+

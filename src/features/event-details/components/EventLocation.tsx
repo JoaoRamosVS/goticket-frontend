@@ -1,6 +1,6 @@
 import { MapPin, Navigation, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { EventVenue } from "./types";
+import type { EventVenue } from "@/features/event-details/types/event-details.types";
 
 interface EventLocationProps {
   venue: EventVenue;
@@ -72,3 +72,4 @@ const EventLocation = ({ venue }: EventLocationProps) => {
 };
 
 export default EventLocation;
+

@@ -1,5 +1,5 @@
 import {create} from 'zustand'
-import decodeJwtPayload from '@/helpers/DecodeJWT';
+import decodeJwtPayload from '@/utils/DecodeJWT';
 
 interface AuthState {
   isAuth: boolean;

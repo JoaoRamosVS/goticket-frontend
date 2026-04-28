@@ -1,4 +1,4 @@
-import type { EventDetails } from "./types";
+import type { EventDetails } from "../types/event-details.types";
 
 export const mockEvent: EventDetails = {
   id: "evt-001",
@@ -146,3 +146,4 @@ Prepare-se para vivenciar performances inesquecíveis, descobrir novos artistas 
   ageRating: "16+",
   status: "available",
 };
+

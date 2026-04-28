@@ -15,7 +15,7 @@ import {
     Upload,
     X,
 } from "lucide-react";
-import { buildEventImageUrl } from "@/helpers/events";
+import { buildEventImageUrl } from "@/utils/events";
 import type {
     EventDetailDTO,
     EventImageDTO,
@@ -1056,3 +1056,4 @@ const ImagesPanel = ({
         </div>
     );
 };
+
