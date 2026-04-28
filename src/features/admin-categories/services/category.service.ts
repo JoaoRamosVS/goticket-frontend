@@ -3,7 +3,7 @@ import type {
     CreateEventCategoryDTO,
     EventCategoryDTO,
     UpdateEventCategoryPayload,
-} from "@/types";
+} from "@/features/admin-categories/types/category.types";
 
 function authHeaders(extra?: Record<string, string>): Record<string, string> {
     const accessToken = localStorage.getItem("accessToken");
