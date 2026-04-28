@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import eventService from "@/features/admin-events/services/event.service";
+import eventService from "@/features/admin/admin-events/services/event.service";
 import type { EventMinDTO } from "@/types";
 
 type UseEventsOptions = {

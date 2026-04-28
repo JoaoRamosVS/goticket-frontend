@@ -2,8 +2,8 @@ import { ArrowLeft, Pencil } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import AdminPageHeader from "@/components/layout/AdminPageHeader";
-import { SpaceForm } from "@/features/admin-spaces/components/SpaceForm";
-import { useSpaceForm } from "@/features/admin-spaces/hooks/useSpaceForm";
+import { SpaceForm } from "@/features/admin/admin-spaces/components/SpaceForm";
+import { useSpaceForm } from "@/features/admin/admin-spaces/hooks/useSpaceForm";
 
 const EditarEspaco = () => {
     const navigate = useNavigate();

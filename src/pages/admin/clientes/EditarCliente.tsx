@@ -1,8 +1,8 @@
 import { ArrowLeft, Pencil } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import AdminPageHeader from "@/components/layout/AdminPageHeader";
-import { ClientForm } from "@/features/admin-clients/components/ClientForm";
-import { useClientForm } from "@/features/admin-clients/hooks/useClientForm";
+import { ClientForm } from "@/features/admin/admin-clients/components/ClientForm";
+import { useClientForm } from "@/features/admin/admin-clients/hooks/useClientForm";
 
 const EditarCliente = () => {
     const navigate = useNavigate();

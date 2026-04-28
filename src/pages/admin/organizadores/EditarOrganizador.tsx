@@ -2,8 +2,8 @@ import { ArrowLeft, Pencil } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import AdminPageHeader from "@/components/layout/AdminPageHeader";
-import { OrganizerForm } from "@/features/admin-organizers/components/OrganizerForm";
-import { useOrganizerForm } from "@/features/admin-organizers/hooks/useOrganizerForm";
+import { OrganizerForm } from "@/features/admin/admin-organizers/components/OrganizerForm";
+import { useOrganizerForm } from "@/features/admin/admin-organizers/hooks/useOrganizerForm";
 
 const EditarOrganizador = () => {
     const navigate = useNavigate();

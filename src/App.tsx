@@ -7,9 +7,9 @@ import Footer from '@/components/layout/Footer';
 
 import { useAuthStore } from '@/stores/authStore';
 
-import Login from '@/pages/Login'
+import Login from '@/pages/auth/Login'
 import Home from '@/pages/Home'
-import SignUp from '@/pages/SignUp';
+import SignUp from '@/pages/auth/SignUp';
 import QuemSomos from '@/pages/QuemSomos';
 import EventPage from '@/pages/EventPage';
 import AdminLayout from '@/layouts/AdminLayout';

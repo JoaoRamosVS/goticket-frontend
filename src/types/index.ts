@@ -7,7 +7,8 @@ import type {
     EventStatusName,
     EventVisibilityValue,
     UpdateEventPayload,
-} from "@/features/admin-events/types/event.types";
+} from "@/features/admin/admin-events/types/event.types";
+
 import type {
     ClientDTO,
     ClientDetailDTO,
@@ -15,32 +16,34 @@ import type {
     ClientLoginResponse,
     ClientMinDTO,
     UpdateClientPayload,
-} from "@/features/admin-clients/types/client.types";
+} from "@/features/admin/admin-clients/types/client.types";
+
 import type {
     CreateVenueDTO,
     UpdateVenuePayload,
     VenueDetailDTO,
     VenueListDTO,
     VenueMinDTO,
-} from "@/features/admin-spaces/types/space.types";
+} from "@/features/admin/admin-spaces/types/space.types";
+
 import type {
     CreateOrganizerDTO,
     OrganizerDetailDTO,
     OrganizerListDTO,
     OrganizerMinDTO,
     UpdateOrganizerPayload,
-} from "@/features/admin-organizers/types/organizer.types";
+} from "@/features/admin/admin-organizers/types/organizer.types";
 
-export interface LoginRequest {
-    email: string;
-    password: string;
-}
-
-export interface LoginResponse {
-    accessToken: string;
-    refreshToken: string;
-    expiresIn: number;
-}
+import type {
+    LoginRequest,
+    LoginResponse,
+    RoleDTO,
+    RoleValue,
+    StatusDTO,
+    StatusValue,
+    UserDTO,
+    UserListDTO,
+} from "@/features/auth/types/auth.types";
 
 export type {
     EventMinDTO,
@@ -62,38 +65,17 @@ export type {
 
 export type { UpdateEventPayload };
 
-export type RoleValue = "ADMIN" | "ORGANIZER" | "CLIENT";
-export type StatusValue = "ACTIVE" | "INACTIVE";
+export type { 
+    LoginRequest, 
+    LoginResponse, 
+    RoleDTO, 
+    RoleValue, 
+    StatusDTO, 
+    StatusValue, 
+    UserDTO, 
+    UserListDTO,
+};
 
-export interface RoleDTO {
-    roleID: number;
-    name: RoleValue;
-}
-
-export interface StatusDTO {
-    statusID: number;
-    name: StatusValue;
-}
-
-export interface UserDTO {
-    userId: string;
-    email: string;
-    role: RoleDTO;
-    status: StatusDTO;
-}
-
-export interface UserListDTO {
-    page: number;
-    pageSize: number;
-    totalPages: number;
-    totalElements: number;
-    userDTOList: UserDTO[];
-}
-
-/**
- * Payload de criação utilizado em `POST /clients`.
- * Espelha `tech.goticket.backendapi.client.dto.CreateClientDTO`.
- */
 export type {
     CreateOrganizerDTO,
     OrganizerDetailDTO,

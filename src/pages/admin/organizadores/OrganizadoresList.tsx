@@ -2,8 +2,8 @@ import { UserCog } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import AdminPageHeader from "@/components/layout/AdminPageHeader";
-import { OrganizersTable } from "@/features/admin-organizers/components/OrganizersTable";
-import { useOrganizers } from "@/features/admin-organizers/hooks/useOrganizers";
+import { OrganizersTable } from "@/features/admin/admin-organizers/components/OrganizersTable";
+import { useOrganizers } from "@/features/admin/admin-organizers/hooks/useOrganizers";
 
 const OrganizadoresList = () => {
     const navigate = useNavigate();

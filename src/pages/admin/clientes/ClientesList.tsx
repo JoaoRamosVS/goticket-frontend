@@ -1,8 +1,8 @@
 import { Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import AdminPageHeader from "@/components/layout/AdminPageHeader";
-import { ClientsTable } from "@/features/admin-clients/components/ClientsTable";
-import { useClients } from "@/features/admin-clients/hooks/useClients";
+import { ClientsTable } from "@/features/admin/admin-clients/components/ClientsTable";
+import { useClients } from "@/features/admin/admin-clients/hooks/useClients";
 
 const ClientesList = () => {
     const navigate = useNavigate();

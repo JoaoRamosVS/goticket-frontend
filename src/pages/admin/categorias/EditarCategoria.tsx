@@ -2,8 +2,8 @@ import { ArrowLeft, Pencil } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import AdminPageHeader from "@/components/layout/AdminPageHeader";
-import { CategoryForm } from "@/features/admin-categories/components/CategoryForm";
-import { useCategoryForm } from "@/features/admin-categories/hooks/useCategoryForm";
+import { CategoryForm } from "@/features/admin/admin-categories/components/CategoryForm";
+import { useCategoryForm } from "@/features/admin/admin-categories/hooks/useCategoryForm";
 
 const EditarCategoria = () => {
     const navigate = useNavigate();

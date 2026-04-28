@@ -2,8 +2,8 @@ import { Tags } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import AdminPageHeader from "@/components/layout/AdminPageHeader";
-import { CategoriesTable } from "@/features/admin-categories/components/CategoriesTable";
-import { useCategories } from "@/features/admin-categories/hooks/useCategories";
+import { CategoriesTable } from "@/features/admin/admin-categories/components/CategoriesTable";
+import { useCategories } from "@/features/admin/admin-categories/hooks/useCategories";
 
 const CategoriasList = () => {
     const navigate = useNavigate();

@@ -2,8 +2,8 @@ import { Building2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import AdminPageHeader from "@/components/layout/AdminPageHeader";
-import { SpacesTable } from "@/features/admin-spaces/components/SpacesTable";
-import { useSpaces } from "@/features/admin-spaces/hooks/useSpaces";
+import { SpacesTable } from "@/features/admin/admin-spaces/components/SpacesTable";
+import { useSpaces } from "@/features/admin/admin-spaces/hooks/useSpaces";
 
 const EspacosList = () => {
     const navigate = useNavigate();
