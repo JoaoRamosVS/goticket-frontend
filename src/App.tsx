@@ -14,18 +14,24 @@ import QuemSomos from '@/pages/QuemSomos';
 import EventPage from '@/pages/EventPage';
 import Admin from '@/pages/Admin';
 import AdminDashboard from '@/pages/admin/Dashboard';
-import AdminEventos from '@/pages/admin/Eventos';
-import AdminEditarEvento from '@/pages/admin/EditarEvento';
-import AdminClientes from '@/pages/admin/Clientes';
-import AdminEditarCliente from '@/pages/admin/EditarCliente';
-import AdminOrganizadores from '@/pages/admin/Organizadores';
-import AdminEditarOrganizador from '@/pages/admin/EditarOrganizador';
+
+import AdminEventos from '@/pages/admin/eventos/EventosList';
+import AdminEditarEvento from '@/pages/admin/eventos/EditarEvento';
+
+import AdminClientes from '@/pages/admin/clientes/ClientesList';
+import AdminEditarCliente from '@/pages/admin/clientes/EditarCliente';
+
+import AdminOrganizadores from '@/pages/admin/organizadores/OrganizadoresList';
+import AdminEditarOrganizador from '@/pages/admin/organizadores/EditarOrganizador';
+
 import AdminVendas from '@/pages/admin/Vendas';
 import AdminConfiguracoes from '@/pages/admin/Configuracoes';
-import AdminEspacos from '@/pages/admin/Espacos';
-import AdminEditarEspaco from '@/pages/admin/EditarEspaco';
-import AdminCategorias from '@/pages/admin/Categorias';
-import AdminEditarCategoria from '@/pages/admin/EditarCategoria';
+
+import AdminEspacos from '@/pages/admin/espacos/EspacosList';
+import AdminEditarEspaco from '@/pages/admin/espacos/EditarEspaco';
+
+import AdminCategorias from '@/pages/admin/categorias/CategoriasList';
+import AdminEditarCategoria from '@/pages/admin/categorias/EditarCategoria';
 
 function AppContent() {
   const isAuth = useAuthStore((state) => state.isAuth)
