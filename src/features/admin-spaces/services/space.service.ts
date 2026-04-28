@@ -4,7 +4,7 @@ import type {
     UpdateVenuePayload,
     VenueDetailDTO,
     VenueListDTO,
-} from "@/types";
+} from "@/features/admin-spaces/types/space.types";
 
 function authHeaders(extra?: Record<string, string>): Record<string, string> {
     const accessToken = localStorage.getItem("accessToken");

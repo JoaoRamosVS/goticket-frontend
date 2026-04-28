@@ -1,20 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import {
-    ArrowLeft,
     CheckCircle2,
     Info,
     Loader2,
-    Pencil,
     Save,
     ShieldCheck,
     ShieldOff,
 } from "lucide-react";
-
-import AdminPageHeader from "@/components/admin/AdminPageHeader";
-import venueService from "@/services/venue";
-import type { UpdateVenuePayload, VenueDetailDTO } from "@/types";
+import type { VenueDetailDTO } from "@/features/admin-spaces/types/space.types";
 
 type StatusValue = "ACTIVE" | "INACTIVE";
 
@@ -32,260 +24,39 @@ type FormState = {
     zipCode: string;
 };
 
-const EMPTY_FORM: FormState = {
-    name: "",
-    legalName: "",
-    CNPJ: "",
-    description: "",
-    streetAddress: "",
-    streetAddressNumber: "",
-    neighborhood: "",
-    city: "",
-    state: "",
-    country: "",
-    zipCode: "",
+type SpaceFormProps = {
+    venue: VenueDetailDTO | null;
+    form: FormState;
+    isLoading: boolean;
+    isSaving: boolean;
+    isTogglingStatus: boolean;
+    error: string | null;
+    successMessage: string | null;
+    hasChanges: boolean;
+    onFieldChange: <K extends keyof FormState>(
+        field: K
+    ) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+    onSave: () => void;
+    onReset: () => void;
+    onToggleStatus: (value: StatusValue) => void;
 };
 
-const STATUS_OPTIONS: Record<
-    StatusValue,
-    { statusID: number; name: StatusValue }
-> = {
-    ACTIVE: { statusID: 1, name: "ACTIVE" },
-    INACTIVE: { statusID: 2, name: "INACTIVE" },
-};
-
-function venueToFormState(venue: VenueDetailDTO): FormState {
-    return {
-        name: venue.name ?? "",
-        legalName: venue.legalName ?? "",
-        CNPJ: venue.CNPJ ?? "",
-        description: venue.description ?? "",
-        streetAddress: venue.streetAddress ?? "",
-        streetAddressNumber: venue.streetAddressNumber ?? "",
-        neighborhood: venue.neighborhood ?? "",
-        city: venue.city ?? "",
-        state: venue.state ?? "",
-        country: venue.country ?? "",
-        zipCode: venue.zipCode ?? "",
-    };
-}
-
-function normalizeOptional(value: string): string | null {
-    const trimmed = value.trim();
-    return trimmed.length === 0 ? null : trimmed;
-}
-
-function buildPatchPayload(
-    form: FormState,
-    original: VenueDetailDTO
-): UpdateVenuePayload {
-    const payload: UpdateVenuePayload = {};
-
-    if (form.name.trim() !== (original.name ?? "")) {
-        payload.name = form.name.trim();
-    }
-    if (form.legalName.trim() !== (original.legalName ?? "")) {
-        payload.legalName = form.legalName.trim();
-    }
-    if (form.CNPJ.trim() !== (original.CNPJ ?? "")) {
-        payload.CNPJ = form.CNPJ.trim();
-    }
-
-    const nextDescription = normalizeOptional(form.description);
-    const currentDescription = original.description ?? null;
-    if (nextDescription !== currentDescription) {
-        payload.description = nextDescription;
-    }
-
-    const addressFields: Array<
-        keyof Pick<
-            FormState,
-            | "streetAddress"
-            | "streetAddressNumber"
-            | "neighborhood"
-            | "city"
-            | "state"
-            | "country"
-            | "zipCode"
-        >
-    > = [
-        "streetAddress",
-        "streetAddressNumber",
-        "neighborhood",
-        "city",
-        "state",
-        "country",
-        "zipCode",
-    ];
-
-    addressFields.forEach((field) => {
-        const next = form[field].trim();
-        const current = (original[field] as string | null) ?? "";
-        if (next !== current) {
-            (payload as Record<string, unknown>)[field] = next;
-        }
-    });
-
-    return payload;
-}
-
-function getAxiosErrorMessage(err: unknown, fallback: string): string {
-    if (axios.isAxiosError(err)) {
-        const data = err.response?.data as
-            | { message?: string; error?: string; errors?: string[] }
-            | undefined;
-        if (Array.isArray(data?.errors) && data.errors.length > 0) {
-            return data.errors.join(" · ");
-        }
-        return data?.message ?? data?.error ?? err.message ?? fallback;
-    }
-    return fallback;
-}
-
-const EditarEspaco = () => {
-    const navigate = useNavigate();
-    const { venueId } = useParams<{ venueId: string }>();
-
-    const [venue, setVenue] = useState<VenueDetailDTO | null>(null);
-    const [form, setForm] = useState<FormState>(EMPTY_FORM);
-
-    const [isLoading, setIsLoading] = useState(true);
-    const [isSaving, setIsSaving] = useState(false);
-    const [isTogglingStatus, setIsTogglingStatus] = useState(false);
-
-    const [error, setError] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
-    const fetchVenue = useCallback(
-        (signal?: AbortSignal) => {
-            if (!venueId) return;
-            setIsLoading(true);
-            setError(null);
-
-            return venueService
-                .getVenueById(venueId, signal)
-                .then((data) => {
-                    setVenue(data);
-                    setForm(venueToFormState(data));
-                })
-                .catch((err: unknown) => {
-                    if (axios.isCancel(err)) return;
-                    setError(
-                        getAxiosErrorMessage(err, "Espaço não encontrado.")
-                    );
-                    setVenue(null);
-                })
-                .finally(() => {
-                    if (!signal?.aborted) setIsLoading(false);
-                });
-        },
-        [venueId]
-    );
-
-    useEffect(() => {
-        const controller = new AbortController();
-        fetchVenue(controller.signal);
-        return () => controller.abort();
-    }, [fetchVenue]);
-
-    useEffect(() => {
-        if (!successMessage) return;
-        const id = window.setTimeout(() => setSuccessMessage(null), 3500);
-        return () => window.clearTimeout(id);
-    }, [successMessage]);
-
-    const patchPayload = useMemo(() => {
-        if (!venue) return {};
-        return buildPatchPayload(form, venue);
-    }, [form, venue]);
-
-    const hasChanges = Object.keys(patchPayload).length > 0;
-
-    const handleFieldChange =
-        <K extends keyof FormState>(field: K) =>
-        (
-            e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-        ) => {
-            setForm((prev) => ({ ...prev, [field]: e.target.value }));
-        };
-
-    const handleSave = async () => {
-        if (!venue || !venueId || !hasChanges) return;
-        setIsSaving(true);
-        setError(null);
-        try {
-            const updated = await venueService.updateVenue(
-                venueId,
-                patchPayload
-            );
-            setVenue(updated);
-            setForm(venueToFormState(updated));
-            setSuccessMessage("Espaço atualizado com sucesso.");
-        } catch (err) {
-            setError(
-                getAxiosErrorMessage(
-                    err,
-                    "Não foi possível atualizar o espaço."
-                )
-            );
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
-    const handleReset = () => {
-        if (venue) setForm(venueToFormState(venue));
-    };
-
-    const handleToggleStatus = async (next: StatusValue) => {
-        if (!venue || !venueId) return;
-        if (venue.status?.name === next) return;
-
-        setIsTogglingStatus(true);
-        setError(null);
-        try {
-            const updated = await venueService.updateVenue(venueId, {
-                status: STATUS_OPTIONS[next],
-            });
-            setVenue(updated);
-            setForm(venueToFormState(updated));
-            setSuccessMessage(
-                next === "ACTIVE" ? "Espaço reativado." : "Espaço desativado."
-            );
-        } catch (err) {
-            setError(
-                getAxiosErrorMessage(err, "Não foi possível alterar o status.")
-            );
-        } finally {
-            setIsTogglingStatus(false);
-        }
-    };
-
+export const SpaceForm = ({
+    venue,
+    form,
+    isLoading,
+    isSaving,
+    isTogglingStatus,
+    error,
+    successMessage,
+    hasChanges,
+    onFieldChange,
+    onSave,
+    onReset,
+    onToggleStatus,
+}: SpaceFormProps) => {
     return (
-        <div>
-            <div className="mb-4 flex items-center gap-2">
-                <button
-                    type="button"
-                    onClick={() => navigate("/admin/espacos")}
-                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-white/70 bg-white/60 px-3 py-1.5 text-xs font-semibold text-[#00334d] transition-all duration-300 hover:bg-white hover:shadow-md"
-                >
-                    <ArrowLeft className="size-3.5" strokeWidth={2.6} />
-                    Voltar para espaços
-                </button>
-            </div>
-
-            <AdminPageHeader
-                icon={Pencil}
-                title={venue ? `Editar: ${venue.name}` : "Editar espaço"}
-                description={
-                    venue
-                        ? `ID ${venue.venueID} · última atualização ${new Date(
-                              venue.lastUpdateDate
-                          ).toLocaleString("pt-BR")}`
-                        : "Carregando detalhes do espaço..."
-                }
-            />
-
+        <>
             {error && <Banner variant="error" message={error} />}
             {successMessage && (
                 <Banner variant="success" message={successMessage} />
@@ -318,7 +89,7 @@ const EditarEspaco = () => {
                                     <TextInput
                                         id="name"
                                         value={form.name}
-                                        onChange={handleFieldChange("name")}
+                                        onChange={onFieldChange("name")}
                                         placeholder="Nome comercial do espaço"
                                     />
                                 </Field>
@@ -330,7 +101,7 @@ const EditarEspaco = () => {
                                     <TextInput
                                         id="legalName"
                                         value={form.legalName}
-                                        onChange={handleFieldChange(
+                                        onChange={onFieldChange(
                                             "legalName"
                                         )}
                                         placeholder="Razão social registrada"
@@ -342,7 +113,7 @@ const EditarEspaco = () => {
                                 <TextInput
                                     id="CNPJ"
                                     value={form.CNPJ}
-                                    onChange={handleFieldChange("CNPJ")}
+                                    onChange={onFieldChange("CNPJ")}
                                     placeholder="00.000.000/0000-00"
                                     maxLength={18}
                                 />
@@ -352,7 +123,7 @@ const EditarEspaco = () => {
                                 <TextArea
                                     id="description"
                                     value={form.description}
-                                    onChange={handleFieldChange("description")}
+                                    onChange={onFieldChange("description")}
                                     placeholder="Breve descrição do espaço, capacidade ou diferenciais..."
                                     rows={4}
                                 />
@@ -375,7 +146,7 @@ const EditarEspaco = () => {
                                         <TextInput
                                             id="streetAddress"
                                             value={form.streetAddress}
-                                            onChange={handleFieldChange(
+                                            onChange={onFieldChange(
                                                 "streetAddress"
                                             )}
                                             placeholder="Rua, Avenida..."
@@ -389,7 +160,7 @@ const EditarEspaco = () => {
                                         <TextInput
                                             id="streetAddressNumber"
                                             value={form.streetAddressNumber}
-                                            onChange={handleFieldChange(
+                                            onChange={onFieldChange(
                                                 "streetAddressNumber"
                                             )}
                                             placeholder="Nº"
@@ -407,7 +178,7 @@ const EditarEspaco = () => {
                                         <TextInput
                                             id="neighborhood"
                                             value={form.neighborhood}
-                                            onChange={handleFieldChange(
+                                            onChange={onFieldChange(
                                                 "neighborhood"
                                             )}
                                         />
@@ -420,7 +191,7 @@ const EditarEspaco = () => {
                                         <TextInput
                                             id="zipCode"
                                             value={form.zipCode}
-                                            onChange={handleFieldChange(
+                                            onChange={onFieldChange(
                                                 "zipCode"
                                             )}
                                             placeholder="00000-000"
@@ -437,7 +208,7 @@ const EditarEspaco = () => {
                                         <TextInput
                                             id="city"
                                             value={form.city}
-                                            onChange={handleFieldChange("city")}
+                                            onChange={onFieldChange("city")}
                                         />
                                     </Field>
                                     <Field
@@ -448,7 +219,7 @@ const EditarEspaco = () => {
                                         <TextInput
                                             id="state"
                                             value={form.state}
-                                            onChange={handleFieldChange(
+                                            onChange={onFieldChange(
                                                 "state"
                                             )}
                                         />
@@ -461,7 +232,7 @@ const EditarEspaco = () => {
                                         <TextInput
                                             id="country"
                                             value={form.country}
-                                            onChange={handleFieldChange(
+                                            onChange={onFieldChange(
                                                 "country"
                                             )}
                                         />
@@ -473,7 +244,7 @@ const EditarEspaco = () => {
                         <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
                             <button
                                 type="button"
-                                onClick={handleReset}
+                                onClick={onReset}
                                 disabled={!hasChanges || isSaving}
                                 className="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-white/70 bg-white/60 px-4 py-2 text-sm font-semibold text-[#00334d] transition-all duration-300 hover:bg-white hover:shadow-md disabled:cursor-not-allowed disabled:opacity-40"
                             >
@@ -481,7 +252,7 @@ const EditarEspaco = () => {
                             </button>
                             <button
                                 type="button"
-                                onClick={handleSave}
+                                onClick={onSave}
                                 disabled={!hasChanges || isSaving}
                                 className="inline-flex cursor-pointer items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:brightness-110 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
                                 style={{
@@ -505,14 +276,14 @@ const EditarEspaco = () => {
                         <StatusCard
                             current={venue.status?.name ?? "ACTIVE"}
                             isLoading={isTogglingStatus}
-                            onChange={handleToggleStatus}
+                            onChange={onToggleStatus}
                         />
 
                         <MetadataCard venue={venue} />
                     </div>
                 </div>
             )}
-        </div>
+        </>
     );
 };
 
@@ -764,5 +535,3 @@ const MetaRow = ({ label, value, mono }: MetaRowProps) => (
         </span>
     </li>
 );
-
-export default EditarEspaco;
