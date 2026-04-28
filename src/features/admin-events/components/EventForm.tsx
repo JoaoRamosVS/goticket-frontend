@@ -1,8 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
-    ArrowLeft,
     CheckCircle2,
     Eye,
     EyeOff,
@@ -11,7 +8,6 @@ import {
     ImagePlus,
     Info,
     Loader2,
-    Pencil,
     Save,
     Star,
     Tags,
@@ -19,19 +15,13 @@ import {
     Upload,
     X,
 } from "lucide-react";
-
-import AdminPageHeader from "@/components/admin/AdminPageHeader";
-import eventService from "@/services/event";
-import eventCategoryService from "@/services/eventCategory";
 import { buildEventImageUrl } from "@/helpers/events";
 import type {
-    EventCategoryDTO,
     EventDetailDTO,
     EventImageDTO,
-    EventImageOrderItemDTO,
     EventVisibilityValue,
-    UpdateEventPayload,
-} from "@/types";
+} from "@/features/admin-events/types/event.types";
+import type { EventCategoryDTO } from "@/features/admin-categories/types/category.types";
 
 type FormState = {
     title: string;
@@ -42,82 +32,32 @@ type FormState = {
     salesStartDate: string;
 };
 
-const EMPTY_FORM: FormState = {
-    title: "",
-    description: "",
-    ageRestriction: "0",
-    startDate: "",
-    endDate: "",
-    salesStartDate: "",
+type EventFormProps = {
+    event: EventDetailDTO | null;
+    form: FormState;
+    categories: EventCategoryDTO[];
+    isLoadingCategories: boolean;
+    isSavingCategory: boolean;
+    isLoading: boolean;
+    isSaving: boolean;
+    isTogglingVisibility: boolean;
+    isUploadingImages: boolean;
+    isSavingImageOrder: boolean;
+    isDeleting: boolean;
+    error: string | null;
+    successMessage: string | null;
+    hasChanges: boolean;
+    onFieldChange: <K extends keyof FormState>(
+        field: K
+    ) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+    onSave: () => void;
+    onReset: () => void;
+    onToggleVisibility: (value: EventVisibilityValue) => void;
+    onChangeCategory: (categoryId: number) => void;
+    onDeleteEvent: () => void;
+    onUploadImages: (files: File[], mainIndex: number) => void;
+    onSaveImageOrder: (orderedS3Keys: string[]) => void | Promise<void>;
 };
-
-/**
- * Converte um valor vindo do backend (`LocalDateTime` serializado como
- * `"2025-12-01T18:00:00"`) para o formato aceito por `<input type="datetime-local">`
- * (`"2025-12-01T18:00"`). Não aplica timezone.
- */
-function isoToDateTimeLocal(value: string | null | undefined): string {
-    if (!value) return "";
-    const [date, time] = value.split("T");
-    if (!date || !time) return "";
-    return `${date}T${time.substring(0, 5)}`;
-}
-
-/**
- * Converte o valor de `<input type="datetime-local">` (`YYYY-MM-DDTHH:mm`)
- * para o formato `LocalDateTime` esperado pelo backend (`YYYY-MM-DDTHH:mm:ss`).
- */
-function dateTimeLocalToLocalDateTime(value: string): string | null {
-    if (!value) return null;
-    return value.length === 16 ? `${value}:00` : value;
-}
-
-function eventToFormState(event: EventDetailDTO): FormState {
-    return {
-        title: event.title ?? "",
-        description: event.description ?? "",
-        ageRestriction: String(event.ageRestriction ?? 0),
-        startDate: isoToDateTimeLocal(event.startDate),
-        endDate: isoToDateTimeLocal(event.endDate),
-        salesStartDate: isoToDateTimeLocal(event.salesStartDate),
-    };
-}
-
-function buildPatchPayload(
-    form: FormState,
-    original: EventDetailDTO
-): UpdateEventPayload {
-    const payload: UpdateEventPayload = {};
-
-    if (form.title !== original.title) {
-        payload.title = form.title;
-    }
-    if (form.description !== original.description) {
-        payload.description = form.description;
-    }
-
-    const ageValue = Number(form.ageRestriction);
-    if (Number.isFinite(ageValue) && ageValue !== original.ageRestriction) {
-        payload.ageRestriction = ageValue;
-    }
-
-    const nextStart = dateTimeLocalToLocalDateTime(form.startDate);
-    if (nextStart && nextStart !== original.startDate) {
-        payload.startDate = nextStart;
-    }
-
-    const nextEnd = dateTimeLocalToLocalDateTime(form.endDate);
-    if (nextEnd && nextEnd !== original.endDate) {
-        payload.endDate = nextEnd;
-    }
-
-    const nextSalesStart = dateTimeLocalToLocalDateTime(form.salesStartDate);
-    if (nextSalesStart !== (original.salesStartDate ?? null)) {
-        payload.salesStartDate = nextSalesStart;
-    }
-
-    return payload;
-}
 
 function sortEventImages(images: EventImageDTO[]): EventImageDTO[] {
     return [...images].sort((a, b) => {
@@ -143,302 +83,32 @@ function moveItem<T>(arr: T[], from: number, to: number): T[] {
     return next;
 }
 
-function reorderWithMainFirst<T>(items: T[], mainIndex: number): T[] {
-    if (items.length === 0) return [];
-    const clamped = Math.min(Math.max(mainIndex, 0), items.length - 1);
-    const main = items[clamped];
-    const rest = items.filter((_, i) => i !== clamped);
-    return [main, ...rest];
-}
-
-function getAxiosErrorMessage(err: unknown, fallback: string): string {
-    if (axios.isAxiosError(err)) {
-        const data = err.response?.data as
-            | { message?: string; error?: string }
-            | undefined;
-        return data?.message ?? data?.error ?? err.message ?? fallback;
-    }
-    return fallback;
-}
-
-const EditarEvento = () => {
-    const navigate = useNavigate();
-    const { eventId } = useParams<{ eventId: string }>();
-
-    const [event, setEvent] = useState<EventDetailDTO | null>(null);
-    const [form, setForm] = useState<FormState>(EMPTY_FORM);
-
-    const [categories, setCategories] = useState<EventCategoryDTO[]>([]);
-    const [isLoadingCategories, setIsLoadingCategories] = useState(false);
-    const [isSavingCategory, setIsSavingCategory] = useState(false);
-
-    const [isLoading, setIsLoading] = useState(true);
-    const [isSaving, setIsSaving] = useState(false);
-    const [isTogglingVisibility, setIsTogglingVisibility] = useState(false);
-    const [isUploadingImages, setIsUploadingImages] = useState(false);
-    const [isSavingImageOrder, setIsSavingImageOrder] = useState(false);
-    const [isDeleting, setIsDeleting] = useState(false);
-
-    const [error, setError] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
-    const fetchEvent = useCallback(
-        (signal?: AbortSignal) => {
-            if (!eventId) return;
-            setIsLoading(true);
-            setError(null);
-
-            return eventService
-                .getEventById(eventId, signal)
-                .then((data) => {
-                    setEvent(data);
-                    setForm(eventToFormState(data));
-                })
-                .catch((err: unknown) => {
-                    if (axios.isCancel(err)) return;
-                    setError(
-                        getAxiosErrorMessage(err, "Evento não encontrado.")
-                    );
-                    setEvent(null);
-                })
-                .finally(() => {
-                    if (!signal?.aborted) setIsLoading(false);
-                });
-        },
-        [eventId]
-    );
-
-    useEffect(() => {
-        const controller = new AbortController();
-        fetchEvent(controller.signal);
-        return () => controller.abort();
-    }, [fetchEvent]);
-
-    useEffect(() => {
-        const controller = new AbortController();
-        setIsLoadingCategories(true);
-        eventCategoryService
-            .listEventCategories(controller.signal)
-            .then((data) => setCategories(data ?? []))
-            .catch((err: unknown) => {
-                if (axios.isCancel(err)) return;
-                setCategories([]);
-            })
-            .finally(() => {
-                if (!controller.signal.aborted) setIsLoadingCategories(false);
-            });
-        return () => controller.abort();
-    }, []);
-
-    useEffect(() => {
-        if (!successMessage) return;
-        const id = window.setTimeout(() => setSuccessMessage(null), 3500);
-        return () => window.clearTimeout(id);
-    }, [successMessage]);
-
-    const patchPayload = useMemo(() => {
-        if (!event) return {};
-        return buildPatchPayload(form, event);
-    }, [form, event]);
-
-    const hasChanges = Object.keys(patchPayload).length > 0;
-
-    const handleFieldChange =
-        <K extends keyof FormState>(field: K) =>
-        (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-            setForm((prev) => ({ ...prev, [field]: e.target.value }));
-        };
-
-    const handleSave = async () => {
-        if (!event || !eventId || !hasChanges) return;
-        setIsSaving(true);
-        setError(null);
-        try {
-            const updated = await eventService.updateEvent(
-                eventId,
-                patchPayload
-            );
-            setEvent(updated);
-            setForm(eventToFormState(updated));
-            setSuccessMessage("Evento atualizado com sucesso.");
-        } catch (err) {
-            setError(
-                getAxiosErrorMessage(err, "Não foi possível atualizar o evento.")
-            );
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
-    const handleReset = () => {
-        if (event) setForm(eventToFormState(event));
-    };
-
-    const handleToggleVisibility = async (next: EventVisibilityValue) => {
-        if (!event || !eventId) return;
-        if (event.eventVisibility?.name === next) return;
-
-        setIsTogglingVisibility(true);
-        setError(null);
-        try {
-            await eventService.updateEventVisibility(eventId, next);
-            await fetchEvent();
-            setSuccessMessage(
-                next === "PUBLIC"
-                    ? "Evento agora está público."
-                    : "Evento agora está privado."
-            );
-        } catch (err) {
-            setError(
-                getAxiosErrorMessage(
-                    err,
-                    "Não foi possível alterar a visibilidade."
-                )
-            );
-        } finally {
-            setIsTogglingVisibility(false);
-        }
-    };
-
-    const handleUploadImages = async (files: File[], mainIndex: number) => {
-        if (!eventId || !event || files.length === 0) return;
-        setIsUploadingImages(true);
-        setError(null);
-        try {
-            const orderedNew = reorderWithMainFirst(files, mainIndex);
-            const sortedExisting = sortEventImages(event.images ?? []);
-            const metadata: EventImageOrderItemDTO[] = [
-                ...sortedExisting.map((img) => ({
-                    type: "existing" as const,
-                    s3Key: img.s3Key,
-                    fileIndex: null,
-                })),
-                ...orderedNew.map((_, idx) => ({
-                    type: "new" as const,
-                    s3Key: null,
-                    fileIndex: idx,
-                })),
-            ];
-            await eventService.replaceEventImages(
-                eventId,
-                metadata,
-                orderedNew
-            );
-            await fetchEvent();
-            setSuccessMessage(
-                files.length === 1
-                    ? "Imagem enviada com sucesso."
-                    : `${files.length} imagens enviadas com sucesso.`
-            );
-        } catch (err) {
-            setError(
-                getAxiosErrorMessage(
-                    err,
-                    "Não foi possível enviar as imagens."
-                )
-            );
-        } finally {
-            setIsUploadingImages(false);
-        }
-    };
-
-    const handleSaveImageOrder = async (orderedS3Keys: string[]) => {
-        if (!eventId || orderedS3Keys.length === 0) return;
-        setIsSavingImageOrder(true);
-        setError(null);
-        try {
-            const metadata: EventImageOrderItemDTO[] = orderedS3Keys.map(
-                (s3Key) => ({
-                    type: "existing" as const,
-                    s3Key,
-                    fileIndex: null,
-                })
-            );
-            await eventService.replaceEventImages(eventId, metadata, []);
-            await fetchEvent();
-            setSuccessMessage("Ordem das imagens atualizada.");
-        } catch (err) {
-            setError(
-                getAxiosErrorMessage(
-                    err,
-                    "Não foi possível salvar a ordem das imagens."
-                )
-            );
-        } finally {
-            setIsSavingImageOrder(false);
-        }
-    };
-
-    const handleChangeCategory = async (nextCategoryId: number) => {
-        if (!event || !eventId) return;
-        if (event.category?.categoryId === nextCategoryId) return;
-
-        setIsSavingCategory(true);
-        setError(null);
-        try {
-            const updated = await eventService.updateEvent(eventId, {
-                category: { categoryId: nextCategoryId },
-            });
-            setEvent(updated);
-            setForm(eventToFormState(updated));
-            setSuccessMessage("Categoria do evento atualizada.");
-        } catch (err) {
-            setError(
-                getAxiosErrorMessage(
-                    err,
-                    "Não foi possível atualizar a categoria do evento."
-                )
-            );
-        } finally {
-            setIsSavingCategory(false);
-        }
-    };
-
-    const handleDeleteEvent = async () => {
-        if (!event || !eventId) return;
-        const confirmed = window.confirm(
-            `Excluir permanentemente "${event.title}"?`
-        );
-        if (!confirmed) return;
-
-        setIsDeleting(true);
-        setError(null);
-        try {
-            await eventService.deleteEvent(eventId);
-            navigate("/admin/eventos");
-        } catch (err) {
-            setError(
-                getAxiosErrorMessage(err, "Não foi possível excluir o evento.")
-            );
-            setIsDeleting(false);
-        }
-    };
-
+export const EventForm = ({
+    event,
+    form,
+    categories,
+    isLoadingCategories,
+    isSavingCategory,
+    isLoading,
+    isSaving,
+    isTogglingVisibility,
+    isUploadingImages,
+    isSavingImageOrder,
+    isDeleting,
+    error,
+    successMessage,
+    hasChanges,
+    onFieldChange,
+    onSave,
+    onReset,
+    onToggleVisibility,
+    onChangeCategory,
+    onDeleteEvent,
+    onUploadImages,
+    onSaveImageOrder,
+}: EventFormProps) => {
     return (
-        <div>
-            <div className="mb-4 flex items-center gap-2">
-                <button
-                    type="button"
-                    onClick={() => navigate("/admin/eventos")}
-                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-white/70 bg-white/60 px-3 py-1.5 text-xs font-semibold text-[#00334d] transition-all duration-300 hover:bg-white hover:shadow-md"
-                >
-                    <ArrowLeft className="size-3.5" strokeWidth={2.6} />
-                    Voltar para eventos
-                </button>
-            </div>
-
-            <AdminPageHeader
-                icon={Pencil}
-                title={event ? `Editar: ${event.title}` : "Editar evento"}
-                description={
-                    event
-                        ? `ID #${event.eventID} · última atualização ${new Date(
-                              event.lastUpdateDate
-                          ).toLocaleString("pt-BR")}`
-                        : "Carregando detalhes do evento..."
-                }
-            />
-
+        <>
             {error && <Banner variant="error" message={error} />}
             {successMessage && (
                 <Banner variant="success" message={successMessage} />
@@ -466,7 +136,7 @@ const EditarEvento = () => {
                                 <TextInput
                                     id="title"
                                     value={form.title}
-                                    onChange={handleFieldChange("title")}
+                                    onChange={onFieldChange("title")}
                                     placeholder="Nome do evento"
                                 />
                             </Field>
@@ -479,7 +149,7 @@ const EditarEvento = () => {
                                 <TextAreaInput
                                     id="description"
                                     value={form.description}
-                                    onChange={handleFieldChange("description")}
+                                    onChange={onFieldChange("description")}
                                     rows={5}
                                     placeholder="Detalhes e atrações do evento..."
                                 />
@@ -497,7 +167,7 @@ const EditarEvento = () => {
                                         min={0}
                                         max={99}
                                         value={form.ageRestriction}
-                                        onChange={handleFieldChange(
+                                        onChange={onFieldChange(
                                             "ageRestriction"
                                         )}
                                     />
@@ -511,7 +181,7 @@ const EditarEvento = () => {
                                         id="salesStartDate"
                                         type="datetime-local"
                                         value={form.salesStartDate}
-                                        onChange={handleFieldChange(
+                                        onChange={onFieldChange(
                                             "salesStartDate"
                                         )}
                                     />
@@ -528,7 +198,7 @@ const EditarEvento = () => {
                                         id="startDate"
                                         type="datetime-local"
                                         value={form.startDate}
-                                        onChange={handleFieldChange(
+                                        onChange={onFieldChange(
                                             "startDate"
                                         )}
                                     />
@@ -542,7 +212,7 @@ const EditarEvento = () => {
                                         id="endDate"
                                         type="datetime-local"
                                         value={form.endDate}
-                                        onChange={handleFieldChange("endDate")}
+                                        onChange={onFieldChange("endDate")}
                                     />
                                 </Field>
                             </div>
@@ -551,7 +221,7 @@ const EditarEvento = () => {
                         <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
                             <button
                                 type="button"
-                                onClick={handleReset}
+                                onClick={onReset}
                                 disabled={!hasChanges || isSaving}
                                 className="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-white/70 bg-white/60 px-4 py-2 text-sm font-semibold text-[#00334d] transition-all duration-300 hover:bg-white hover:shadow-md disabled:cursor-not-allowed disabled:opacity-40"
                             >
@@ -559,7 +229,7 @@ const EditarEvento = () => {
                             </button>
                             <button
                                 type="button"
-                                onClick={handleSave}
+                                onClick={onSave}
                                 disabled={!hasChanges || isSaving}
                                 className="inline-flex cursor-pointer items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:brightness-110 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
                                 style={{
@@ -583,7 +253,7 @@ const EditarEvento = () => {
                         <VisibilityCard
                             current={event.eventVisibility?.name ?? "PRIVATE"}
                             isLoading={isTogglingVisibility}
-                            onChange={handleToggleVisibility}
+                            onChange={onToggleVisibility}
                         />
 
                         <CategoryCard
@@ -591,14 +261,14 @@ const EditarEvento = () => {
                             categories={categories}
                             isLoadingCategories={isLoadingCategories}
                             isSaving={isSavingCategory}
-                            onChange={handleChangeCategory}
+                            onChange={onChangeCategory}
                         />
 
                         <MetadataCard event={event} />
 
                         <DangerCard
                             isDeleting={isDeleting}
-                            onDelete={handleDeleteEvent}
+                            onDelete={onDeleteEvent}
                         />
                     </div>
 
@@ -607,13 +277,13 @@ const EditarEvento = () => {
                             event={event}
                             isUploading={isUploadingImages}
                             isSavingOrder={isSavingImageOrder}
-                            onUpload={handleUploadImages}
-                            onSaveOrder={handleSaveImageOrder}
+                            onUpload={onUploadImages}
+                            onSaveOrder={onSaveImageOrder}
                         />
                     </GlassCard>
                 </div>
             )}
-        </div>
+        </>
     );
 };
 
@@ -1386,5 +1056,3 @@ const ImagesPanel = ({
         </div>
     );
 };
-
-export default EditarEvento;

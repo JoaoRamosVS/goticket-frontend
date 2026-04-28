@@ -5,7 +5,7 @@ import type {
     EventMinListDTO,
     EventVisibilityValue,
     UpdateEventPayload,
-} from "@/types";
+} from "@/features/admin-events/types/event.types";
 
 function authHeaders(extra?: Record<string, string>): Record<string, string> {
     const accessToken = localStorage.getItem("accessToken");
