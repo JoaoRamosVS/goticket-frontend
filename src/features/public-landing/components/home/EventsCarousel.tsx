@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import EventCard from "../ui/event-card";
+import EventCard from "@/components/ui/event-card";
 import type { EventMinDTO } from "@/types";
 
 type EventsCarouselProps = {

@@ -1,16 +1,15 @@
-import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom'
+import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
 
 // import SessionWatcher from '@/components/global/SessionWatcher';
-import Navbar from '@/components/layout/Navbar';
 import SmoothScroll from '@/components/global/SmoothScroll';
-import Footer from '@/components/layout/Footer';
+import MainLayout from '@/layouts/MainLayout';
 
 import { useAuthStore } from '@/stores/authStore';
 
 import Login from '@/pages/auth/Login'
-import Home from '@/pages/Home'
+import Home from '@/pages/public/Home'
 import SignUp from '@/pages/auth/SignUp';
-import QuemSomos from '@/pages/QuemSomos';
+import QuemSomos from '@/pages/public/QuemSomos';
 import EventPage from '@/pages/EventPage';
 import AdminLayout from '@/layouts/AdminLayout';
 import AdminDashboard from '@/pages/admin/Dashboard';
@@ -35,20 +34,15 @@ import AdminEditarCategoria from '@/pages/admin/categorias/EditarCategoria';
 
 function AppContent() {
   const isAuth = useAuthStore((state) => state.isAuth)
-  const location = useLocation()
-
-  const isAdminRoute = location.pathname.includes('/admin')
 
   return (
     <SmoothScroll>
-      {!isAdminRoute && <Navbar />}
-
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={isAuth ? <Navigate to="/home" replace /> : <Login />} />
         <Route path="/cadastro" element={isAuth ? <Navigate to="/home" replace /> : <SignUp />} />
         <Route path="/home" element={<Home />} />
-        <Route path="/evento" element={<EventPage />} />
+        <Route path="/evento" element={<MainLayout><EventPage /></MainLayout>} />
         <Route path="/quem-somos" element={<QuemSomos />} />
         <Route path="/admin" element={<AdminLayout><Outlet /></AdminLayout>}>
           <Route index element={<Navigate to="dashboard" replace />} />
@@ -67,8 +61,6 @@ function AppContent() {
           <Route path="configuracoes" element={<AdminConfiguracoes />} />
         </Route>
       </Routes>
-
-      {!isAdminRoute && <Footer />}
     </SmoothScroll>
   )
 }

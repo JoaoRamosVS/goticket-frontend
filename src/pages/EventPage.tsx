@@ -5,7 +5,7 @@ import EventDescription from "@/components/event-page/EventDescription";
 import EventLocation from "@/components/event-page/EventLocation";
 import EventPolicies from "@/components/event-page/EventPolicies";
 import { mockEvent } from "@/components/event-page/mockData";
-import FaqSection from "@/components/global/FAQSection/FAQSection";
+import FaqSection from "@/features/public-landing/components/FAQSection/FAQSection";
 import ShareAndSave from "@/components/event-page/ShareAndSave";
 
 const EventPage = () => {
