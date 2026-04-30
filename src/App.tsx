@@ -49,18 +49,26 @@ function AppContent() {
         
         <Route path="/admin" element={<AdminLayout><Outlet /></AdminLayout>}>
           <Route index element={<Navigate to="dashboard" replace />} />
+          
           <Route path="dashboard" element={<AdminDashboard />} />
+          
           <Route path="eventos" element={<AdminEventos />} />
           <Route path="eventos/:eventId" element={<AdminEditarEvento />} />
+          
           <Route path="espacos" element={<AdminEspacos />} />
           <Route path="espacos/:venueId" element={<AdminEditarEspaco />} />
+          
           <Route path="clientes" element={<AdminClientes />} />
           <Route path="clientes/:clientId" element={<AdminEditarCliente />} />
+          
           <Route path="organizadores" element={<AdminOrganizadores />} />
           <Route path="organizadores/:organizerId" element={<AdminEditarOrganizador />} />
+          
           <Route path="categorias" element={<AdminCategorias />} />
           <Route path="categorias/:categoryId" element={<AdminEditarCategoria />} />
+          
           <Route path="vendas" element={<AdminVendas />} />
+          
           <Route path="configuracoes" element={<AdminConfiguracoes />} />
         </Route>
       </Routes>
