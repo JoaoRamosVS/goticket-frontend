@@ -19,7 +19,11 @@ const DATE_FORMATTER = new Intl.DateTimeFormat("pt-BR", {
  */
 export function buildEventImageUrl(imageKey?: string | null): string {
     if (!imageKey) return FALLBACK_IMAGE_URL;
-    return `${S3_BASE_URL.replace(/\/$/, "")}/${imageKey}`;
+    return buildS3AssetUrl(imageKey);
+}
+
+export function buildS3AssetUrl(assetKey: string): string {
+    return `${S3_BASE_URL.replace(/\/$/, "")}/${assetKey.replace(/^\//, "")}`;
 }
 
 /**
