@@ -29,7 +29,7 @@ export interface EventMinListDTO {
 
 export type EventVisibilityValue = "PUBLIC" | "PRIVATE";
 
-export type EventStatusName =
+type EventStatusName =
     | "PENDING_APPROVAL"
     | "APPROVED"
     | "COMPLETED"

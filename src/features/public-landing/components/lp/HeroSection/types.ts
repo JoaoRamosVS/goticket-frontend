@@ -1,20 +1,20 @@
-export interface ButtonConfig {
+interface ButtonConfig {
 	text: string;
 	url: string;
 }
 
-export interface AvatarConfig {
+interface AvatarConfig {
 	src: string;
 	alt: string;
 }
 
-export interface ReviewsConfig {
+interface ReviewsConfig {
 	count: number;
 	avatars: AvatarConfig[];
 	rating?: number;
 }
 
-export interface ImageConfig {
+interface ImageConfig {
 	src: string;
 	alt: string;
 }

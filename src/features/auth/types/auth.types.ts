@@ -24,15 +24,15 @@ export interface RegisterResponse {
     expiresIn: number;
 }
 
-export type RoleValue = "ADMIN" | "ORGANIZER" | "CLIENT";
-export type StatusValue = "ACTIVE" | "INACTIVE";
+type RoleValue = "ADMIN" | "ORGANIZER" | "CLIENT";
+type StatusValue = "ACTIVE" | "INACTIVE";
 
-export interface RoleDTO {
+interface RoleDTO {
     roleID: number;
     name: RoleValue;
 }
 
-export interface StatusDTO {
+interface StatusDTO {
     statusID: number;
     name: StatusValue;
 }

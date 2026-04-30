@@ -1,4 +1,4 @@
-export interface FeatureItem {
+interface FeatureItem {
 	text: string;
 }
 

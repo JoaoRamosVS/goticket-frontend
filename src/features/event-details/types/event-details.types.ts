@@ -1,4 +1,4 @@
-export interface TicketType {
+interface TicketType {
   id: string;
   name: string;
   description: string;
@@ -9,13 +9,13 @@ export interface TicketType {
   salesEnd: string;
 }
 
-export interface EventDate {
+interface EventDate {
   start: string;
   end: string;
   doorsOpen?: string;
 }
 
-export interface EventVenue {
+interface EventVenue {
   name: string;
   address: string;
   city: string;
@@ -25,7 +25,7 @@ export interface EventVenue {
   longitude?: number;
 }
 
-export interface EventOrganizerInfo {
+interface EventOrganizerInfo {
   name: string;
   avatar: string;
   description: string;
@@ -34,7 +34,7 @@ export interface EventOrganizerInfo {
   rating: number;
 }
 
-export interface EventPolicy {
+interface EventPolicy {
   icon: "age" | "refund" | "camera" | "food" | "accessibility" | "id";
   title: string;
   description: string;
@@ -57,22 +57,23 @@ export interface EventDetails {
   status: "available" | "sold_out" | "coming_soon" | "cancelled";
 }
 
-export interface EventPageCategoryDTO {
+interface EventPageCategoryDTO {
   name: string;
   slug: string;
 }
 
-export interface EventPageOrganizerDTO {
+interface EventPageOrganizerDTO {
   legalName: string;
   cnpj: string;
 }
 
-export interface EventPageStatusDTO {
+interface EventPageStatusDTO {
   statusID: number;
   name: string;
 }
 
-export interface EventPageVenueDTO {
+interface EventPageVenueDTO {
+  venueID: number;
   name: string;
   cnpj: string;
   description: string;
@@ -83,6 +84,8 @@ export interface EventPageVenueDTO {
   state: string;
   country: string;
   zipCode: string;
+  sectorMapS3Key?: string | null;
+  sectorMapUrl?: string | null;
   status: EventPageStatusDTO | null;
 }
 
@@ -102,13 +105,15 @@ export interface EventPageSectorDTO {
   registerDate: string;
   lastUpdateDate: string;
   hasNumberedSeats: boolean;
+  venueSectorId?: number;
+  mapElementId?: string | null;
   batches: EventPageBatchDTO[];
   soldTickets: number;
   availableTickets: number;
   totalTickets: number;
 }
 
-export interface EventPageImageDTO {
+interface EventPageImageDTO {
   eventImageID: number;
   s3Key: string;
   ordination: number;
