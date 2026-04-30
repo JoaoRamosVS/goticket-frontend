@@ -79,24 +79,6 @@ const EventPage = () => {
         </div>
       </div>
 
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-t p-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div>
-            <p className="text-sm text-muted-foreground">A partir de</p>
-            <p className="text-xl font-bold text-foreground">
-              {(event.tickets[0]?.price ?? 0).toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              })}
-            </p>
-          </div>
-          <button className="bg-primary text-primary-foreground font-bold px-8 py-3 rounded-full">
-            Ver Ingressos
-          </button>
-        </div>
-      </div>
-
-      
       <FaqSection />
     </>
   );

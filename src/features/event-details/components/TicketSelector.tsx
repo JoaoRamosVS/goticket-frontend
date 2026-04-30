@@ -1,5 +1,4 @@
 import { Ticket } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/features/event-details/utils/helpers";
@@ -43,15 +42,6 @@ const TicketSelector = ({ tickets }: TicketSelectorProps) => {
                     {formatCurrency(ticket.price)}
                   </p>
                 </div>
-              </div>
-
-              <div className="flex items-center justify-end mt-3">
-                <Button
-                  variant="default"
-                  className="gap-2 bg-linear-to-r from-primary to-[#2959b9] text-primary-foreground px-8 rounded-4xl w-full"
-                >
-                  Selecionar Ingresso
-                </Button>
               </div>
             </div>
           );
