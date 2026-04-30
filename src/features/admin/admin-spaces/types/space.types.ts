@@ -40,6 +40,7 @@ export interface VenueDetailDTO {
     state: string;
     country: string;
     zipCode: string;
+    sectorMapS3Key?: string | null;
     approvalDate: string | null;
     registerDate: string;
     lastUpdateDate: string;
@@ -50,6 +51,22 @@ export interface VenueDetailDTO {
         legalName?: string;
         CNPJ?: string;
     } | null;
+}
+
+export interface VenueSectorDTO {
+    sectorID: number;
+    name: string;
+    description: string;
+    maxCapacity: number;
+    mapElementId?: string | null;
+}
+
+export interface UpsertVenueSectorDTO {
+    sectorID?: number;
+    name: string;
+    description: string;
+    maxCapacity: number;
+    mapElementId?: string | null;
 }
 
 /**
@@ -70,21 +87,3 @@ export interface UpdateVenuePayload {
     status?: { statusID: number; name: "ACTIVE" | "INACTIVE" };
 }
 
-/**
- * Payload de criação utilizado em `POST /venues`.
- * Espelha `tech.goticket.backendapi.venue.dto.CreateVenueDTO`.
- */
-export interface CreateVenueDTO {
-    name: string;
-    legalName: string;
-    CNPJ: string;
-    description?: string;
-    streetAddress: string;
-    streetAddressNumber: string;
-    neighborhood: string;
-    city: string;
-    state: string;
-    country: string;
-    zipCode: string;
-    organizerID?: string | null;
-}

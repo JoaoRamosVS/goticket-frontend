@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import AdminPageHeader from "@/components/layout/AdminPageHeader";
 import { SpaceForm } from "@/features/admin/admin-spaces/components/SpaceForm";
+import VenueMapEditor from "@/features/admin/admin-spaces/components/VenueMapEditor";
 import { useSpaceForm } from "@/features/admin/admin-spaces/hooks/useSpaceForm";
 
 const EditarEspaco = () => {
@@ -62,6 +63,12 @@ const EditarEspaco = () => {
                 onReset={handleReset}
                 onToggleStatus={handleToggleStatus}
             />
+
+            {venueId && (
+                <div className="mt-6">
+                    <VenueMapEditor venueId={venueId} venue={venue} />
+                </div>
+            )}
         </div>
     );
 };

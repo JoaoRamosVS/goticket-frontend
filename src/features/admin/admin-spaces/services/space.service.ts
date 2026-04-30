@@ -1,9 +1,10 @@
 import goTicketApi from "@/services/api";
 import type {
-    CreateVenueDTO,
+    UpsertVenueSectorDTO,
     UpdateVenuePayload,
     VenueDetailDTO,
     VenueListDTO,
+    VenueSectorDTO,
 } from "@/features/admin/admin-spaces/types/space.types";
 
 function authHeaders(extra?: Record<string, string>): Record<string, string> {
@@ -49,15 +50,6 @@ const getVenueById = async (
 };
 
 /**
- * `POST /venues` — cadastro de um novo espaço (admin ou organizador).
- */
-const createVenue = async (venueData: CreateVenueDTO): Promise<void> => {
-    await goTicketApi.post("/venues", venueData, {
-        headers: authHeaders(),
-    });
-};
-
-/**
  * `PATCH /venues/{venueId}` — atualização parcial com merge-patch+json.
  */
 const updateVenue = async (
@@ -85,10 +77,59 @@ const deleteVenue = async (venueId: number | string): Promise<void> => {
     });
 };
 
+const listVenueSectors = async (
+    venueId: number | string,
+    signal?: AbortSignal
+): Promise<VenueSectorDTO[]> => {
+    const response = await goTicketApi.get<VenueSectorDTO[]>(
+        `/venues/${venueId}/sectors`,
+        {
+            headers: authHeaders(),
+            signal,
+        }
+    );
+    return response.data;
+};
+
+const replaceVenueSectors = async (
+    venueId: number | string,
+    sectors: UpsertVenueSectorDTO[]
+): Promise<VenueSectorDTO[]> => {
+    const response = await goTicketApi.put<VenueSectorDTO[]>(
+        `/venues/${venueId}/sectors`,
+        { sectors },
+        {
+            headers: authHeaders(),
+        }
+    );
+    return response.data;
+};
+
+const uploadVenueSectorMap = async (
+    venueId: number | string,
+    mapFile: File
+): Promise<VenueDetailDTO> => {
+    const formData = new FormData();
+    formData.append("mapFile", mapFile);
+
+    const response = await goTicketApi.put<VenueDetailDTO>(
+        `/venues/${venueId}/sector-map`,
+        formData,
+        {
+            headers: authHeaders({
+                "Content-Type": "multipart/form-data",
+            }),
+        }
+    );
+    return response.data;
+};
+
 export default {
     listVenues,
     getVenueById,
-    createVenue,
     updateVenue,
     deleteVenue,
+    listVenueSectors,
+    replaceVenueSectors,
+    uploadVenueSectorMap,
 };
