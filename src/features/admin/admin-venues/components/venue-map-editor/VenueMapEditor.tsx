@@ -55,13 +55,13 @@ export const VenueMapEditor = ({
                         type="file"
                         accept="image/*"
                         onChange={(event) => void vm.handleBaseImageUpload(event.target.files?.[0] ?? null)}
-                        className="text-xs"
+                        className="text-xs cursor-pointer text-white bg-linear-to-b from-[#30a5f3] to-[#266ca5] pl-3 py-2 rounded-4xl hover:scale-95 hover:shadow-2xl transition-all duration-200"
                     />
                     {allowSectorCrud && (
                         <button
                             type="button"
                             onClick={vm.addSector}
-                            className="rounded-xl border border-white/70 bg-white/70 px-3 py-2 text-xs font-semibold text-[#00334d] transition-all duration-200 hover:scale-[0.97] hover:shadow-md"
+                            className="cursor-pointer shadow-md rounded-xl border border-white/70 bg-white/70 px-3 py-2 text-xs font-semibold text-[#00334d] transition-all duration-300 hover:bg-accent/50 hover:scale-95 hover:shadow-xl"
                         >
                             Adicionar setor
                         </button>
