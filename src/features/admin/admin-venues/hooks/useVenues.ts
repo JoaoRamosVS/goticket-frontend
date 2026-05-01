@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 
-import spaceService from "@/features/admin/admin-spaces/services/space.service";
-import type { VenueMinDTO } from "@/features/admin/admin-spaces/types/space.types";
+import venueService from "@/features/admin/admin-venues/services/venue.service";
+import type { VenueMinDTO } from "@/features/admin/admin-venues/types/venue.types";
 
 const PAGE_SIZE = 10;
 
-export const useSpaces = () => {
+export const useVenues = () => {
     const [venues, setVenues] = useState<VenueMinDTO[]>([]);
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
@@ -19,7 +19,7 @@ export const useSpaces = () => {
         setIsLoading(true);
         setError(null);
 
-        return spaceService
+        return venueService
             .listVenues(targetPage, PAGE_SIZE, signal)
             .then((data) => {
                 setVenues(data.venueMinDTOList ?? []);

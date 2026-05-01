@@ -1,11 +1,17 @@
-import type { HoveredEdge, VenueMapEditorProps } from "@/features/admin/admin-spaces/types/VenueMapEditor.types";
-import { getInsertVertexIndex } from "@/features/admin/admin-spaces/components/venue-map-editor/VenueMapEditor.helper";
-import { useVenueMapEditor } from "@/features/admin/admin-spaces/components/venue-map-editor/useVenueMapEditor";
-import VenueMapCanvas from "@/features/admin/admin-spaces/components/venue-map-editor/VenueMapCanvas";
-import VenueMapSidebar from "@/features/admin/admin-spaces/components/venue-map-editor/VenueMapSidebar";
+import type { HoveredEdge, VenueMapEditorProps } from "@/features/admin/admin-venues/types/venueMapEditor.types";
+import { getInsertVertexIndex } from "@/features/admin/admin-venues/components/venue-map-editor/VenueMapEditor.helper";
+import { useVenueMapEditor } from "@/features/admin/admin-venues/components/venue-map-editor/useVenueMapEditor";
+import VenueMapCanvas from "@/features/admin/admin-venues/components/venue-map-editor/VenueMapCanvas";
+import VenueMapSidebar from "@/features/admin/admin-venues/components/venue-map-editor/VenueMapSidebar";
 
-export const VenueMapEditor = ({ venueId, venue }: VenueMapEditorProps) => {
-    const vm = useVenueMapEditor({ venueId, venue });
+export const VenueMapEditor = ({
+    venueId,
+    venue,
+    mode = "full",
+    onSuccessfulSave,
+}: VenueMapEditorProps) => {
+    const allowSectorCrud = mode === "full";
+    const vm = useVenueMapEditor({ venueId, venue, onSuccessfulSave });
 
     const insertVertexGeneric = (
         sectorLocalId: string,
@@ -36,7 +42,7 @@ export const VenueMapEditor = ({ venueId, venue }: VenueMapEditorProps) => {
     }
 
     return (
-        <div className="rounded-3xl border border-white/70 bg-white/20 p-6 backdrop-blur-xl">
+        <div className="rounded-4xl border border-white/70 bg-white/20 p-6 backdrop-blur-xl shadow-lg">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                 <div>
                     <h3 className="text-lg font-bold text-[#00334d]">Mapa de setores</h3>
@@ -51,13 +57,15 @@ export const VenueMapEditor = ({ venueId, venue }: VenueMapEditorProps) => {
                         onChange={(event) => void vm.handleBaseImageUpload(event.target.files?.[0] ?? null)}
                         className="text-xs"
                     />
-                    <button
-                        type="button"
-                        onClick={vm.addSector}
-                        className="rounded-xl border border-white/70 bg-white/70 px-3 py-2 text-xs font-semibold text-[#00334d]"
-                    >
-                        Adicionar setor
-                    </button>
+                    {allowSectorCrud && (
+                        <button
+                            type="button"
+                            onClick={vm.addSector}
+                            className="rounded-xl border border-white/70 bg-white/70 px-3 py-2 text-xs font-semibold text-[#00334d] transition-all duration-200 hover:scale-[0.97] hover:shadow-md"
+                        >
+                            Adicionar setor
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -80,7 +88,9 @@ export const VenueMapEditor = ({ venueId, venue }: VenueMapEditorProps) => {
                     onSelectSector={vm.setSelectedSectorId}
                     onUpdateSelectedSector={vm.updateSelectedSector}
                     onRemoveSelectedSector={vm.removeSelectedSector}
+                    allowSectorCrud={allowSectorCrud}
                 />
+                
                 <VenueMapCanvas
                     sectors={vm.sectors}
                     selectedSectorId={vm.selectedSectorId}
@@ -108,23 +118,15 @@ export const VenueMapEditor = ({ venueId, venue }: VenueMapEditorProps) => {
             <div className="mt-4 flex flex-wrap justify-end gap-2">
                 <button
                     type="button"
-                    onClick={vm.saveSectors}
-                    disabled={vm.isSavingSectors}
-                    className="rounded-xl border border-white/70 bg-white/70 px-4 py-2 text-sm font-semibold text-[#00334d]"
-                >
-                    {vm.isSavingSectors ? "Salvando..." : "Salvar setores"}
-                </button>
-                <button
-                    type="button"
-                    onClick={vm.saveMap}
-                    disabled={vm.isSavingMap}
-                    className="rounded-xl px-4 py-2 text-sm font-bold text-white"
+                    onClick={() => void vm.saveVenueMap()}
+                    disabled={vm.isSavingVenueMap}
+                    className="rounded-xl cursor-pointer px-12 py-2 mt-4 text-md font-bold text-white shadow-2xl hover:scale-105 transition-all duration-200"
                     style={{
                         background:
                             "linear-gradient(135deg, #4db8e8 0%, #2a8fd4 50%, #1c6fb5 100%)",
                     }}
                 >
-                    {vm.isSavingMap ? "Enviando SVG..." : "Gerar e enviar SVG"}
+                    {vm.isSavingVenueMap ? "Salvando..." : "Salvar alterações"}
                 </button>
             </div>
         </div>

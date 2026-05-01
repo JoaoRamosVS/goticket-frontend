@@ -4,15 +4,17 @@ type AdminPageHeaderProps = {
     icon: LucideIcon;
     title: string;
     description: string;
+    className?: string;
 };
 
 const AdminPageHeader = ({
     icon: Icon,
     title,
     description,
+    className = "",
 }: AdminPageHeaderProps) => {
     return (
-        <div className="mb-8 flex items-start gap-4">
+        <div className={`mb-8 flex items-start gap-4 ${className}`}>
             <div
                 className="flex size-14 shrink-0 items-center justify-center rounded-2xl text-white"
                 style={{

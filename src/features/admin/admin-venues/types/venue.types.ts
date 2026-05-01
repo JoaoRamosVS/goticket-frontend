@@ -70,6 +70,25 @@ export interface UpsertVenueSectorDTO {
 }
 
 /**
+ * Payload de `POST /venues` (admin exige `organizerID`).
+ * Espelha `tech.goticket.backendapi.venue.dto.CreateVenueDTO`.
+ */
+export interface CreateVenuePayload {
+    name: string;
+    legalName: string;
+    CNPJ: string;
+    description: string;
+    streetAddress: string;
+    streetAddressNumber: string;
+    neighborhood: string;
+    city: string;
+    state: string;
+    country: string;
+    zipCode: string;
+    organizerID: string | null;
+}
+
+/**
  * Payload aceito pelo `PATCH /venues/{venueId}` (merge-patch+json).
  */
 export interface UpdateVenuePayload {

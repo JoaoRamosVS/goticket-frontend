@@ -1,5 +1,5 @@
 import { Circle, Group, Image as KonvaImage, Layer, Line, Stage } from "react-konva";
-import type { EditableSector, HoveredEdge } from "@/features/admin/admin-spaces/types/VenueMapEditor.types";
+import type { EditableSector, HoveredEdge } from "@/features/admin/admin-venues/types/venueMapEditor.types";
 
 type VenueMapCanvasProps = {
     sectors: EditableSector[];
@@ -32,7 +32,7 @@ const VenueMapCanvas = ({
     onInsertVertexAtSegment,
     onInsertVertexGeneric,
 }: VenueMapCanvasProps) => (
-    <div className="overflow-auto rounded-2xl border border-white/70 bg-white/65 p-2">
+    <div className="overflow-auto rounded-4xl border border-white/70 bg-white/25 p-2 shadow-lg">
         <Stage
             width={mapSize.w}
             height={mapSize.h}

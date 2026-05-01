@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 
-import spaceService from "@/features/admin/admin-spaces/services/space.service";
-import type { UpsertVenueSectorDTO } from "@/features/admin/admin-spaces/types/space.types";
+import venueService from "@/features/admin/admin-venues/services/venue.service";
+import type { UpsertVenueSectorDTO } from "@/features/admin/admin-venues/types/venue.types";
 import type {
     EditableSector,
     HoveredEdge,
     VenueMapEditorProps,
-} from "@/features/admin/admin-spaces/types/VenueMapEditor.types";
+} from "@/features/admin/admin-venues/types/venueMapEditor.types";
 import {
     DEFAULT_MAP_HEIGHT,
     DEFAULT_MAP_WIDTH,
@@ -19,17 +19,20 @@ import {
     parseMapSizeFromSvgDoc,
     randomColor,
     toSvgPoints,
-} from "@/features/admin/admin-spaces/components/venue-map-editor/VenueMapEditor.helper";
+} from "@/features/admin/admin-venues/components/venue-map-editor/VenueMapEditor.helper";
 
-export const useVenueMapEditor = ({ venueId, venue }: VenueMapEditorProps) => {
+export const useVenueMapEditor = ({
+    venueId,
+    venue,
+    onSuccessfulSave,
+}: VenueMapEditorProps) => {
     const [sectors, setSectors] = useState<EditableSector[]>([]);
     const [selectedSectorId, setSelectedSectorId] = useState<string | null>(null);
     const [baseImageDataUrl, setBaseImageDataUrl] = useState<string | null>(null);
     const [baseImage, setBaseImage] = useState<HTMLImageElement | null>(null);
     const [mapSize, setMapSize] = useState({ w: DEFAULT_MAP_WIDTH, h: DEFAULT_MAP_HEIGHT });
     const [isLoading, setIsLoading] = useState(true);
-    const [isSavingMap, setIsSavingMap] = useState(false);
-    const [isSavingSectors, setIsSavingSectors] = useState(false);
+    const [isSavingVenueMap, setIsSavingVenueMap] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const [hoveredEdge, setHoveredEdge] = useState<HoveredEdge | null>(null);
@@ -63,15 +66,32 @@ export const useVenueMapEditor = ({ venueId, venue }: VenueMapEditorProps) => {
         setSectors([]);
         setSelectedSectorId(null);
 
-        Promise.all([
-            spaceService.listVenueSectors(venueId, controller.signal),
-            venue?.venueID
-                ? fetch(
-                      `${import.meta.env.VITE_API_URL}/venues/${venue.venueID}/sector-map`,
-                      { signal: controller.signal }
-                  ).then((res) => (res.ok ? res.text() : ""))
-                : Promise.resolve(""),
-        ])
+        const loadSectors = venueService.listVenueSectors(venueId, controller.signal);
+        const loadSvgText = async (): Promise<string> => {
+            if (!venue?.venueID) return "";
+            try {
+                const accessToken = localStorage.getItem("accessToken");
+                const response = await fetch(
+                    `${import.meta.env.VITE_API_URL}/venues/${venue.venueID}/sector-map`,
+                    {
+                        signal: controller.signal,
+                        headers: accessToken
+                            ? { Authorization: `Bearer ${accessToken}` }
+                            : undefined,
+                    }
+                );
+                if (!response.ok) {
+                    // No fluxo de criação, ainda não existir mapa é estado esperado.
+                    return "";
+                }
+                return await response.text();
+            } catch {
+                // Falhas de rede do SVG não devem bloquear o editor nessa etapa.
+                return "";
+            }
+        };
+
+        Promise.all([loadSectors, loadSvgText()])
             .then(([sectorRows, svgText]) => {
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(svgText || "<svg />", "image/svg+xml");
@@ -214,8 +234,8 @@ export const useVenueMapEditor = ({ venueId, venue }: VenueMapEditorProps) => {
         );
     };
 
-    const saveSectors = async () => {
-        setIsSavingSectors(true);
+    const saveVenueMap = async () => {
+        setIsSavingVenueMap(true);
         setError(null);
         setSuccess(null);
         try {
@@ -226,7 +246,7 @@ export const useVenueMapEditor = ({ venueId, venue }: VenueMapEditorProps) => {
                 maxCapacity: Number(sector.maxCapacity) || 0,
                 mapElementId: sector.mapElementId.trim(),
             }));
-            const saved = await spaceService.replaceVenueSectors(venueId, payload);
+            const saved = await venueService.replaceVenueSectors(venueId, payload);
             const pointsByMapElementId = new Map(
                 sectors.map((sector) => [sector.mapElementId, sector.points] as const)
             );
@@ -235,24 +255,13 @@ export const useVenueMapEditor = ({ venueId, venue }: VenueMapEditorProps) => {
             );
             setSectors(remapped);
             setSelectedSectorId(remapped[0]?.localId ?? null);
-            setSuccess("Setores atualizados com sucesso.");
-        } catch (err: unknown) {
-            setError(getErrorMessage(err, "Não foi possível salvar os setores."));
-        } finally {
-            setIsSavingSectors(false);
-        }
-    };
 
-    const saveMap = async () => {
-        if (!baseImageDataUrl) {
-            setError("Faça upload da imagem base antes de gerar o mapa.");
-            return;
-        }
-        setIsSavingMap(true);
-        setError(null);
-        setSuccess(null);
-        try {
-            const polygons = sectors
+            if (!baseImageDataUrl) {
+                setError("Faça upload da imagem base antes de gerar o mapa.");
+                return;
+            }
+
+            const polygons = remapped
                 .map(
                     (sector) =>
                         `<polygon id="${sector.mapElementId}" points="${toSvgPoints(
@@ -267,12 +276,13 @@ ${polygons}
 </svg>`;
 
             const file = new File([svg], "sector-map.svg", { type: "image/svg+xml" });
-            await spaceService.uploadVenueSectorMap(venueId, file);
-            setSuccess("Mapa SVG enviado com sucesso.");
+            await venueService.uploadVenueSectorMap(venueId, file);
+            setSuccess("Mapa e setores salvos com sucesso.");
+            onSuccessfulSave?.();
         } catch (err: unknown) {
-            setError(getErrorMessage(err, "Não foi possível enviar o mapa SVG."));
+            setError(getErrorMessage(err, "Não foi possível salvar o mapa."));
         } finally {
-            setIsSavingMap(false);
+            setIsSavingVenueMap(false);
         }
     };
 
@@ -284,8 +294,7 @@ ${polygons}
         baseImage,
         mapSize,
         isLoading,
-        isSavingMap,
-        isSavingSectors,
+        isSavingVenueMap,
         error,
         success,
         hoveredEdge,
@@ -298,7 +307,6 @@ ${polygons}
         updateVertex,
         insertVertexInSelectedSector,
         insertVertexAtSegment,
-        saveSectors,
-        saveMap,
+        saveVenueMap,
     };
 };

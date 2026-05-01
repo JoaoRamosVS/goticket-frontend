@@ -28,6 +28,7 @@ import AdminConfiguracoes from '@/pages/admin/Configuracoes';
 
 import AdminEspacos from '@/pages/admin/espacos/EspacosList';
 import AdminEditarEspaco from '@/pages/admin/espacos/EditarEspaco';
+import AdminNewVenue from '@/pages/admin/espacos/NewVenue';
 
 import AdminCategorias from '@/pages/admin/categorias/CategoriasList';
 import AdminEditarCategoria from '@/pages/admin/categorias/EditarCategoria';
@@ -56,6 +57,7 @@ function AppContent() {
           <Route path="eventos/:eventId" element={<AdminEditarEvento />} />
           
           <Route path="espacos" element={<AdminEspacos />} />
+          <Route path="new-venue" element={<AdminNewVenue />} />
           <Route path="espacos/:venueId" element={<AdminEditarEspaco />} />
           
           <Route path="clientes" element={<AdminClientes />} />

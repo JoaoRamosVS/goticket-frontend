@@ -1,11 +1,12 @@
 import goTicketApi from "@/services/api";
 import type {
+    CreateVenuePayload,
     UpsertVenueSectorDTO,
     UpdateVenuePayload,
     VenueDetailDTO,
     VenueListDTO,
     VenueSectorDTO,
-} from "@/features/admin/admin-spaces/types/space.types";
+} from "@/features/admin/admin-venues/types/venue.types";
 
 function authHeaders(extra?: Record<string, string>): Record<string, string> {
     const accessToken = localStorage.getItem("accessToken");
@@ -28,6 +29,21 @@ const listVenues = async (
         headers: authHeaders(),
         params: { page, pageSize },
         signal,
+    });
+    return response.data;
+};
+
+/**
+ * `POST /venues` — cria um novo espaço (admin ou organizador).
+ * Resposta: corpo com o mesmo formato de `GET /venues/{id}`.
+ */
+const createVenue = async (payload: CreateVenuePayload): Promise<VenueDetailDTO> => {
+    const body = {
+        ...payload,
+        organizerID: payload.organizerID ?? undefined,
+    };
+    const response = await goTicketApi.post<VenueDetailDTO>("/venues", body, {
+        headers: authHeaders(),
     });
     return response.data;
 };
@@ -126,6 +142,7 @@ const uploadVenueSectorMap = async (
 
 export default {
     listVenues,
+    createVenue,
     getVenueById,
     updateVenue,
     deleteVenue,

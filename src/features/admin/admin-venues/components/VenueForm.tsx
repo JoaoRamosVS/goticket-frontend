@@ -6,7 +6,7 @@ import {
     ShieldCheck,
     ShieldOff,
 } from "lucide-react";
-import type { VenueDetailDTO } from "@/features/admin/admin-spaces/types/space.types";
+import type { VenueDetailDTO } from "@/features/admin/admin-venues/types/venue.types";
 
 type StatusValue = "ACTIVE" | "INACTIVE";
 
@@ -24,7 +24,7 @@ type FormState = {
     zipCode: string;
 };
 
-type SpaceFormProps = {
+type VenueFormProps = {
     venue: VenueDetailDTO | null;
     form: FormState;
     isLoading: boolean;
@@ -41,7 +41,7 @@ type SpaceFormProps = {
     onToggleStatus: (value: StatusValue) => void;
 };
 
-export const SpaceForm = ({
+export const VenueForm = ({
     venue,
     form,
     isLoading,
@@ -54,7 +54,7 @@ export const SpaceForm = ({
     onSave,
     onReset,
     onToggleStatus,
-}: SpaceFormProps) => {
+}: VenueFormProps) => {
     return (
         <>
             {error && <Banner variant="error" message={error} />}

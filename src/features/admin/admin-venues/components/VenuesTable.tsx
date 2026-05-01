@@ -12,7 +12,7 @@ import {
     UserCircle2,
 } from "lucide-react";
 
-import type { VenueMinDTO } from "@/features/admin/admin-spaces/types/space.types";
+import type { VenueMinDTO } from "@/features/admin/admin-venues/types/venue.types";
 
 function formatLocation(venue: VenueMinDTO): string | null {
     if (venue.city && venue.state) {
@@ -21,7 +21,7 @@ function formatLocation(venue: VenueMinDTO): string | null {
     return venue.city ?? venue.state ?? null;
 }
 
-type SpacesTableProps = {
+type VenuesTableProps = {
     venues: VenueMinDTO[];
     filteredVenues: VenueMinDTO[];
     page: number;
@@ -40,7 +40,7 @@ type SpacesTableProps = {
     onNextPage: () => void;
 };
 
-export const SpacesTable = ({
+export const VenuesTable = ({
     venues,
     filteredVenues,
     page,
@@ -57,7 +57,7 @@ export const SpacesTable = ({
     onEdit,
     onPreviousPage,
     onNextPage,
-}: SpacesTableProps) => {
+}: VenuesTableProps) => {
     return (
         <div
             className="rounded-4xl border border-white/70 bg-white/25 backdrop-blur-xl"

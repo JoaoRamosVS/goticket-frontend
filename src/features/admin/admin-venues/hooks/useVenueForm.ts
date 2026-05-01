@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 
-import spaceService from "@/features/admin/admin-spaces/services/space.service";
-import type { UpdateVenuePayload, VenueDetailDTO } from "@/features/admin/admin-spaces/types/space.types";
+import venueService from "@/features/admin/admin-venues/services/venue.service";
+import type { UpdateVenuePayload, VenueDetailDTO } from "@/features/admin/admin-venues/types/venue.types";
 
 type StatusValue = "ACTIVE" | "INACTIVE";
 
@@ -130,7 +130,7 @@ function getAxiosErrorMessage(err: unknown, fallback: string): string {
     return fallback;
 }
 
-export const useSpaceForm = (venueId?: string) => {
+export const useVenueForm = (venueId?: string) => {
     const [venue, setVenue] = useState<VenueDetailDTO | null>(null);
     const [form, setForm] = useState<FormState>(EMPTY_FORM);
 
@@ -147,7 +147,7 @@ export const useSpaceForm = (venueId?: string) => {
             setIsLoading(true);
             setError(null);
 
-            return spaceService
+            return venueService
                 .getVenueById(venueId, signal)
                 .then((data) => {
                     setVenue(data);
@@ -199,7 +199,7 @@ export const useSpaceForm = (venueId?: string) => {
         setIsSaving(true);
         setError(null);
         try {
-            const updated = await spaceService.updateVenue(
+            const updated = await venueService.updateVenue(
                 venueId,
                 patchPayload
             );
@@ -229,7 +229,7 @@ export const useSpaceForm = (venueId?: string) => {
         setIsTogglingStatus(true);
         setError(null);
         try {
-            const updated = await spaceService.updateVenue(venueId, {
+            const updated = await venueService.updateVenue(venueId, {
                 status: STATUS_OPTIONS[next],
             });
             setVenue(updated);

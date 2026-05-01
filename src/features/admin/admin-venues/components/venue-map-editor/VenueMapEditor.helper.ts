@@ -1,6 +1,6 @@
 import axios from "axios";
-import type { VenueSectorDTO } from "@/features/admin/admin-spaces/types/space.types";
-import type { EditableSector } from "@/features/admin/admin-spaces/types/VenueMapEditor.types";
+import type { VenueSectorDTO } from "@/features/admin/admin-venues/types/venue.types";
+import type { EditableSector } from "@/features/admin/admin-venues/types/venueMapEditor.types";
 
 export const DEFAULT_MAP_WIDTH = 1200;
 export const DEFAULT_MAP_HEIGHT = 750;
