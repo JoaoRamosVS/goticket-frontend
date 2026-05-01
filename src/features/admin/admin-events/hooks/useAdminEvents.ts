@@ -2,10 +2,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import eventService from "@/features/admin/admin-events/services/event.service";
 import type { EventMinDTO } from "@/features/admin/admin-events/types/event.types";
+import { useToast } from "@/components/ui/toast";
 
 const PAGE_SIZE = 10;
 
 export const useAdminEvents = () => {
+    const { showToast } = useToast();
     const [events, setEvents] = useState<EventMinDTO[]>([]);
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
@@ -72,12 +74,16 @@ export const useAdminEvents = () => {
             setDeletingId(event.eventID);
             await eventService.deleteEvent(event.eventID);
             await loadEvents(page);
+            showToast({
+                type: "success",
+                message: `Evento "${event.title}" excluído com sucesso.`,
+            });
         } catch (err) {
             const message =
                 axios.isAxiosError(err) && err.response?.data?.message
                     ? err.response.data.message
                     : "Não foi possível excluir o evento.";
-            window.alert(message);
+            showToast({ type: "error", message });
         } finally {
             setDeletingId(null);
         }

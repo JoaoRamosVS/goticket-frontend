@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import eventService from "@/features/admin/admin-events/services/event.service";
 import categoryService from "@/features/admin/admin-categories/services/category.service";
+import { useToast } from "@/components/ui/toast";
 import type {
     EventDetailDTO,
     EventImageDTO,
@@ -115,6 +116,7 @@ function getAxiosErrorMessage(err: unknown, fallback: string): string {
 }
 
 export const useEventForm = (eventId?: string) => {
+    const { showToast } = useToast();
     const [event, setEvent] = useState<EventDetailDTO | null>(null);
     const [form, setForm] = useState<FormState>(EMPTY_FORM);
 
@@ -130,7 +132,6 @@ export const useEventForm = (eventId?: string) => {
     const [isDeleting, setIsDeleting] = useState(false);
 
     const [error, setError] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     const fetchEvent = useCallback(
         (signal?: AbortSignal) => {
@@ -180,12 +181,6 @@ export const useEventForm = (eventId?: string) => {
         return () => controller.abort();
     }, []);
 
-    useEffect(() => {
-        if (!successMessage) return;
-        const id = window.setTimeout(() => setSuccessMessage(null), 3500);
-        return () => window.clearTimeout(id);
-    }, [successMessage]);
-
     const patchPayload = useMemo(() => {
         if (!event) return {};
         return buildPatchPayload(form, event);
@@ -210,11 +205,17 @@ export const useEventForm = (eventId?: string) => {
             );
             setEvent(updated);
             setForm(eventToFormState(updated));
-            setSuccessMessage("Evento atualizado com sucesso.");
+            showToast({
+                type: "success",
+                message: "Evento atualizado com sucesso.",
+            });
         } catch (err) {
-            setError(
-                getAxiosErrorMessage(err, "Não foi possível atualizar o evento.")
+            const message = getAxiosErrorMessage(
+                err,
+                "Não foi possível atualizar o evento."
             );
+            setError(message);
+            showToast({ type: "error", message });
         } finally {
             setIsSaving(false);
         }
@@ -233,18 +234,20 @@ export const useEventForm = (eventId?: string) => {
         try {
             await eventService.updateEventVisibility(eventId, next);
             await fetchEvent();
-            setSuccessMessage(
-                next === "PUBLIC"
-                    ? "Evento agora está público."
-                    : "Evento agora está privado."
-            );
+            showToast({
+                type: "update",
+                message:
+                    next === "PUBLIC"
+                        ? "Evento agora está público."
+                        : "Evento agora está privado.",
+            });
         } catch (err) {
-            setError(
-                getAxiosErrorMessage(
-                    err,
-                    "Não foi possível alterar a visibilidade."
-                )
+            const message = getAxiosErrorMessage(
+                err,
+                "Não foi possível alterar a visibilidade."
             );
+            setError(message);
+            showToast({ type: "error", message });
         } finally {
             setIsTogglingVisibility(false);
         }
@@ -275,18 +278,20 @@ export const useEventForm = (eventId?: string) => {
                 orderedNew
             );
             await fetchEvent();
-            setSuccessMessage(
-                files.length === 1
-                    ? "Imagem enviada com sucesso."
-                    : `${files.length} imagens enviadas com sucesso.`
-            );
+            showToast({
+                type: "success",
+                message:
+                    files.length === 1
+                        ? "Imagem enviada com sucesso."
+                        : `${files.length} imagens enviadas com sucesso.`,
+            });
         } catch (err) {
-            setError(
-                getAxiosErrorMessage(
-                    err,
-                    "Não foi possível enviar as imagens."
-                )
+            const message = getAxiosErrorMessage(
+                err,
+                "Não foi possível enviar as imagens."
             );
+            setError(message);
+            showToast({ type: "error", message });
         } finally {
             setIsUploadingImages(false);
         }
@@ -306,14 +311,14 @@ export const useEventForm = (eventId?: string) => {
             );
             await eventService.replaceEventImages(eventId, metadata, []);
             await fetchEvent();
-            setSuccessMessage("Ordem das imagens atualizada.");
+            showToast({ type: "update", message: "Ordem das imagens atualizada." });
         } catch (err) {
-            setError(
-                getAxiosErrorMessage(
-                    err,
-                    "Não foi possível salvar a ordem das imagens."
-                )
+            const message = getAxiosErrorMessage(
+                err,
+                "Não foi possível salvar a ordem das imagens."
             );
+            setError(message);
+            showToast({ type: "error", message });
         } finally {
             setIsSavingImageOrder(false);
         }
@@ -331,14 +336,17 @@ export const useEventForm = (eventId?: string) => {
             });
             setEvent(updated);
             setForm(eventToFormState(updated));
-            setSuccessMessage("Categoria do evento atualizada.");
+            showToast({
+                type: "update",
+                message: "Categoria do evento atualizada.",
+            });
         } catch (err) {
-            setError(
-                getAxiosErrorMessage(
-                    err,
-                    "Não foi possível atualizar a categoria do evento."
-                )
+            const message = getAxiosErrorMessage(
+                err,
+                "Não foi possível atualizar a categoria do evento."
             );
+            setError(message);
+            showToast({ type: "error", message });
         } finally {
             setIsSavingCategory(false);
         }
@@ -355,11 +363,15 @@ export const useEventForm = (eventId?: string) => {
         setError(null);
         try {
             await eventService.deleteEvent(eventId);
+            showToast({ type: "success", message: "Evento excluído com sucesso." });
             onDeleted();
         } catch (err) {
-            setError(
-                getAxiosErrorMessage(err, "Não foi possível excluir o evento.")
+            const message = getAxiosErrorMessage(
+                err,
+                "Não foi possível excluir o evento."
             );
+            setError(message);
+            showToast({ type: "error", message });
             setIsDeleting(false);
         }
     };
@@ -377,7 +389,6 @@ export const useEventForm = (eventId?: string) => {
         isSavingImageOrder,
         isDeleting,
         error,
-        successMessage,
         hasChanges,
         handleFieldChange,
         handleSave,

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import clientService from "@/features/admin/admin-clients/services/client.service";
+import { useToast } from "@/components/ui/toast";
 import type {
     ClientDetailDTO,
     StatusValue,
@@ -133,6 +134,7 @@ function getAxiosErrorMessage(err: unknown, fallback: string): string {
 }
 
 export const useClientForm = (clientId?: string) => {
+    const { showToast } = useToast();
     const [client, setClient] = useState<ClientDetailDTO | null>(null);
     const [form, setForm] = useState<FormState>(EMPTY_FORM);
 
@@ -141,7 +143,6 @@ export const useClientForm = (clientId?: string) => {
     const [isTogglingStatus, setIsTogglingStatus] = useState(false);
 
     const [error, setError] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     const fetchClient = useCallback(
         (signal?: AbortSignal) => {
@@ -175,12 +176,6 @@ export const useClientForm = (clientId?: string) => {
         return () => controller.abort();
     }, [fetchClient]);
 
-    useEffect(() => {
-        if (!successMessage) return;
-        const id = window.setTimeout(() => setSuccessMessage(null), 3500);
-        return () => window.clearTimeout(id);
-    }, [successMessage]);
-
     const patchPayload = useMemo(() => {
         if (!client) return {};
         return buildPatchPayload(form, client);
@@ -205,14 +200,14 @@ export const useClientForm = (clientId?: string) => {
             );
             setClient(updated);
             setForm(clientToFormState(updated));
-            setSuccessMessage("Cliente atualizado com sucesso.");
+            showToast({ type: "success", message: "Cliente atualizado com sucesso." });
         } catch (err) {
-            setError(
-                getAxiosErrorMessage(
-                    err,
-                    "Não foi possível atualizar o cliente."
-                )
+            const message = getAxiosErrorMessage(
+                err,
+                "Não foi possível atualizar o cliente."
             );
+            setError(message);
+            showToast({ type: "error", message });
         } finally {
             setIsSaving(false);
         }
@@ -234,16 +229,18 @@ export const useClientForm = (clientId?: string) => {
             });
             setClient(updated);
             setForm(clientToFormState(updated));
-            setSuccessMessage(
-                next === "ACTIVE" ? "Cliente reativado." : "Cliente desativado."
-            );
+            showToast({
+                type: "update",
+                message:
+                    next === "ACTIVE" ? "Cliente reativado." : "Cliente desativado.",
+            });
         } catch (err) {
-            setError(
-                getAxiosErrorMessage(
-                    err,
-                    "Não foi possível alterar o status."
-                )
+            const message = getAxiosErrorMessage(
+                err,
+                "Não foi possível alterar o status."
             );
+            setError(message);
+            showToast({ type: "error", message });
         } finally {
             setIsTogglingStatus(false);
         }
@@ -256,7 +253,6 @@ export const useClientForm = (clientId?: string) => {
         isSaving,
         isTogglingStatus,
         error,
-        successMessage,
         hasChanges,
         handleFieldChange,
         handleSave,

@@ -1,6 +1,4 @@
 import {
-    CheckCircle2,
-    Info,
     Loader2,
     Save,
     ShieldCheck,
@@ -31,8 +29,6 @@ type OrganizerFormProps = {
     isLoading: boolean;
     isSaving: boolean;
     isTogglingStatus: boolean;
-    error: string | null;
-    successMessage: string | null;
     hasChanges: boolean;
     onFieldChange: <K extends keyof FormState>(
         field: K
@@ -48,8 +44,6 @@ export const OrganizerForm = ({
     isLoading,
     isSaving,
     isTogglingStatus,
-    error,
-    successMessage,
     hasChanges,
     onFieldChange,
     onSave,
@@ -58,11 +52,6 @@ export const OrganizerForm = ({
 }: OrganizerFormProps) => {
     return (
         <>
-            {error && <Banner variant="error" message={error} />}
-            {successMessage && (
-                <Banner variant="success" message={successMessage} />
-            )}
-
             {isLoading && !organizer ? (
                 <div className="flex items-center justify-center rounded-3xl border border-dashed border-[#2a8fd4]/30 bg-white/40 py-16 text-sm text-[#5e6c87]">
                     <Loader2 className="mr-2 size-4 animate-spin" />
@@ -327,28 +316,6 @@ const TextInput = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
         className={`${baseInputClasses} h-11 ${props.className ?? ""}`}
     />
 );
-
-type BannerProps = {
-    variant: "success" | "error";
-    message: string;
-};
-
-const Banner = ({ variant, message }: BannerProps) => {
-    const isError = variant === "error";
-    const Icon = isError ? Info : CheckCircle2;
-    return (
-        <div
-            className={`mb-4 flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-semibold backdrop-blur-xl ${
-                isError
-                    ? "border-red-200/80 bg-red-50/80 text-red-600"
-                    : "border-emerald-200/80 bg-emerald-50/80 text-emerald-700"
-            }`}
-        >
-            <Icon className="size-4" />
-            <span>{message}</span>
-        </div>
-    );
-};
 
 type StatusCardProps = {
     current: StatusValue;

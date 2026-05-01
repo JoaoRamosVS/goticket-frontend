@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
+import { useToast } from "@/components/ui/toast";
 
 import venueService from "@/features/admin/admin-venues/services/venue.service";
 import type { UpsertVenueSectorDTO } from "@/features/admin/admin-venues/types/venue.types";
@@ -26,6 +27,7 @@ export const useVenueMapEditor = ({
     venue,
     onSuccessfulSave,
 }: VenueMapEditorProps) => {
+    const { showToast } = useToast();
     const [sectors, setSectors] = useState<EditableSector[]>([]);
     const [selectedSectorId, setSelectedSectorId] = useState<string | null>(null);
     const [baseImageDataUrl, setBaseImageDataUrl] = useState<string | null>(null);
@@ -34,7 +36,6 @@ export const useVenueMapEditor = ({
     const [isLoading, setIsLoading] = useState(true);
     const [isSavingVenueMap, setIsSavingVenueMap] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
     const [hoveredEdge, setHoveredEdge] = useState<HoveredEdge | null>(null);
     const mapSizeFromSvgRef = useRef(false);
     const pendingIntrinsicSizeRef = useRef(false);
@@ -237,7 +238,6 @@ export const useVenueMapEditor = ({
     const saveVenueMap = async () => {
         setIsSavingVenueMap(true);
         setError(null);
-        setSuccess(null);
         try {
             const payload: UpsertVenueSectorDTO[] = sectors.map((sector) => ({
                 sectorID: sector.sectorID,
@@ -277,10 +277,15 @@ ${polygons}
 
             const file = new File([svg], "sector-map.svg", { type: "image/svg+xml" });
             await venueService.uploadVenueSectorMap(venueId, file);
-            setSuccess("Mapa e setores salvos com sucesso.");
+            showToast({
+                type: "success",
+                message: "Mapa e setores salvos com sucesso.",
+            });
             onSuccessfulSave?.();
         } catch (err: unknown) {
-            setError(getErrorMessage(err, "Não foi possível salvar o mapa."));
+            const message = getErrorMessage(err, "Não foi possível salvar o mapa.");
+            setError(message);
+            showToast({ type: "error", message });
         } finally {
             setIsSavingVenueMap(false);
         }
@@ -296,7 +301,6 @@ ${polygons}
         isLoading,
         isSavingVenueMap,
         error,
-        success,
         hoveredEdge,
         setSelectedSectorId,
         setHoveredEdge,

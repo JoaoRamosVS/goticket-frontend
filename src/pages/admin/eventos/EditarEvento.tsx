@@ -19,8 +19,6 @@ const EditarEvento = () => {
         isUploadingImages,
         isSavingImageOrder,
         isDeleting,
-        error,
-        successMessage,
         hasChanges,
         handleFieldChange,
         handleSave,
@@ -69,8 +67,6 @@ const EditarEvento = () => {
                 isUploadingImages={isUploadingImages}
                 isSavingImageOrder={isSavingImageOrder}
                 isDeleting={isDeleting}
-                error={error}
-                successMessage={successMessage}
                 hasChanges={hasChanges}
                 onFieldChange={handleFieldChange}
                 onSave={handleSave}

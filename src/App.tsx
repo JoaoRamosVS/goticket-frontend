@@ -32,6 +32,7 @@ import AdminNewVenue from '@/pages/admin/espacos/NewVenue';
 
 import AdminCategorias from '@/pages/admin/categorias/CategoriasList';
 import AdminEditarCategoria from '@/pages/admin/categorias/EditarCategoria';
+import { ToastProvider } from '@/components/ui/toast';
 
 function AppContent() {
   const isAuth = useAuthStore((state) => state.isAuth)
@@ -81,7 +82,9 @@ function AppContent() {
 function App() {
   return (
     <BrowserRouter>
-      <AppContent />
+      <ToastProvider>
+        <AppContent />
+      </ToastProvider>
     </BrowserRouter>
   )
 }

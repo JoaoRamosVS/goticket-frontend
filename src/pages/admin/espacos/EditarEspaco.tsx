@@ -1,25 +1,24 @@
-import { useEffect, useState } from "react";
-import { ArrowLeft, CheckCircle2, Pencil } from "lucide-react";
+import { useEffect } from "react";
+import { ArrowLeft, Pencil } from "lucide-react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import AdminPageHeader from "@/components/layout/AdminPageHeader";
 import { VenueForm } from "@/features/admin/admin-venues/components/VenueForm";
 import VenueMapEditor from "@/features/admin/admin-venues/components/VenueMapEditor";
 import { useVenueForm } from "@/features/admin/admin-venues/hooks/useVenueForm";
+import { useToast } from "@/components/ui/toast";
 
 const EditarEspaco = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { venueId } = useParams<{ venueId: string }>();
-    const [flashSuccess, setFlashSuccess] = useState<string | null>(null);
+    const { showToast } = useToast();
     const {
         venue,
         form,
         isLoading,
         isSaving,
         isTogglingStatus,
-        error,
-        successMessage,
         hasChanges,
         handleFieldChange,
         handleSave,
@@ -32,18 +31,12 @@ const EditarEspaco = () => {
         const successFromRoute = routeState?.successMessage;
         if (!successFromRoute) return;
 
-        setFlashSuccess(successFromRoute);
+        showToast({ type: "success", message: successFromRoute });
         navigate(location.pathname, { replace: true });
-    }, [location.pathname, location.state, navigate]);
+    }, [location.pathname, location.state, navigate, showToast]);
 
     return (
         <div>
-            {flashSuccess && (
-                <div className="mb-4 flex items-center gap-2 rounded-2xl border border-emerald-200/80 bg-emerald-50/80 px-4 py-3 text-sm font-semibold text-emerald-700 backdrop-blur-xl">
-                    <CheckCircle2 className="size-4 shrink-0" />
-                    {flashSuccess}
-                </div>
-            )}
             <div className="mb-4 flex items-center gap-2">
                 <button
                     type="button"
@@ -73,8 +66,6 @@ const EditarEspaco = () => {
                 isLoading={isLoading}
                 isSaving={isSaving}
                 isTogglingStatus={isTogglingStatus}
-                error={error}
-                successMessage={successMessage}
                 hasChanges={hasChanges}
                 onFieldChange={handleFieldChange}
                 onSave={handleSave}

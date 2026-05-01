@@ -74,12 +74,6 @@ export const VenueMapEditor = ({
                     {vm.error}
                 </div>
             )}
-            {vm.success && (
-                <div className="mb-3 rounded-xl border border-emerald-200 bg-emerald-50/80 px-3 py-2 text-sm text-emerald-700">
-                    {vm.success}
-                </div>
-            )}
-
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-[320px_1fr]">
                 <VenueMapSidebar
                     sectors={vm.sectors}

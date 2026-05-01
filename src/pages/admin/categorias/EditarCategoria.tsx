@@ -14,8 +14,6 @@ const EditarCategoria = () => {
         isLoading,
         isSaving,
         isDeleting,
-        error,
-        successMessage,
         hasChanges,
         liveSlug,
         handleFieldChange,
@@ -53,8 +51,6 @@ const EditarCategoria = () => {
                 isLoading={isLoading}
                 isSaving={isSaving}
                 isDeleting={isDeleting}
-                error={error}
-                successMessage={successMessage}
                 hasChanges={hasChanges}
                 liveSlug={liveSlug}
                 onNameChange={handleFieldChange("name")}

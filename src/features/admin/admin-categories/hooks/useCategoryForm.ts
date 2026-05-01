@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
+import { useToast } from "@/components/ui/toast";
 
 import categoryService from "@/features/admin/admin-categories/services/category.service";
 import type {
@@ -44,6 +45,7 @@ function getAxiosErrorMessage(err: unknown, fallback: string): string {
 }
 
 export const useCategoryForm = (categoryId?: string) => {
+    const { showToast } = useToast();
     const [category, setCategory] = useState<EventCategoryDTO | null>(null);
     const [form, setForm] = useState<FormState>(EMPTY_FORM);
 
@@ -52,7 +54,6 @@ export const useCategoryForm = (categoryId?: string) => {
     const [isDeleting, setIsDeleting] = useState(false);
 
     const [error, setError] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     const fetchCategory = useCallback(
         (signal?: AbortSignal) => {
@@ -85,12 +86,6 @@ export const useCategoryForm = (categoryId?: string) => {
         fetchCategory(controller.signal);
         return () => controller.abort();
     }, [fetchCategory]);
-
-    useEffect(() => {
-        if (!successMessage) return;
-        const id = window.setTimeout(() => setSuccessMessage(null), 3500);
-        return () => window.clearTimeout(id);
-    }, [successMessage]);
 
     const patchPayload = useMemo(() => {
         if (!category) return {};
@@ -127,14 +122,17 @@ export const useCategoryForm = (categoryId?: string) => {
             );
             setCategory(updated);
             setForm(categoryToFormState(updated));
-            setSuccessMessage("Categoria atualizada com sucesso.");
+            showToast({
+                type: "success",
+                message: "Categoria atualizada com sucesso.",
+            });
         } catch (err) {
-            setError(
-                getAxiosErrorMessage(
-                    err,
-                    "Não foi possível atualizar a categoria."
-                )
+            const message = getAxiosErrorMessage(
+                err,
+                "Não foi possível atualizar a categoria."
             );
+            setError(message);
+            showToast({ type: "error", message });
         } finally {
             setIsSaving(false);
         }
@@ -156,14 +154,18 @@ export const useCategoryForm = (categoryId?: string) => {
         setError(null);
         try {
             await categoryService.deleteEventCategory(categoryId);
+            showToast({
+                type: "success",
+                message: `Categoria "${category.name}" excluída com sucesso.`,
+            });
             onDeleted();
         } catch (err) {
-            setError(
-                getAxiosErrorMessage(
-                    err,
-                    "Não foi possível excluir a categoria."
-                )
+            const message = getAxiosErrorMessage(
+                err,
+                "Não foi possível excluir a categoria."
             );
+            setError(message);
+            showToast({ type: "error", message });
             setIsDeleting(false);
         }
     };
@@ -175,7 +177,6 @@ export const useCategoryForm = (categoryId?: string) => {
         isSaving,
         isDeleting,
         error,
-        successMessage,
         hasChanges,
         liveSlug,
         handleFieldChange,

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
+import { useToast } from "@/components/ui/toast";
 
 import venueService from "@/features/admin/admin-venues/services/venue.service";
 import type { UpdateVenuePayload, VenueDetailDTO } from "@/features/admin/admin-venues/types/venue.types";
@@ -131,6 +132,7 @@ function getAxiosErrorMessage(err: unknown, fallback: string): string {
 }
 
 export const useVenueForm = (venueId?: string) => {
+    const { showToast } = useToast();
     const [venue, setVenue] = useState<VenueDetailDTO | null>(null);
     const [form, setForm] = useState<FormState>(EMPTY_FORM);
 
@@ -139,7 +141,6 @@ export const useVenueForm = (venueId?: string) => {
     const [isTogglingStatus, setIsTogglingStatus] = useState(false);
 
     const [error, setError] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     const fetchVenue = useCallback(
         (signal?: AbortSignal) => {
@@ -173,12 +174,6 @@ export const useVenueForm = (venueId?: string) => {
         return () => controller.abort();
     }, [fetchVenue]);
 
-    useEffect(() => {
-        if (!successMessage) return;
-        const id = window.setTimeout(() => setSuccessMessage(null), 3500);
-        return () => window.clearTimeout(id);
-    }, [successMessage]);
-
     const patchPayload = useMemo(() => {
         if (!venue) return {};
         return buildPatchPayload(form, venue);
@@ -205,14 +200,14 @@ export const useVenueForm = (venueId?: string) => {
             );
             setVenue(updated);
             setForm(venueToFormState(updated));
-            setSuccessMessage("Espaço atualizado com sucesso.");
+            showToast({ type: "success", message: "Espaço atualizado com sucesso." });
         } catch (err) {
-            setError(
-                getAxiosErrorMessage(
-                    err,
-                    "Não foi possível atualizar o espaço."
-                )
+            const message = getAxiosErrorMessage(
+                err,
+                "Não foi possível atualizar o espaço."
             );
+            setError(message);
+            showToast({ type: "error", message });
         } finally {
             setIsSaving(false);
         }
@@ -234,13 +229,18 @@ export const useVenueForm = (venueId?: string) => {
             });
             setVenue(updated);
             setForm(venueToFormState(updated));
-            setSuccessMessage(
-                next === "ACTIVE" ? "Espaço reativado." : "Espaço desativado."
-            );
+            showToast({
+                type: "update",
+                message:
+                    next === "ACTIVE" ? "Espaço reativado." : "Espaço desativado.",
+            });
         } catch (err) {
-            setError(
-                getAxiosErrorMessage(err, "Não foi possível alterar o status.")
+            const message = getAxiosErrorMessage(
+                err,
+                "Não foi possível alterar o status."
             );
+            setError(message);
+            showToast({ type: "error", message });
         } finally {
             setIsTogglingStatus(false);
         }
@@ -253,7 +253,6 @@ export const useVenueForm = (venueId?: string) => {
         isSaving,
         isTogglingStatus,
         error,
-        successMessage,
         hasChanges,
         handleFieldChange,
         handleSave,

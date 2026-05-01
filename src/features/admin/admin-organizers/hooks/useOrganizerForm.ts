@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
+import { useToast } from "@/components/ui/toast";
 
 import organizerService from "@/features/admin/admin-organizers/services/organizer.service";
 import type {
@@ -124,6 +125,7 @@ function getAxiosErrorMessage(err: unknown, fallback: string): string {
 }
 
 export const useOrganizerForm = (organizerId?: string) => {
+    const { showToast } = useToast();
     const [organizer, setOrganizer] = useState<OrganizerDetailDTO | null>(null);
     const [form, setForm] = useState<FormState>(EMPTY_FORM);
 
@@ -132,7 +134,6 @@ export const useOrganizerForm = (organizerId?: string) => {
     const [isTogglingStatus, setIsTogglingStatus] = useState(false);
 
     const [error, setError] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     const fetchOrganizer = useCallback(
         (signal?: AbortSignal) => {
@@ -169,12 +170,6 @@ export const useOrganizerForm = (organizerId?: string) => {
         return () => controller.abort();
     }, [fetchOrganizer]);
 
-    useEffect(() => {
-        if (!successMessage) return;
-        const id = window.setTimeout(() => setSuccessMessage(null), 3500);
-        return () => window.clearTimeout(id);
-    }, [successMessage]);
-
     const patchPayload = useMemo(() => {
         if (!organizer) return {};
         return buildPatchPayload(form, organizer);
@@ -199,14 +194,17 @@ export const useOrganizerForm = (organizerId?: string) => {
             );
             setOrganizer(updated);
             setForm(organizerToFormState(updated));
-            setSuccessMessage("Organizador atualizado com sucesso.");
+            showToast({
+                type: "success",
+                message: "Organizador atualizado com sucesso.",
+            });
         } catch (err) {
-            setError(
-                getAxiosErrorMessage(
-                    err,
-                    "Não foi possível atualizar o organizador."
-                )
+            const message = getAxiosErrorMessage(
+                err,
+                "Não foi possível atualizar o organizador."
             );
+            setError(message);
+            showToast({ type: "error", message });
         } finally {
             setIsSaving(false);
         }
@@ -229,18 +227,20 @@ export const useOrganizerForm = (organizerId?: string) => {
             );
             setOrganizer(updated);
             setForm(organizerToFormState(updated));
-            setSuccessMessage(
-                next === "ACTIVE"
-                    ? "Organizador reativado."
-                    : "Organizador desativado."
-            );
+            showToast({
+                type: "update",
+                message:
+                    next === "ACTIVE"
+                        ? "Organizador reativado."
+                        : "Organizador desativado.",
+            });
         } catch (err) {
-            setError(
-                getAxiosErrorMessage(
-                    err,
-                    "Não foi possível alterar o status."
-                )
+            const message = getAxiosErrorMessage(
+                err,
+                "Não foi possível alterar o status."
             );
+            setError(message);
+            showToast({ type: "error", message });
         } finally {
             setIsTogglingStatus(false);
         }
@@ -253,7 +253,6 @@ export const useOrganizerForm = (organizerId?: string) => {
         isSaving,
         isTogglingStatus,
         error,
-        successMessage,
         hasChanges,
         handleFieldChange,
         handleSave,
