@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import type {
+    EventDateSummary,
     EventDetails,
-    EventPageBatchDTO,
+    EventPageDateDTO,
     EventPageDTO,
-    EventPageSectorDTO,
 } from "@/features/event-details/types/event-details.types";
 import eventDetailsService from "@/features/event-details/services/event-details.service";
 import { buildEventImageUrl } from "@/utils/events";
@@ -29,31 +29,53 @@ function mapVenueAddress(venue: EventPageDTO["venue"]): string {
         .join(", ");
 }
 
-function mapBatchToTicket(
-    batch: EventPageBatchDTO,
-    sector: EventPageSectorDTO
-): EventDetails["tickets"][number] {
-    return {
-        id: String(batch.batchID),
-        name: `${sector.name} - Lote ${batch.batchNumber}`,
-        description: sector.description,
-        price: Number(batch.price ?? 0),
-        available: batch.availableTickets ?? 0,
-        maxPerPurchase: 10,
-        salesEnd: "",
-    };
+function pickStartingPrice(date: EventPageDateDTO): number | null {
+    const prices: number[] = [];
+    for (const sector of date.dateSectors ?? []) {
+        for (const allotment of Object.values(sector.currentAllotments ?? {})) {
+            if (!allotment) continue;
+            if ((allotment.availableTickets ?? 0) <= 0) continue;
+            const price = Number(allotment.price);
+            if (Number.isFinite(price)) prices.push(price);
+        }
+    }
+    if (prices.length === 0) return null;
+    return Math.min(...prices);
 }
 
-function mapTickets(sectors: EventPageSectorDTO[]): EventDetails["tickets"] {
-    return sectors.flatMap((sector) =>
-        (sector.batches ?? []).map((batch) => mapBatchToTicket(batch, sector))
+function mapDateSummary(date: EventPageDateDTO): EventDateSummary {
+    const totals = (date.dateSectors ?? []).reduce(
+        (acc, sector) => {
+            acc.total += sector.totalTickets ?? 0;
+            acc.available += sector.availableTickets ?? 0;
+            return acc;
+        },
+        { total: 0, available: 0 }
     );
+
+    return {
+        eventDateId: date.eventDateID,
+        start: date.startDate,
+        end: date.endDate,
+        statusId: date.statusId ?? null,
+        totalTickets: totals.total,
+        availableTickets: totals.available,
+        startingPrice: pickStartingPrice(date),
+    };
 }
 
 function mapEventDetails(dto: EventPageDTO): EventDetails {
     const orderedImages = [...(dto.images ?? [])].sort(
         (a, b) => (a.ordination ?? 0) - (b.ordination ?? 0)
     );
+
+    const dates = [...(dto.dates ?? [])]
+        .sort(
+            (a, b) =>
+                new Date(a.startDate).getTime() -
+                new Date(b.startDate).getTime()
+        )
+        .map(mapDateSummary);
 
     return {
         id: "",
@@ -84,7 +106,7 @@ function mapEventDetails(dto: EventPageDTO): EventDetails {
             followers: 0,
             rating: 0,
         },
-        tickets: mapTickets(dto.sectors ?? []),
+        dates,
         policies: [],
         lineup: [],
         tags: [],

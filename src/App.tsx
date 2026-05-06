@@ -11,6 +11,7 @@ import Home from '@/pages/public/Home'
 import SignUp from '@/pages/auth/SignUp';
 import QuemSomos from '@/pages/public/QuemSomos';
 import EventPage from '@/pages/public/EventPage';
+import EventDateTicketsPage from '@/pages/public/EventDateTicketsPage';
 import AdminLayout from '@/layouts/AdminLayout';
 import AdminDashboard from '@/pages/admin/Dashboard';
 
@@ -47,6 +48,7 @@ function AppContent() {
 
         <Route path="/home" element={<Home />} />
         <Route path="/evento/:eventId" element={<MainLayout><EventPage /></MainLayout>} />
+        <Route path="/evento/:eventId/data/:eventDateId/ingressos" element={<MainLayout><EventDateTicketsPage /></MainLayout>} />
         <Route path="/quem-somos" element={<QuemSomos />} />
         
         <Route path="/admin" element={<AdminLayout><Outlet /></AdminLayout>}>

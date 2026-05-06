@@ -1,13 +1,4 @@
-interface TicketType {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  originalPrice?: number;
-  available: number;
-  maxPerPurchase: number;
-  salesEnd: string;
-}
+export type TicketTypeName = "FULL" | "HALF" | "SOLIDARY";
 
 interface EventDate {
   start: string;
@@ -40,6 +31,16 @@ interface EventPolicy {
   description: string;
 }
 
+export interface EventDateSummary {
+  eventDateId: number;
+  start: string;
+  end: string;
+  statusId: number | null;
+  totalTickets: number;
+  availableTickets: number;
+  startingPrice: number | null;
+}
+
 export interface EventDetails {
   id: string;
   title: string;
@@ -49,7 +50,7 @@ export interface EventDetails {
   date: EventDate;
   venue: EventVenue;
   organizer: EventOrganizerInfo;
-  tickets: TicketType[];
+  dates: EventDateSummary[];
   policies: EventPolicy[];
   lineup?: string[];
   tags?: string[];
@@ -89,28 +90,35 @@ interface EventPageVenueDTO {
   status: EventPageStatusDTO | null;
 }
 
-export interface EventPageBatchDTO {
-  batchID: number;
+export interface EventPageAllotmentDTO {
+  allotmentID: number;
   batchNumber: number;
   price: number;
-  totalTickets: number;
-  soldTickets: number;
   availableTickets: number;
 }
 
-export interface EventPageSectorDTO {
-  sectorID: number;
+export type EventPageAllotmentsByType = Partial<
+  Record<TicketTypeName, EventPageAllotmentDTO>
+>;
+
+export interface EventPageDateSectorDTO {
+  eventDateSectorID: number;
   name: string;
   description: string;
-  registerDate: string;
-  lastUpdateDate: string;
   hasNumberedSeats: boolean;
   venueSectorId?: number;
   mapElementId?: string | null;
-  batches: EventPageBatchDTO[];
-  soldTickets: number;
-  availableTickets: number;
   totalTickets: number;
+  availableTickets: number;
+  currentAllotments: EventPageAllotmentsByType;
+}
+
+export interface EventPageDateDTO {
+  eventDateID: number;
+  startDate: string;
+  endDate: string;
+  statusId: number | null;
+  dateSectors: EventPageDateSectorDTO[];
 }
 
 interface EventPageImageDTO {
@@ -132,7 +140,7 @@ export interface EventPageDTO {
   category: EventPageCategoryDTO | null;
   organizer: EventPageOrganizerDTO | null;
   venue: EventPageVenueDTO | null;
-  sectors: EventPageSectorDTO[];
+  dates: EventPageDateDTO[];
   images: EventPageImageDTO[];
 }
 
@@ -164,5 +172,6 @@ export interface EventPoliciesProps {
 }
 
 export interface TicketSelectorProps {
-  tickets: TicketType[];
+  eventId: string;
+  dates: EventDateSummary[];
 }

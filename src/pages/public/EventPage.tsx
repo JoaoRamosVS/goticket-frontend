@@ -74,7 +74,7 @@ const EventPage = () => {
               status={event.status}
             />
 
-            <TicketSelector tickets={event.tickets} />
+            <TicketSelector eventId={event.id} dates={event.dates} />
           </aside>
         </div>
       </div>
