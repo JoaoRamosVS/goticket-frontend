@@ -14,13 +14,13 @@ const TicketTypePicker = ({
     const options = sector ? availableTicketTypeOptions(sector) : [];
 
     return (
-        <aside className="sticky top-28 rounded-4xl border bg-card/40 backdrop-blur-xl p-6 shadow-xs">
+        <aside className="sticky top-28 rounded-4xl border bg-card/60 backdrop-blur-xl p-6 shadow-sm">
             <header className="mb-4 flex items-center gap-3">
-                <span className="flex size-10 items-center justify-center rounded-2xl bg-primary/15 text-primary">
+                <span className="flex size-10 items-center justify-center rounded-2xl bg-linear-to-t from-primary to-[#2959b9] text-white">
                     <Ticket className="size-5" />
                 </span>
                 <div>
-                    <h2 className="text-xl font-bold">
+                    <h2 className="text-xl font-extrabold">
                         {sector ? sector.name : "Seu pedido"}
                     </h2>
                     <p className="text-sm text-muted-foreground">
@@ -50,7 +50,7 @@ const TicketTypePicker = ({
             )}
 
             {sector && options.length > 0 && (
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-4">
                     {options.map((option) => (
                         <TicketTypeRow
                             key={option.type}

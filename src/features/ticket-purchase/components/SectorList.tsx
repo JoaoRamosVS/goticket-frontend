@@ -23,13 +23,13 @@ const SectorList = ({
     }
 
     return (
-        <section className="rounded-4xl border bg-card/40 backdrop-blur-xl p-6 md:p-8 shadow-xs">
+        <section className="rounded-4xl border bg-card/60 backdrop-blur-xl p-6 md:p-8 shadow-xs">
             <header className="mb-5 flex items-center gap-3">
-                <span className="flex size-10 items-center justify-center rounded-2xl bg-primary/15 text-primary">
-                    <LayoutGrid className="size-5" />
+                <span className="flex size-10 items-center justify-center rounded-md shadow-2xl bg-linear-to-l from-primary to-[#15429c] text-primary">
+                    <LayoutGrid className="size-5 text-white" />
                 </span>
                 <div>
-                    <h2 className="text-xl font-bold">Setores disponíveis</h2>
+                    <h2 className="text-xl font-extrabold">Setores disponíveis</h2>
                     <p className="text-sm text-muted-foreground">
                         Escolha um setor para ver as opções de ingressos.
                     </p>

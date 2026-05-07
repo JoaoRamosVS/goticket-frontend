@@ -20,14 +20,14 @@ const TicketTypeRow = ({ option, quantity, onChange }: TicketTypeRowProps) => {
     const canDecrement = quantity > 0;
 
     return (
-        <div className="rounded-2xl border bg-card/60 backdrop-blur-md p-4 shadow-xs">
+        <div className="rounded-2xl border bg-card backdrop-blur-md p-4 shadow-sm">
             <div className="flex items-start justify-between gap-4">
                 <div className="flex flex-col gap-1 min-w-0">
                     <div className="flex items-center gap-2">
                         <p className="text-base font-bold text-foreground">
                             {option.label}
                         </p>
-                        <span className="rounded-full border bg-background/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        <span className="rounded-full border bg-linear-to-r from-primary to-[#2959b9] px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-white">
                             Lote {option.allotment.batchNumber}
                         </span>
                     </div>
@@ -40,7 +40,7 @@ const TicketTypeRow = ({ option, quantity, onChange }: TicketTypeRowProps) => {
                 </div>
 
                 <div className="flex flex-col items-end gap-2 shrink-0">
-                    <div className="flex items-center gap-2 rounded-full border bg-background/70 p-1">
+                    <div className="flex items-center gap-2 rounded-full shadow-sm bg-background/60 p-1">
                         <Button
                             type="button"
                             variant="ghost"

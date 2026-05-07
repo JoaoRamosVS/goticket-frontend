@@ -37,10 +37,10 @@ const SectorCard = ({
                     : ""
             )}
         >
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex items-end justify-between gap-4">
                 <div className="flex flex-col gap-2 min-w-0">
                     <p className="flex items-center gap-2 text-lg font-bold text-foreground">
-                        <Icon className="size-5 text-primary" />
+                        <Icon className="size-8 text-primary border border-primary p-1 rounded-sm" />
                         {sector.name}
                     </p>
                     {sector.description && (
@@ -49,24 +49,24 @@ const SectorCard = ({
                         </p>
                     )}
                     <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                        <span className="rounded-full border bg-background/60 px-2.5 py-0.5">
+                        <span className="rounded-full border bg-linear-to-b from-primary to-[#2959b9] text-white px-2.5 py-0.5">
                             {sector.hasNumberedSeats
                                 ? "Lugares numerados"
                                 : "Lugares livres"}
                         </span>
-                        <span className="rounded-full border bg-background/60 px-2.5 py-0.5">
+                        <span className="rounded-full border bg-linear-to-b from-primary to-[#2959b9] text-white px-2.5 py-0.5">
                             {sector.availableTickets} disponíveis
                         </span>
                     </div>
                 </div>
 
-                <div className="flex flex-col items-end gap-1 shrink-0">
+                <div className="flex justify-end items-center gap-2">
                     {sector.startingPrice !== null ? (
                         <>
                             <p className="text-xs text-muted-foreground">
                                 A partir de
                             </p>
-                            <p className="text-lg font-bold text-foreground">
+                            <p className="text-lg font-extrabold text-foreground">
                                 {formatCurrency(sector.startingPrice)}
                             </p>
                         </>
@@ -82,7 +82,7 @@ const SectorCard = ({
                                 Selecionado
                             </span>
                         ) : (
-                            <ChevronRight className="size-5 text-primary transition-transform group-hover:translate-x-0.5" />
+                            <ChevronRight strokeWidth={2.5} className="size-5 text-primary transition-transform group-hover:translate-x-0.5" />
                         )
                     )}
                 </div>

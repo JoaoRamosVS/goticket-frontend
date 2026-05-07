@@ -16,7 +16,7 @@ const PurchaseSummary = ({
     const hasSelection = totals.totalQuantity > 0;
 
     return (
-        <div className="rounded-2xl border bg-background/70 backdrop-blur-md p-5 shadow-xs">
+        <div className="rounded-4xl border bg-background/60 backdrop-blur-md p-5 shadow-md">
             <div className="flex items-center justify-between gap-3">
                 <div>
                     <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
@@ -57,7 +57,7 @@ const PurchaseSummary = ({
                 type="button"
                 onClick={onConfirm}
                 disabled={!hasSelection}
-                className="mt-4 w-full h-11 rounded-xl text-base"
+                className="mt-4 w-full h-11 rounded-xl text-base shadow-2xl bg-linear-to-l from-primary to-[#2959b9]"
             >
                 Continuar
             </Button>
