@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Search, MapPin, ChevronDown, Check } from "lucide-react";
 
 const MOCK_LOCATIONS = [
@@ -12,10 +13,26 @@ const MOCK_LOCATIONS = [
 ];
 
 const SearchBar = () => {
+    const navigate = useNavigate();
     const [query, setQuery] = useState("");
     const [location, setLocation] = useState("");
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+    const handleSearch = () => {
+        const term = query.trim();
+        if (!term) return;
+        const params = new URLSearchParams();
+        if (location) {
+            const parts = location.split(", ");
+            if (parts.length === 2) {
+                params.set("venueCity", parts[0]);
+                params.set("venueState", parts[1]);
+            }
+        }
+        const qs = params.toString();
+        navigate(`/busca/${encodeURIComponent(term)}${qs ? `?${qs}` : ""}`);
+    };
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
@@ -46,6 +63,7 @@ const SearchBar = () => {
                             placeholder="Buscar eventos, shows, festivais..."
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                             className="w-full bg-transparent text-sm py-4 font-medium text-[#002233] placeholder:text-[#5e6c87]/50 outline-none sm:text-xl"
                         />
                     </div>
@@ -102,6 +120,7 @@ const SearchBar = () => {
                     <div className="p-2 sm:pl-0">
                         <button
                             type="button"
+                            onClick={handleSearch}
                             className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-[20px] px-3 py-3 text-sm font-bold text-white transition-all duration-300 hover:scale-[1.02] hover:brightness-110 sm:rounded-full sm:px-3 sm:py-3"
                             style={{
                                 background: "linear-gradient(135deg, #4db8e8 0%, #2a8fd4 50%, #1c6fb5 100%)",

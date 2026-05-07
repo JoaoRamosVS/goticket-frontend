@@ -34,6 +34,7 @@ import AdminNewVenue from '@/pages/admin/espacos/NewVenue';
 import AdminCategorias from '@/pages/admin/categorias/CategoriasList';
 import AdminEditarCategoria from '@/pages/admin/categorias/EditarCategoria';
 import { ToastProvider } from '@/components/ui/toast';
+import BuscaPage from '@/pages/public/BuscaPage';
 
 function AppContent() {
   const isAuth = useAuthStore((state) => state.isAuth)
@@ -47,6 +48,7 @@ function AppContent() {
         <Route path="/cadastro" element={isAuth ? <Navigate to="/home" replace /> : <SignUp />} />
 
         <Route path="/home" element={<Home />} />
+        <Route path="/busca/:searchTerm" element={<MainLayout><BuscaPage /></MainLayout>} />
         <Route path="/evento/:eventId" element={<MainLayout><EventPage /></MainLayout>} />
         <Route path="/evento/:eventId/data/:eventDateId/ingressos" element={<MainLayout><EventDateTicketsPage /></MainLayout>} />
         <Route path="/quem-somos" element={<QuemSomos />} />
