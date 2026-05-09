@@ -74,7 +74,7 @@ interface EventPageStatusDTO {
 }
 
 interface EventPageVenueDTO {
-  venueID: number;
+  venueId: number;
   name: string;
   cnpj: string;
   description: string;

@@ -88,7 +88,7 @@ export function mapEventDateTickets(
         eventId,
         eventTitle: dto.title,
         eventImage: buildEventImageUrl(orderedImages[0]?.s3Key),
-        venueId: dto.venue?.venueID ?? null,
+        venueId: dto.venue?.venueId ?? null,
         venueName: dto.venue?.name ?? "Local a confirmar",
         venueCity: dto.venue?.city ?? "",
         venueState: dto.venue?.state ?? "",

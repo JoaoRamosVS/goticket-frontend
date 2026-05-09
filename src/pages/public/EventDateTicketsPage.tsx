@@ -73,8 +73,8 @@ const EventDateTicketsPage = () => {
     const hasMap = Boolean(sectorMap && sectorMap.polygons.length > 0);
 
     return (
-        <div className="max-w-7xl mx-auto px-6 py-12 mt-24">
-            <div className="flex flex-col gap-8">
+        <div className="mx-auto px-6 md:px-12 py-12 mt-24">
+            <div className="flex flex-col gap-8 items-center">
                 <EventDateHeader
                     eventTitle={data.eventTitle}
                     eventImage={data.eventImage}
@@ -87,7 +87,7 @@ const EventDateTicketsPage = () => {
                 />
 
                 {hasMap && sectorMap ? (
-                    <div className="grid grid-cols-1 xl:grid-cols-[420px_1fr] gap-6 items-start">
+                    <div className="grid w-full grid-cols-1 xl:grid-cols-[4fr_6fr] gap-6 items-start max-w-7xl">
                         <div className="xl:col-start-1 xl:row-start-1">
                             <SectorList
                                 sectors={sectors}
@@ -98,7 +98,7 @@ const EventDateTicketsPage = () => {
                             />
                         </div>
 
-                        <div className="xl:col-start-2 xl:row-start-1 xl:row-span-2 xl:sticky xl:top-24">
+                        <div className="xl:col-start-2 xl:row-start-1 xl:row-span-2 xl:sticky xl:top-24 w-full">
                             <SectorMapViewer
                                 map={sectorMap}
                                 sectors={sectors}
