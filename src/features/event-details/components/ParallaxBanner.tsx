@@ -31,7 +31,7 @@ const ParallaxBanner = ({ image, title }: { image: string; title: string }) => {
         className="fixed inset-0 w-full h-[65vh] object-cover object-center brightness-85 -z-10 will-change-transform"
         style={{ transform: `scale(${scale})` }}
       />
-      <div className="absolute inset-0 backdrop-blur-2xl mask-[linear-gradient(to_bottom,transparent_45%,black_100%)]" />
+      <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-black/90" />
       <div className="absolute bottom-0 left-0 pl-16 pb-16 z-10">
         <h1 className="text-7xl font-extrabold text-white">{title}</h1>
       </div>
