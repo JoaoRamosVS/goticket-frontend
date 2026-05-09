@@ -60,7 +60,7 @@ const SectorCard = ({
                     </div>
                 </div>
 
-                <div className="flex justify-end items-center gap-2">
+                <div className="flex flex-col justify-end items-end gap-2">
                     {sector.startingPrice !== null ? (
                         <>
                             <p className="text-xs text-muted-foreground">

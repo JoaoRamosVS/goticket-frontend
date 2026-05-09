@@ -21,7 +21,7 @@ const EventDateHeader = ({
         .join(", ");
 
     return (
-        <section className="relative overflow-hidden rounded-[56px] backdrop-blur-xl shadow-2xl w-full">
+        <section className="relative overflow-hidden rounded-[56px] backdrop-blur-xl shadow-2xl w-full max-w-7xl">
             <div
                 className="absolute inset-0 bg-cover bg-center brightness-75 blur-sm"
                 style={{ backgroundImage: `url(${eventImage})` }}
@@ -29,7 +29,7 @@ const EventDateHeader = ({
             />
             <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-black/80" />
 
-            <div className="relative flex flex-col justify-between gap-4 p-6 md:p-12 min-h-[400px]">
+            <div className="relative flex flex-col justify-between gap-4 p-6 md:p-12 min-h-[420px]">
                 <Link
                     to={backTo}
                     className="inline-flex w-fit items-center gap-2 shadow-2xl rounded-full bg-linear-to-b from-primary to-[#103d97] px-3 py-1.5 text-sm font-semibold text-white backdrop-blur-md hover:scale-95 transition-transform duration-200"
