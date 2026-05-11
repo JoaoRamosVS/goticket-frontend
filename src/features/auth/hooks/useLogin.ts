@@ -39,7 +39,15 @@ const useLogin = () => {
                     expirationTime,
                     decodedPayload.name as string
                 );
-                navigate("/");
+
+                const scope = decodedPayload.scope as string | undefined;
+                if (scope === "ORGANIZER") {
+                    navigate("/organizer/dashboard");
+                } else if (scope === "ADMIN") {
+                    navigate("/admin/dashboard");
+                } else {
+                    navigate("/");
+                }
             }
         } catch (error) {
             if (
