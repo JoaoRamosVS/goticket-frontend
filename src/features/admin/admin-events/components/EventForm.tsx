@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { isAdminToken } from "@/utils/auth";
 import {
     Eye,
     EyeOff,
@@ -307,6 +308,7 @@ export const EventForm = ({
                         <VisibilityCard
                             current={event.visibilityName ?? "PRIVATE"}
                             isLoading={isTogglingVisibility}
+                            isEventApproved={event.statusName === "APPROVED"}
                             onChange={onToggleVisibility}
                         />
 
@@ -425,11 +427,17 @@ type StatusCardProps = {
 
 const StatusCard = ({ statusName, isLoading, onChange }: StatusCardProps) => {
     const colors = STATUS_COLORS[statusName] ?? STATUS_COLORS.PENDING_APPROVAL;
+    const isAdmin = isAdminToken();
+
     return (
         <GlassCard>
             <SectionHeader
                 title="Status do evento"
-                description="Altere o status administrativo do evento."
+                description={
+                    isAdmin
+                        ? "Altere o status administrativo do evento."
+                        : "Status administrativo do evento."
+                }
             />
             <div
                 className={`mb-4 inline-flex items-center gap-2 rounded-2xl border px-4 py-2.5 text-sm font-bold ${colors.bg} ${colors.text} ${colors.border}`}
@@ -437,23 +445,27 @@ const StatusCard = ({ statusName, isLoading, onChange }: StatusCardProps) => {
                 <span className="size-2 rounded-full bg-current opacity-70" />
                 {STATUS_LABELS[statusName] ?? statusName}
             </div>
-            <select
-                value={statusName}
-                disabled={isLoading}
-                onChange={(e) => onChange(e.target.value as EventStatusName)}
-                className="h-11 w-full cursor-pointer rounded-2xl border border-white/70 bg-white/60 px-4 text-sm text-[#00334d] backdrop-blur-xl shadow-xs outline-none transition-all duration-300 focus:border-[#2a8fd4]/50 focus:bg-white/90 focus:shadow-[0_0_0_4px_rgba(42,143,212,0.12)] disabled:cursor-not-allowed disabled:opacity-60"
-            >
-                {ALL_STATUSES.map((s) => (
-                    <option key={s} value={s}>
-                        {STATUS_LABELS[s]}
-                    </option>
-                ))}
-            </select>
-            {isLoading && (
-                <p className="mt-3 inline-flex items-center gap-2 text-xs text-[#5e6c87]">
-                    <Loader2 className="size-3 animate-spin" />
-                    Atualizando status...
-                </p>
+            {isAdmin && (
+                <>
+                    <select
+                        value={statusName}
+                        disabled={isLoading}
+                        onChange={(e) => onChange(e.target.value as EventStatusName)}
+                        className="h-11 w-full cursor-pointer rounded-2xl border border-white/70 bg-white/60 px-4 text-sm text-[#00334d] backdrop-blur-xl shadow-xs outline-none transition-all duration-300 focus:border-[#2a8fd4]/50 focus:bg-white/90 focus:shadow-[0_0_0_4px_rgba(42,143,212,0.12)] disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                        {ALL_STATUSES.map((s) => (
+                            <option key={s} value={s}>
+                                {STATUS_LABELS[s]}
+                            </option>
+                        ))}
+                    </select>
+                    {isLoading && (
+                        <p className="mt-3 inline-flex items-center gap-2 text-xs text-[#5e6c87]">
+                            <Loader2 className="size-3 animate-spin" />
+                            Atualizando status...
+                        </p>
+                    )}
+                </>
             )}
         </GlassCard>
     );
@@ -462,12 +474,14 @@ const StatusCard = ({ statusName, isLoading, onChange }: StatusCardProps) => {
 type VisibilityCardProps = {
     current: EventVisibilityValue;
     isLoading: boolean;
+    isEventApproved: boolean;
     onChange: (value: EventVisibilityValue) => void;
 };
 
 const VisibilityCard = ({
     current,
     isLoading,
+    isEventApproved,
     onChange,
 }: VisibilityCardProps) => {
     const isPublic = current === "PUBLIC";
@@ -478,22 +492,28 @@ const VisibilityCard = ({
                 description="Altere a visibilidade do evento para público ou privado."
             />
 
-            <div className="flex gap-2">
+            <div className={`flex gap-2 ${isEventApproved ? "opacity-100" : "opacity-50"}`}>
                 <VisibilityButton
                     active={isPublic}
                     onClick={() => onChange("PUBLIC")}
-                    disabled={isLoading || isPublic}
+                    disabled={isLoading || isPublic || !isEventApproved}
                     icon={Eye}
                     label="Público"
                 />
                 <VisibilityButton
                     active={!isPublic}
                     onClick={() => onChange("PRIVATE")}
-                    disabled={isLoading || !isPublic}
+                    disabled={isLoading || !isPublic || !isEventApproved}
                     icon={EyeOff}
                     label="Privado"
                 />
             </div>
+
+            {!isEventApproved && (
+                <p className="mt-3 text-xs text-amber-600/80">
+                    A visibilidade só pode ser alterada quando o evento estiver aprovado.
+                </p>
+            )}
 
             {isLoading && (
                 <p className="mt-3 inline-flex items-center gap-2 text-xs text-[#5e6c87]">
@@ -692,7 +712,7 @@ const MetadataCard = ({ event }: MetadataCardProps) => (
         <SectionHeader title="Metadados" />
         <ul className="flex flex-col gap-3 text-sm">
             {event.organizer && (
-                <li className="flex items-center gap-2.5 rounded-2xl border border-white/70 bg-white/50 px-3 py-2.5">
+                <li className="flex items-center gap-2.5 rounded-2xl shadow-xs border border-white/70 bg-white/50 px-3 py-2.5">
                     <User className="size-4 shrink-0 text-[#2a8fd4]" strokeWidth={2.4} />
                     <div className="min-w-0">
                         <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#5e6c87]">
@@ -709,7 +729,7 @@ const MetadataCard = ({ event }: MetadataCardProps) => (
             )}
 
             {event.venue && (
-                <li className="flex items-start gap-2.5 rounded-2xl border border-white/70 bg-white/50 px-3 py-2.5">
+                <li className="flex items-start gap-2.5 rounded-2xl shadow-xs border border-white/70 bg-white/50 px-3 py-2.5">
                     <MapPin className="mt-0.5 size-4 shrink-0 text-[#2a8fd4]" strokeWidth={2.4} />
                     <div className="min-w-0">
                         <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#5e6c87]">

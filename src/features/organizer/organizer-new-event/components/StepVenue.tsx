@@ -87,7 +87,7 @@ export const StepVenue = ({
                                 onClick={() =>
                                     onChange("venueId", String(venue.venueID))
                                 }
-                                className={`group relative flex items-start gap-3 rounded-2xl border p-3 text-left transition-all duration-300 ${
+                                className={`group relative flex items-start gap-3 rounded-2xl cursor-pointer hover:scale-95 border p-3 text-left transition-all duration-300 ${
                                     isSelected
                                         ? "border-transparent text-white"
                                         : "border-white/70 bg-white/55 hover:bg-white"

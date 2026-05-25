@@ -151,7 +151,6 @@ export const EventsTable = ({
                             <Th>Status</Th>
                             <Th>Local</Th>
                             <Th>Data</Th>
-                            <Th>Preço inicial</Th>
                             <Th>Ações</Th>
                         </tr>
                     </thead>
@@ -293,9 +292,6 @@ const EventRow = ({ event, isDeleting, onEdit, onDelete }: EventRowProps) => {
             </td>
             <td className="py-3 pr-4 align-middle text-sm text-[#5e6c87]">
                 {formattedDate || <span className="text-[#5e6c87]/60">—</span>}
-            </td>
-            <td className="py-3 pr-4 align-middle text-sm font-semibold text-[#00334d]">
-                {formattedPrice ?? <span className="text-[#5e6c87]/60">—</span>}
             </td>
             <td className="py-3 pl-2 pr-6 align-middle">
                 <div className="flex items-center justify-start gap-2">

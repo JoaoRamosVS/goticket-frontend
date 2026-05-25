@@ -50,7 +50,7 @@ const EditarEvento = () => {
                 title={event ? `Editar: ${event.title}` : "Editar evento"}
                 description={
                     event
-                        ? `ID #${event.eventID} · última atualização ${new Date(
+                        ? `ID #${event.eventId} · última atualização ${new Date(
                               event.lastUpdateDate
                           ).toLocaleString("pt-BR")}`
                         : "Carregando detalhes do evento..."
