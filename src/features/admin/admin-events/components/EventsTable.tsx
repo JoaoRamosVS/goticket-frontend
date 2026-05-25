@@ -14,7 +14,50 @@ import {
     formatEventStartingPrice,
     getEventMainImage,
 } from "@/utils/events";
-import type { EventMinDTO } from "@/features/admin/admin-events/types/event.types";
+import type {
+    EventMinDTO,
+    EventStatusName,
+} from "@/features/admin/admin-events/types/event.types";
+
+const STATUS_ID_MAP: Record<number, EventStatusName> = {
+    1: "PENDING_APPROVAL",
+    2: "APPROVED",
+    3: "COMPLETED",
+    4: "DECLINED",
+    5: "CANCELED",
+    6: "POSTPONED",
+};
+
+const STATUS_LABELS: Record<EventStatusName, string> = {
+    PENDING_APPROVAL: "Pendente",
+    APPROVED: "Aprovado",
+    COMPLETED: "Concluído",
+    DECLINED: "Recusado",
+    CANCELED: "Cancelado",
+    POSTPONED: "Adiado",
+};
+
+const STATUS_STYLES: Record<EventStatusName, string> = {
+    PENDING_APPROVAL: "bg-amber-50 text-amber-700 border-amber-200/70",
+    APPROVED: "bg-emerald-50 text-emerald-700 border-emerald-200/70",
+    COMPLETED: "bg-blue-50 text-blue-700 border-blue-200/70",
+    DECLINED: "bg-red-50 text-red-600 border-red-200/70",
+    CANCELED: "bg-red-50 text-red-600 border-red-200/70",
+    POSTPONED: "bg-orange-50 text-orange-700 border-orange-200/70",
+};
+
+const StatusBadge = ({ statusId }: { statusId: number | null }) => {
+    const name = statusId != null ? STATUS_ID_MAP[statusId] : undefined;
+    if (!name) return <span className="text-[#5e6c87]/60 text-xs">—</span>;
+    return (
+        <span
+            className={`inline-flex items-center gap-1 rounded-xl border px-2.5 py-1 text-[11px] font-bold ${STATUS_STYLES[name]}`}
+        >
+            <span className="size-1.5 rounded-full bg-current opacity-70" />
+            {STATUS_LABELS[name]}
+        </span>
+    );
+};
 
 type EventsTableProps = {
     events: EventMinDTO[];
@@ -105,6 +148,7 @@ export const EventsTable = ({
                         <tr className="border-y border-white/80 bg-linear-to-r from-[#e5f1ff]/60 to-transparent text-left">
                             <Th className="pl-6">ID</Th>
                             <Th>Evento</Th>
+                            <Th>Status</Th>
                             <Th>Local</Th>
                             <Th>Data</Th>
                             <Th>Preço inicial</Th>
@@ -114,7 +158,7 @@ export const EventsTable = ({
                     <tbody>
                         {isLoading && events.length === 0 ? (
                             <tr>
-                                <td colSpan={6} className="py-14 text-center">
+                                <td colSpan={7} className="py-14 text-center">
                                     <div className="inline-flex items-center gap-2 text-sm text-[#5e6c87]">
                                         <Loader2 className="size-4 animate-spin" />
                                         Carregando eventos...
@@ -123,13 +167,13 @@ export const EventsTable = ({
                             </tr>
                         ) : error ? (
                             <tr>
-                                <td colSpan={6} className="py-14 text-center text-sm text-red-500">
+                                <td colSpan={7} className="py-14 text-center text-sm text-red-500">
                                     {error}
                                 </td>
                             </tr>
                         ) : filteredEvents.length === 0 ? (
                             <tr>
-                                <td colSpan={6} className="py-14 text-center text-sm text-[#5e6c87]">
+                                <td colSpan={7} className="py-14 text-center text-sm text-[#5e6c87]">
                                     {normalizedSearch
                                         ? "Nenhum evento corresponde à busca nesta página."
                                         : "Nenhum evento encontrado."}
@@ -226,8 +270,16 @@ const EventRow = ({ event, isDeleting, onEdit, onDelete }: EventRowProps) => {
                         <p className="truncate text-sm font-bold text-[#00334d]">
                             {event.title}
                         </p>
+                        {event.categoryName && (
+                            <p className="truncate text-[11px] text-[#5e6c87]">
+                                {event.categoryName}
+                            </p>
+                        )}
                     </div>
                 </div>
+            </td>
+            <td className="py-3 pr-4 align-middle">
+                <StatusBadge statusId={event.statusId} />
             </td>
             <td className="py-3 pr-4 align-middle text-sm text-[#5e6c87]">
                 {location ? (

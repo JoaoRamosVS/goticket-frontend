@@ -1,11 +1,27 @@
 import goTicketApi from "@/services/api";
 import type {
-    EventDetailDTO,
+    EventFullDTO,
     EventImageOrderItemDTO,
     EventMinListDTO,
+    EventStatusName,
     EventVisibilityValue,
     UpdateEventPayload,
 } from "@/features/admin/admin-events/types/event.types";
+
+/**
+ * `GET /events` — listagem pública de eventos aprovados/visíveis.
+ */
+const getEvents = async (
+    page: number,
+    pageSize: number,
+    signal?: AbortSignal
+): Promise<EventMinListDTO> => {
+    const response = await goTicketApi.get<EventMinListDTO>("/events", {
+        params: { page, pageSize },
+        signal,
+    });
+    return response.data;
+};
 
 function authHeaders(extra?: Record<string, string>): Record<string, string> {
     const accessToken = localStorage.getItem("accessToken");
@@ -17,16 +33,15 @@ function authHeaders(extra?: Record<string, string>): Record<string, string> {
 }
 
 /**
- * `GET /events` — Lista pública de eventos aprovados + públicos.
- * É o único endpoint de listagem existente no backend atualmente.
- * O admin usa ele; filtragem por título/ID extra é feita client-side.
+ * `GET /events/all` — listagem admin-only com todos os eventos
+ * (qualquer status/visibilidade).
  */
-const getEvents = async (
+const getAdminEvents = async (
     page: number,
     pageSize: number,
     signal?: AbortSignal
 ): Promise<EventMinListDTO> => {
-    const response = await goTicketApi.get<EventMinListDTO>("/events", {
+    const response = await goTicketApi.get<EventMinListDTO>("/events/all", {
         headers: authHeaders(),
         params: { page, pageSize },
         signal,
@@ -35,14 +50,15 @@ const getEvents = async (
 };
 
 /**
- * `GET /events/{eventId}` — detalhes completos de um evento.
+ * `GET /events/{eventId}/details` — visão completa do evento para admin/organizador.
+ * Retorna `EventFullDTO` com todos os campos editáveis e metadados.
  */
-const getEventById = async (
+const getAdminEventDetails = async (
     eventId: number | string,
     signal?: AbortSignal
-): Promise<EventDetailDTO> => {
-    const response = await goTicketApi.get<EventDetailDTO>(
-        `/events/${eventId}`,
+): Promise<EventFullDTO> => {
+    const response = await goTicketApi.get<EventFullDTO>(
+        `/events/${eventId}/details`,
         {
             headers: authHeaders(),
             signal,
@@ -53,13 +69,13 @@ const getEventById = async (
 
 /**
  * `PATCH /events/{eventId}` — atualização parcial com merge-patch+json.
- * Aceita apenas os campos primitivos do evento. Visibilidade tem endpoint próprio.
+ * Retorna `EventFullDTO` atualizado.
  */
 const updateEvent = async (
     eventId: number | string,
     payload: UpdateEventPayload
-): Promise<EventDetailDTO> => {
-    const response = await goTicketApi.patch<EventDetailDTO>(
+): Promise<EventFullDTO> => {
+    const response = await goTicketApi.patch<EventFullDTO>(
         `/events/${eventId}`,
         payload,
         {
@@ -73,7 +89,6 @@ const updateEvent = async (
 
 /**
  * `PATCH /events/{eventId}/visibility` — alterna entre PUBLIC e PRIVATE.
- * O backend exige que o evento esteja aprovado para aceitar a troca.
  */
 const updateEventVisibility = async (
     eventId: number | string,
@@ -88,8 +103,6 @@ const updateEventVisibility = async (
 
 /**
  * `PUT /events/{eventId}/images` — substitui a galeria conforme `metadata` + arquivos `newImages`.
- * `metadata` é um JSON serializado; cada item `existing` referencia `s3Key` já salvo;
- * cada item `new` usa `fileIndex` apontando para a posição do arquivo em `newImages`.
  */
 const replaceEventImages = async (
     eventId: number | string,
@@ -114,6 +127,20 @@ const replaceEventImages = async (
 };
 
 /**
+ * `PATCH /events/{eventId}/status` — altera o status do evento (admin-only).
+ */
+const updateEventStatus = async (
+    eventId: number | string,
+    status: EventStatusName
+): Promise<void> => {
+    await goTicketApi.patch(
+        `/events/${eventId}/status`,
+        { status },
+        { headers: authHeaders() }
+    );
+};
+
+/**
  * `DELETE /events/{eventId}` — exclusão do evento.
  */
 const deleteEvent = async (eventId: number | string): Promise<void> => {
@@ -124,9 +151,11 @@ const deleteEvent = async (eventId: number | string): Promise<void> => {
 
 export default {
     getEvents,
-    getEventById,
+    getAdminEvents,
+    getAdminEventDetails,
     updateEvent,
     updateEventVisibility,
+    updateEventStatus,
     replaceEventImages,
     deleteEvent,
 };

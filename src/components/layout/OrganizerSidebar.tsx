@@ -76,7 +76,7 @@ const OrganizerSidebar = () => {
                         className="group flex items-center gap-2.5 transition-all duration-300 hover:gap-1.5"
                     >
                         <img
-                            src="/GoTicketLogo.png"
+                            src="/goticket_logo.svg"
                             width={38}
                             height={38}
                             alt="GoTicket"

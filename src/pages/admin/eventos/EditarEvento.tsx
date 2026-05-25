@@ -16,6 +16,7 @@ const EditarEvento = () => {
         isLoading,
         isSaving,
         isTogglingVisibility,
+        isTogglingStatus,
         isUploadingImages,
         isSavingImageOrder,
         isDeleting,
@@ -24,6 +25,7 @@ const EditarEvento = () => {
         handleSave,
         handleReset,
         handleToggleVisibility,
+        handleChangeStatus,
         handleUploadImages,
         handleSaveImageOrder,
         handleChangeCategory,
@@ -64,6 +66,7 @@ const EditarEvento = () => {
                 isLoading={isLoading}
                 isSaving={isSaving}
                 isTogglingVisibility={isTogglingVisibility}
+                isTogglingStatus={isTogglingStatus}
                 isUploadingImages={isUploadingImages}
                 isSavingImageOrder={isSavingImageOrder}
                 isDeleting={isDeleting}
@@ -72,6 +75,7 @@ const EditarEvento = () => {
                 onSave={handleSave}
                 onReset={handleReset}
                 onToggleVisibility={handleToggleVisibility}
+                onChangeStatus={handleChangeStatus}
                 onChangeCategory={handleChangeCategory}
                 onDeleteEvent={() =>
                     handleDeleteEvent(() => navigate("/admin/eventos"))

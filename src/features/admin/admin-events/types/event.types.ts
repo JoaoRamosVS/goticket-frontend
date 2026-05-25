@@ -1,17 +1,10 @@
-import type { EventCategoryDTO } from "@/features/admin/admin-categories/types/category.types";
-
-/**
- * Representa o payload retornado pelo endpoint `GET /events`.
- * Espelha `tech.goticket.backendapi.event.dto.EventMinDTO`.
- *
- * `startDate` vem como `LocalDateTime` serializado pelo Jackson
- * (ex.: "2025-12-01T18:00:00") e `startingPrice` como BigDecimal
- * serializado como número ou string.
- */
 export interface EventMinDTO {
     eventID: number;
     title: string;
     startDate: string;
+    statusId: number | null;
+    categoryId: number | null;
+    categoryName: string | null;
     venueName: string | null;
     venueCity: string | null;
     venueState: string | null;
@@ -29,7 +22,7 @@ export interface EventMinListDTO {
 
 export type EventVisibilityValue = "PUBLIC" | "PRIVATE";
 
-type EventStatusName =
+export type EventStatusName =
     | "PENDING_APPROVAL"
     | "APPROVED"
     | "COMPLETED"
@@ -38,9 +31,8 @@ type EventStatusName =
     | "POSTPONED";
 
 export interface EventImageDTO {
-    eventImageID: number;
+    eventImageID?: number;
     s3Key: string;
-    /** Ordem no backend; posição 0 = imagem principal. */
     ordination?: number;
 }
 
@@ -55,11 +47,12 @@ export interface EventImageOrderItemDTO {
 }
 
 /**
- * Representa o payload de `GET /events/{eventId}`.
- * Espelha a entidade `tech.goticket.backendapi.event.Event`.
+ * Visão completa do evento para o admin/organizador.
+ * Espelha `tech.goticket.backendapi.event.dto.EventFullDTO`
+ * retornado por `GET /events/{eventId}/details`.
  */
-export interface EventDetailDTO {
-    eventID: number;
+export interface EventFullDTO {
+    eventId: number;
     title: string;
     description: string;
     ageRestriction: number;
@@ -69,15 +62,31 @@ export interface EventDetailDTO {
     approvalDate: string | null;
     registerDate: string;
     lastUpdateDate: string;
-    status: { statusID: number; name: EventStatusName };
-    eventVisibility: { visibilityID: number; name: EventVisibilityValue };
-    category: EventCategoryDTO | null;
-    organizer: { userID: string; fullName?: string } | null;
+    statusId: number;
+    statusName: EventStatusName;
+    visibilityId: number;
+    visibilityName: EventVisibilityValue;
+    category: { id: number; name: string; slug: string } | null;
+    organizer: {
+        userId: string;
+        organizerName: string;
+        legalName: string;
+        cnpj: string;
+    } | null;
     venue: {
         venueID: number;
         name: string;
+        cnpj: string | null;
+        description: string | null;
+        streetAddress: string | null;
+        streetAddressNumber: string | null;
+        neighborhood: string | null;
         city: string;
         state: string;
+        country: string | null;
+        zipCode: string | null;
+        sectorMapS3Key: string | null;
+        sectorMapUrl: string | null;
     } | null;
     images: EventImageDTO[];
 }

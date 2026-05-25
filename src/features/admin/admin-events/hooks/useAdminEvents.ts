@@ -23,7 +23,7 @@ export const useAdminEvents = () => {
             setError(null);
 
             return eventService
-                .getEvents(targetPage, PAGE_SIZE, signal)
+                .getAdminEvents(targetPage, PAGE_SIZE, signal)
                 .then((data) => {
                     setEvents(data.eventMinDTOList ?? []);
                     setTotalPages(Math.max(1, data.totalPages ?? 1));

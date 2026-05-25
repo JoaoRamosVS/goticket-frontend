@@ -7,6 +7,7 @@ import {
     formatEventStartingPrice,
     getEventMainImage,
 } from "@/utils/events";
+import { useNavigate } from "react-router-dom";
 
 type BannerSliderProps = {
     events: EventMinDTO[];
@@ -32,6 +33,8 @@ const BannerSlider = ({ events }: BannerSliderProps) => {
     const viewportRef = useRef<HTMLDivElement>(null);
     const dragStartXRef = useRef(0);
     const dragActiveRef = useRef(false);
+    
+    const navigate = useNavigate();
 
     const banners = useMemo(() => events.slice(0, MAX_BANNERS), [events]);
 
@@ -227,6 +230,7 @@ const BannerSlider = ({ events }: BannerSliderProps) => {
                             const imageUrl = getEventMainImage(banner);
                             const formattedDate = formatEventDate(banner.startDate);
                             const formattedLocation = formatEventLocation(banner);
+                            const currentEvent = events[currentIndex - 1];
 
                             return (
                                 <article
@@ -307,6 +311,7 @@ const BannerSlider = ({ events }: BannerSliderProps) => {
                                                     background: "linear-gradient(135deg, #4db8e8 0%, #2a8fd4 50%, #1c6fb5 100%)",
                                                     boxShadow: "0 4px 14px -3px rgba(42,143,212,0.45)",
                                                 }}
+                                                onClick={() => navigate(`/evento/${currentEvent.eventID}`)}
                                             >
                                                 a partir de {formatEventStartingPrice(banner)}
                                                 <ArrowIcon className="size-4" strokeWidth={4} />

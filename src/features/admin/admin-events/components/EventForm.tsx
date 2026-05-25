@@ -6,17 +6,20 @@ import {
     Hash,
     ImagePlus,
     Loader2,
+    MapPin,
     Save,
     Star,
     Tags,
     Trash2,
     Upload,
+    User,
     X,
 } from "lucide-react";
 import { buildEventImageUrl } from "@/utils/events";
 import type {
-    EventDetailDTO,
+    EventFullDTO,
     EventImageDTO,
+    EventStatusName,
     EventVisibilityValue,
 } from "@/features/admin/admin-events/types/event.types";
 import type { EventCategoryDTO } from "@/features/admin/admin-categories/types/category.types";
@@ -31,7 +34,7 @@ type FormState = {
 };
 
 type EventFormProps = {
-    event: EventDetailDTO | null;
+    event: EventFullDTO | null;
     form: FormState;
     categories: EventCategoryDTO[];
     isLoadingCategories: boolean;
@@ -39,6 +42,7 @@ type EventFormProps = {
     isLoading: boolean;
     isSaving: boolean;
     isTogglingVisibility: boolean;
+    isTogglingStatus: boolean;
     isUploadingImages: boolean;
     isSavingImageOrder: boolean;
     isDeleting: boolean;
@@ -49,16 +53,62 @@ type EventFormProps = {
     onSave: () => void;
     onReset: () => void;
     onToggleVisibility: (value: EventVisibilityValue) => void;
+    onChangeStatus: (value: EventStatusName) => void;
     onChangeCategory: (categoryId: number) => void;
     onDeleteEvent: () => void;
     onUploadImages: (files: File[], mainIndex: number) => void;
     onSaveImageOrder: (orderedS3Keys: string[]) => void | Promise<void>;
 };
 
+const STATUS_LABELS: Record<EventStatusName, string> = {
+    PENDING_APPROVAL: "Pendente de aprovação",
+    APPROVED: "Aprovado",
+    COMPLETED: "Concluído",
+    DECLINED: "Recusado",
+    CANCELED: "Cancelado",
+    POSTPONED: "Adiado",
+};
+
+const STATUS_COLORS: Record<
+    EventStatusName,
+    { bg: string; text: string; border: string }
+> = {
+    PENDING_APPROVAL: {
+        bg: "bg-amber-50/80",
+        text: "text-amber-700",
+        border: "border-amber-200/70",
+    },
+    APPROVED: {
+        bg: "bg-emerald-50/80",
+        text: "text-emerald-700",
+        border: "border-emerald-200/70",
+    },
+    COMPLETED: {
+        bg: "bg-blue-50/80",
+        text: "text-blue-700",
+        border: "border-blue-200/70",
+    },
+    DECLINED: {
+        bg: "bg-red-50/80",
+        text: "text-red-700",
+        border: "border-red-200/70",
+    },
+    CANCELED: {
+        bg: "bg-red-50/80",
+        text: "text-red-700",
+        border: "border-red-200/70",
+    },
+    POSTPONED: {
+        bg: "bg-orange-50/80",
+        text: "text-orange-700",
+        border: "border-orange-200/70",
+    },
+};
+
 function sortEventImages(images: EventImageDTO[]): EventImageDTO[] {
     return [...images].sort((a, b) => {
-        const oa = a.ordination ?? a.eventImageID;
-        const ob = b.ordination ?? b.eventImageID;
+        const oa = a.ordination ?? a.eventImageID ?? 0;
+        const ob = b.ordination ?? b.eventImageID ?? 0;
         return oa - ob;
     });
 }
@@ -88,6 +138,7 @@ export const EventForm = ({
     isLoading,
     isSaving,
     isTogglingVisibility,
+    isTogglingStatus,
     isUploadingImages,
     isSavingImageOrder,
     isDeleting,
@@ -96,11 +147,21 @@ export const EventForm = ({
     onSave,
     onReset,
     onToggleVisibility,
+    onChangeStatus,
     onChangeCategory,
     onDeleteEvent,
     onUploadImages,
     onSaveImageOrder,
 }: EventFormProps) => {
+    // Adapta category de EventFullDTO para o formato que CategoryCard espera
+    const categoryForCard: EventCategoryDTO | null = event?.category
+        ? {
+              categoryId: event.category.id,
+              name: event.category.name,
+              slug: event.category.slug,
+          }
+        : null;
+
     return (
         <>
             {isLoading && !event ? (
@@ -139,7 +200,7 @@ export const EventForm = ({
                                     id="description"
                                     value={form.description}
                                     onChange={onFieldChange("description")}
-                                    rows={5}
+                                    rows={10}
                                     placeholder="Detalhes e atrações do evento..."
                                 />
                             </Field>
@@ -187,9 +248,7 @@ export const EventForm = ({
                                         id="startDate"
                                         type="datetime-local"
                                         value={form.startDate}
-                                        onChange={onFieldChange(
-                                            "startDate"
-                                        )}
+                                        onChange={onFieldChange("startDate")}
                                     />
                                 </Field>
                                 <Field
@@ -239,14 +298,20 @@ export const EventForm = ({
                     </GlassCard>
 
                     <div className="flex flex-col gap-5">
+                        <StatusCard
+                            statusName={event.statusName}
+                            isLoading={isTogglingStatus}
+                            onChange={onChangeStatus}
+                        />
+
                         <VisibilityCard
-                            current={event.eventVisibility?.name ?? "PRIVATE"}
+                            current={event.visibilityName ?? "PRIVATE"}
                             isLoading={isTogglingVisibility}
                             onChange={onToggleVisibility}
                         />
 
                         <CategoryCard
-                            current={event.category}
+                            current={categoryForCard}
                             categories={categories}
                             isLoadingCategories={isLoadingCategories}
                             isSaving={isSavingCategory}
@@ -342,6 +407,57 @@ const TextAreaInput = (
         className={`${baseInputClasses} resize-y  ${props.className ?? ""}`}
     />
 );
+
+const ALL_STATUSES: EventStatusName[] = [
+    "PENDING_APPROVAL",
+    "APPROVED",
+    "COMPLETED",
+    "DECLINED",
+    "CANCELED",
+    "POSTPONED",
+];
+
+type StatusCardProps = {
+    statusName: EventStatusName;
+    isLoading: boolean;
+    onChange: (value: EventStatusName) => void;
+};
+
+const StatusCard = ({ statusName, isLoading, onChange }: StatusCardProps) => {
+    const colors = STATUS_COLORS[statusName] ?? STATUS_COLORS.PENDING_APPROVAL;
+    return (
+        <GlassCard>
+            <SectionHeader
+                title="Status do evento"
+                description="Altere o status administrativo do evento."
+            />
+            <div
+                className={`mb-4 inline-flex items-center gap-2 rounded-2xl border px-4 py-2.5 text-sm font-bold ${colors.bg} ${colors.text} ${colors.border}`}
+            >
+                <span className="size-2 rounded-full bg-current opacity-70" />
+                {STATUS_LABELS[statusName] ?? statusName}
+            </div>
+            <select
+                value={statusName}
+                disabled={isLoading}
+                onChange={(e) => onChange(e.target.value as EventStatusName)}
+                className="h-11 w-full cursor-pointer rounded-2xl border border-white/70 bg-white/60 px-4 text-sm text-[#00334d] backdrop-blur-xl shadow-xs outline-none transition-all duration-300 focus:border-[#2a8fd4]/50 focus:bg-white/90 focus:shadow-[0_0_0_4px_rgba(42,143,212,0.12)] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+                {ALL_STATUSES.map((s) => (
+                    <option key={s} value={s}>
+                        {STATUS_LABELS[s]}
+                    </option>
+                ))}
+            </select>
+            {isLoading && (
+                <p className="mt-3 inline-flex items-center gap-2 text-xs text-[#5e6c87]">
+                    <Loader2 className="size-3 animate-spin" />
+                    Atualizando status...
+                </p>
+            )}
+        </GlassCard>
+    );
+};
 
 type VisibilityCardProps = {
     current: EventVisibilityValue;
@@ -568,26 +684,60 @@ const CategoryCard = ({
 };
 
 type MetadataCardProps = {
-    event: EventDetailDTO;
+    event: EventFullDTO;
 };
 
 const MetadataCard = ({ event }: MetadataCardProps) => (
     <GlassCard>
         <SectionHeader title="Metadados" />
-        <ul className="flex flex-col gap-2.5 text-sm">
-            <MetaRow label="Status" value={event.status?.name ?? "—"} />
-            <MetaRow
-                label="Categoria"
-                value={event.category?.name ?? "—"}
-            />
-            <MetaRow
-                label="Local"
-                value={
-                    event.venue
-                        ? `${event.venue.name} · ${event.venue.city}/${event.venue.state}`
-                        : "—"
-                }
-            />
+        <ul className="flex flex-col gap-3 text-sm">
+            {event.organizer && (
+                <li className="flex items-center gap-2.5 rounded-2xl border border-white/70 bg-white/50 px-3 py-2.5">
+                    <User className="size-4 shrink-0 text-[#2a8fd4]" strokeWidth={2.4} />
+                    <div className="min-w-0">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#5e6c87]">
+                            Organizador
+                        </p>
+                        <p className="truncate text-sm font-semibold text-[#00334d]">
+                            {event.organizer.organizerName}
+                        </p>
+                        <p className="truncate text-[11px] text-[#5e6c87]">
+                            {event.organizer.legalName}
+                        </p>
+                    </div>
+                </li>
+            )}
+
+            {event.venue && (
+                <li className="flex items-start gap-2.5 rounded-2xl border border-white/70 bg-white/50 px-3 py-2.5">
+                    <MapPin className="mt-0.5 size-4 shrink-0 text-[#2a8fd4]" strokeWidth={2.4} />
+                    <div className="min-w-0">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#5e6c87]">
+                            Local
+                        </p>
+                        <p className="text-sm font-semibold text-[#00334d]">
+                            {event.venue.name}
+                        </p>
+                        <p className="text-[11px] text-[#5e6c87] leading-relaxed">
+                            {[
+                                event.venue.streetAddress
+                                    ? `${event.venue.streetAddress}${event.venue.streetAddressNumber ? `, ${event.venue.streetAddressNumber}` : ""}`
+                                    : null,
+                                event.venue.neighborhood,
+                                `${event.venue.city}/${event.venue.state}`,
+                            ]
+                                .filter(Boolean)
+                                .join(" · ")}
+                        </p>
+                        {event.venue.zipCode && (
+                            <p className="text-[11px] text-[#5e6c87] font-mono">
+                                CEP {event.venue.zipCode}
+                            </p>
+                        )}
+                    </div>
+                </li>
+            )}
+
             <MetaRow
                 label="Aprovado em"
                 value={
@@ -600,13 +750,17 @@ const MetadataCard = ({ event }: MetadataCardProps) => (
                 label="Criado em"
                 value={new Date(event.registerDate).toLocaleString("pt-BR")}
             />
+            <MetaRow
+                label="Última atualização"
+                value={new Date(event.lastUpdateDate).toLocaleString("pt-BR")}
+            />
         </ul>
     </GlassCard>
 );
 
 const MetaRow = ({ label, value }: { label: string; value: string }) => (
     <li className="flex items-start justify-between gap-3">
-        <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#5e6c87]">
+        <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#5e6c87] shrink-0">
             {label}
         </span>
         <span className="text-right text-sm font-semibold text-[#00334d]">
@@ -653,7 +807,7 @@ const DangerCard = ({ isDeleting, onDelete }: DangerCardProps) => (
 );
 
 type ImagesPanelProps = {
-    event: EventDetailDTO;
+    event: EventFullDTO;
     isUploading: boolean;
     isSavingOrder: boolean;
     onUpload: (files: File[], mainIndex: number) => void;
@@ -1006,7 +1160,7 @@ const ImagesPanel = ({
                                                             src={buildEventImageUrl(
                                                                 img.s3Key
                                                             )}
-                                                            alt={`Imagem ${img.eventImageID}`}
+                                                            alt={`Imagem ${index + 1}`}
                                                             className="aspect-square w-full object-cover"
                                                             draggable={false}
                                                         />

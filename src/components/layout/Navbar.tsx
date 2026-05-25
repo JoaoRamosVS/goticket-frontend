@@ -11,10 +11,14 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 const Navbar = () => {
+	const navigate = useNavigate();
+	const [query, setQuery] = useState("");
+
 	const isAuth = useAuthStore((state) => state.isAuth);
 	const userFullName = useAuthStore((state) => state.userFullName);
 
@@ -40,6 +44,14 @@ const Navbar = () => {
 		},
 	};
 
+	const handleSearch = () => {
+        const term = query.trim();
+        if (!term) return;
+        const params = new URLSearchParams();
+        const queryString = params.toString();
+        navigate(`/busca/${encodeURIComponent(term)}${queryString ? `?${queryString}` : ""}`);
+    };
+
 	return (
 		<motion.nav
 			initial="hidden"
@@ -56,7 +68,7 @@ const Navbar = () => {
 							bg-linear-to-r from-foreground to-foreground/70 bg-clip-text hover:scale-95 hover:gap-1
 							transition-all ease-out duration-300"
 						>
-							<img src="/GoTicketLogo.png" width={40} height={40} /> GoTicket
+							<img src="/goticket_logo.svg" width={40} height={40} /> GoTicket
 						</Link>
 					</div>
 
@@ -66,6 +78,9 @@ const Navbar = () => {
 							<Input
 								type="search"
 								placeholder="Buscar eventos, shows, festivais..."
+								value={query}
+								onChange={(e) => setQuery(e.target.value)}
+								onKeyDown={(e) => e.key === "Enter" && handleSearch()}
 								className="h-9 w-full rounded-full border-primary-foreground/40 bg-background/50 pl-9 pr-3 shadow-md backdrop-blur-xl placeholder:text-accent-foreground/60"
 							/>
 						</div>

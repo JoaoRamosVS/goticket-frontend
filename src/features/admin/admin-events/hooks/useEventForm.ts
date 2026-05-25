@@ -4,9 +4,10 @@ import eventService from "@/features/admin/admin-events/services/event.service";
 import categoryService from "@/features/admin/admin-categories/services/category.service";
 import { useToast } from "@/components/ui/toast";
 import type {
-    EventDetailDTO,
+    EventFullDTO,
     EventImageDTO,
     EventImageOrderItemDTO,
+    EventStatusName,
     EventVisibilityValue,
     UpdateEventPayload,
 } from "@/features/admin/admin-events/types/event.types";
@@ -42,7 +43,7 @@ function dateTimeLocalToLocalDateTime(value: string): string | null {
     return value.length === 16 ? `${value}:00` : value;
 }
 
-function eventToFormState(event: EventDetailDTO): FormState {
+function eventToFormState(event: EventFullDTO): FormState {
     return {
         title: event.title ?? "",
         description: event.description ?? "",
@@ -55,7 +56,7 @@ function eventToFormState(event: EventDetailDTO): FormState {
 
 function buildPatchPayload(
     form: FormState,
-    original: EventDetailDTO
+    original: EventFullDTO
 ): UpdateEventPayload {
     const payload: UpdateEventPayload = {};
 
@@ -91,8 +92,8 @@ function buildPatchPayload(
 
 function sortEventImages(images: EventImageDTO[]): EventImageDTO[] {
     return [...images].sort((a, b) => {
-        const oa = a.ordination ?? a.eventImageID;
-        const ob = b.ordination ?? b.eventImageID;
+        const oa = a.ordination ?? a.eventImageID ?? 0;
+        const ob = b.ordination ?? b.eventImageID ?? 0;
         return oa - ob;
     });
 }
@@ -117,7 +118,7 @@ function getAxiosErrorMessage(err: unknown, fallback: string): string {
 
 export const useEventForm = (eventId?: string) => {
     const { showToast } = useToast();
-    const [event, setEvent] = useState<EventDetailDTO | null>(null);
+    const [event, setEvent] = useState<EventFullDTO | null>(null);
     const [form, setForm] = useState<FormState>(EMPTY_FORM);
 
     const [categories, setCategories] = useState<EventCategoryDTO[]>([]);
@@ -127,6 +128,7 @@ export const useEventForm = (eventId?: string) => {
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [isTogglingVisibility, setIsTogglingVisibility] = useState(false);
+    const [isTogglingStatus, setIsTogglingStatus] = useState(false);
     const [isUploadingImages, setIsUploadingImages] = useState(false);
     const [isSavingImageOrder, setIsSavingImageOrder] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -140,7 +142,7 @@ export const useEventForm = (eventId?: string) => {
             setError(null);
 
             return eventService
-                .getEventById(eventId, signal)
+                .getAdminEventDetails(eventId, signal)
                 .then((data) => {
                     setEvent(data);
                     setForm(eventToFormState(data));
@@ -225,9 +227,28 @@ export const useEventForm = (eventId?: string) => {
         if (event) setForm(eventToFormState(event));
     };
 
+    const handleChangeStatus = async (next: EventStatusName) => {
+        if (!event || !eventId) return;
+        if (event.statusName === next) return;
+
+        setIsTogglingStatus(true);
+        setError(null);
+        try {
+            await eventService.updateEventStatus(eventId, next);
+            await fetchEvent();
+            showToast({ type: "update", message: "Status do evento atualizado." });
+        } catch (err) {
+            const message = getAxiosErrorMessage(err, "Não foi possível alterar o status.");
+            setError(message);
+            showToast({ type: "error", message });
+        } finally {
+            setIsTogglingStatus(false);
+        }
+    };
+
     const handleToggleVisibility = async (next: EventVisibilityValue) => {
         if (!event || !eventId) return;
-        if (event.eventVisibility?.name === next) return;
+        if (event.visibilityName === next) return;
 
         setIsTogglingVisibility(true);
         setError(null);
@@ -326,7 +347,7 @@ export const useEventForm = (eventId?: string) => {
 
     const handleChangeCategory = async (nextCategoryId: number) => {
         if (!event || !eventId) return;
-        if (event.category?.categoryId === nextCategoryId) return;
+        if (event.category?.id === nextCategoryId) return;
 
         setIsSavingCategory(true);
         setError(null);
@@ -385,6 +406,7 @@ export const useEventForm = (eventId?: string) => {
         isLoading,
         isSaving,
         isTogglingVisibility,
+        isTogglingStatus,
         isUploadingImages,
         isSavingImageOrder,
         isDeleting,
@@ -393,6 +415,7 @@ export const useEventForm = (eventId?: string) => {
         handleFieldChange,
         handleSave,
         handleReset,
+        handleChangeStatus,
         handleToggleVisibility,
         handleUploadImages,
         handleSaveImageOrder,

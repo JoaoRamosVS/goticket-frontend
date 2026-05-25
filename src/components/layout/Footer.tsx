@@ -61,7 +61,7 @@ const Footer = () => {
                         to="/"
                         className="flex items-center gap-2 text-2xl font-bold tracking-tight transition-all duration-300 hover:scale-95"
                     >
-                        <img src="/GoTicketLogo.png" width={36} height={36} alt="GoTicket" />
+                        <img src="/goticket_logo.svg" width={36} height={36} alt="GoTicket" />
                         <span className="bg-linear-to-r from-foreground to-foreground/70 bg-clip-text">
                             GoTicket
                         </span>
