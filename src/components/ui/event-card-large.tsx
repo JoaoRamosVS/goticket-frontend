@@ -22,7 +22,7 @@ const EventCardLarge = ({ event }: EventCardLargeProps) => {
 
     return (
         <article
-            className="group relative overflow-hidden rounded-[48px] border border-white/60 bg-white/25 p-5 shadow-4xl backdrop-blur-2xl transition-all duration-500 hover:shadow-xl hover:bg-white/60"
+            className="group relative overflow-hidden rounded-[48px] border border-white/60 bg-white/50 p-5 shadow-4xl backdrop-blur-2xl transition-all duration-500 hover:shadow-xl hover:bg-white/80"
             style={{
                 boxShadow:
                     "0 8px 32px -8px rgba(0,46,71,0.10), 0 2px 8px -2px rgba(0,46,71,0.06), inset 0 1px 0 0 rgba(255,255,255,0.7)",
@@ -58,7 +58,7 @@ const EventCardLarge = ({ event }: EventCardLargeProps) => {
                     {formattedPrice ? (
                         <span className="text-lg text-[#5e6c87]">
                             a partir de
-                            <strong className="text-base font-extrabold text-accent-foreground ml-1">
+                            <strong className="text-xl font-extrabold text-accent-foreground ml-1 italic">
                                 {formattedPrice}
                             </strong>
                         </span>

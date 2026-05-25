@@ -27,7 +27,7 @@ const EventPagination = ({
     return (
         <div className={cn("flex items-center justify-end gap-3 mt-6", className)}>
             <div className="flex justify-end items-center gap-8 bg-white/55 py-3 px-6 rounded-4xl shadow-xs">
-                <p className="text-sm text-[#5e6c87]">
+                <p className="text-sm text-[#5e6c87]/60 font-bold">
                     Mostrando {rangeStart}–{rangeEnd} de {totalElements} eventos
                 </p>
                 <div className="flex items-center gap-1.5">

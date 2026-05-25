@@ -14,7 +14,7 @@ const EventDescription = ({ description }: EventDescriptionProps) => {
         <div className="relative">
           <div
             className={cn(
-              "text-muted-foreground leading-relaxed whitespace-pre-line mt-8 rounded-4xl px-10 py-8 bg-card/45 backdrop-blur-4xl shadow-xs shadow-primary"
+              "text-muted-foreground leading-relaxed whitespace-pre-line mt-8 rounded-4xl px-10 py-8 bg-card/75 backdrop-blur-4xl shadow-xs shadow-primary"
             )}
           >
             {description}

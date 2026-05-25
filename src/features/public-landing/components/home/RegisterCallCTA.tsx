@@ -1,6 +1,9 @@
 import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const RegisterCallCTA = () => {
+    const navigate = useNavigate();
+
     return (
         <section className="relative w-full px-4 py-8 sm:py-16">
             <div
@@ -31,6 +34,7 @@ const RegisterCallCTA = () => {
                         boxShadow:
                             "0 6px 20px -4px rgba(42,143,212,0.45), 0 2px 6px rgba(42,143,212,0.2)",
                     }}
+                    onClick={() => navigate("/cadastro")}
                 >
                     Criar conta gratuita
                     <ArrowRight className="size-5" />
