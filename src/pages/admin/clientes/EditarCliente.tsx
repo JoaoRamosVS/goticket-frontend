@@ -38,7 +38,7 @@ const EditarCliente = () => {
                 title={client ? `Editar: ${client.fullName}` : "Editar cliente"}
                 description={
                     client
-                        ? `ID ${client.userID} · última atualização ${new Date(
+                        ? `ID ${client.userId} · última atualização ${new Date(
                               client.lastUpdateDate
                           ).toLocaleString("pt-BR")}`
                         : "Carregando detalhes do cliente..."

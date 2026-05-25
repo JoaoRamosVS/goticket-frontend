@@ -1,15 +1,14 @@
 import { useEffect, useState, useCallback } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import axios from "axios";
-import eventSearchService from "../services/eventSearch.service";
+import categorySearchService from "../services/categorySearch.service";
 import type { EventMinListDTO } from "@/features/admin/admin-events/types/event.types";
 import type { SortOption } from "@/utils/eventListing";
 import { sortEvents } from "@/utils/eventListing";
 
-export const SEARCH_PAGE_SIZE = 15;
+export const CATEGORY_PAGE_SIZE = 15;
 
-export default function useEventSearch() {
-    const { searchTerm = "" } = useParams<{ searchTerm: string }>();
+export default function useCategoryEvents(categoryId: number | null) {
     const [searchParams, setSearchParams] = useSearchParams();
 
     const venueState = searchParams.get("venueState") ?? "";
@@ -23,27 +22,34 @@ export default function useEventSearch() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        if (categoryId == null) {
+            // Aguardando resolução do slug — mantém loading mas não dispara request.
+            setData(null);
+            setIsLoading(true);
+            return;
+        }
+
         const controller = new AbortController();
 
         setIsLoading(true);
         setError(null);
 
-        eventSearchService
-            .searchPublicEvents(
+        categorySearchService
+            .fetchEventsByCategory(
                 {
-                    title: searchTerm || undefined,
+                    categoryId,
                     venueState: venueState || undefined,
                     venueCity: venueCity || undefined,
                     startingPrice: maxPrice ? Number(maxPrice) : undefined,
                     page,
-                    pageSize: SEARCH_PAGE_SIZE,
+                    pageSize: CATEGORY_PAGE_SIZE,
                 },
                 controller.signal
             )
             .then(setData)
             .catch((err: unknown) => {
                 if (axios.isCancel(err)) return;
-                setError("Não foi possível carregar os resultados.");
+                setError("Não foi possível carregar os eventos desta categoria.");
                 setData(null);
             })
             .finally(() => {
@@ -51,7 +57,7 @@ export default function useEventSearch() {
             });
 
         return () => controller.abort();
-    }, [searchTerm, venueState, venueCity, maxPrice, page]);
+    }, [categoryId, venueState, venueCity, maxPrice, page]);
 
     const events = data?.eventMinDTOList ?? [];
     const sortedEvents = sortEvents(events, sort);
@@ -97,7 +103,6 @@ export default function useEventSearch() {
     }, [setSearchParams]);
 
     return {
-        searchTerm,
         events: sortedEvents,
         totalPages: data?.totalPages ?? 0,
         totalElements: data?.totalElements ?? 0,

@@ -80,7 +80,7 @@ const AdminSidebar = () => {
 
                 <div className="relative px-6 pt-7 pb-5">
                     <Link
-                        to="/"
+                        to="/admin"
                         className="group flex items-center gap-2.5 transition-all duration-300 hover:gap-1.5"
                     >
                         <img

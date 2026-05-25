@@ -21,7 +21,7 @@ export const EventStatusCard = ({ event, onOpen }: EventStatusCardProps) => {
         <button
             type="button"
             onClick={() => onOpen(event.eventID)}
-            className="group relative w-full overflow-hidden rounded-2xl border border-white/70 bg-white/55 text-left transition-all duration-300 hover:scale-[1.01] hover:bg-white/80 hover:shadow-lg"
+            className="cursor-pointer group relative w-full overflow-hidden rounded-2xl border border-white/70 bg-white/55 text-left transition-all duration-300 hover:scale-[1.01] hover:bg-white/80 hover:shadow-lg"
             style={{
                 boxShadow:
                     "0 6px 18px -8px rgba(0,46,71,0.14), inset 0 1px 0 0 rgba(255,255,255,0.8)",

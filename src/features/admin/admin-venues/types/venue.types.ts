@@ -28,7 +28,7 @@ export interface VenueListDTO {
  * Espelha a entidade `tech.goticket.backendapi.venue.Venue`.
  */
 export interface VenueDetailDTO {
-    venueID: number;
+    venueId: number;
     name: string;
     legalName: string;
     CNPJ: string;

@@ -18,7 +18,7 @@ export interface ClientDTO {
  * Espelha a entidade `tech.goticket.backendapi.client.Client`.
  */
 export interface ClientDetailDTO {
-    userID: string;
+    userId: string;
     email: string;
     role: { roleID: number; name: "ADMIN" | "ORGANIZER" | "CLIENT" };
     status: { statusID: number; name: StatusValue };

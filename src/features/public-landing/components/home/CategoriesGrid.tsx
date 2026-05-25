@@ -1,67 +1,41 @@
 import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import useEventCategories from "@/features/public-landing/hooks/useEventCategories";
+import type { EventCategoryDTO } from "@/features/admin/admin-categories/types/category.types";
 
-const CATEGORIES = [
-    {
-        id: 1,
-        name: "Música",
-        image:
-            "https://media.istockphoto.com/id/1471448614/photo/crowd-of-people-dancing-at-a-music-show-in-barcelona-during-the-summer-of-2022.jpg?s=612x612&w=0&k=20&c=FpGZq6p-1Gqx1JHN-mgapyQhLlvtNGr2M-hxm7mSvt0=",
-    },
-    {
-        id: 2,
-        name: "Cinema",
-        image:
-            "https://s2-oglobo.glbimg.com/OxdUPWTc-_vH9sMLvgf9bhc-dCo=/0x0:1280x841/888x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_da025474c0c44edd99332dddb09cabe8/internal_photos/bs/2024/n/6/dUIzAeQSKl1Fy3JuziFg/whatsapp-image-2024-08-20-at-18.40.28.jpeg",
-    },
-    {
-        id: 3,
-        name: "Teatro",
-        image:
-            "https://humanidades.com/wp-content/uploads/2018/10/teatro-5-e1583803340193.jpg",
-    },
-    {
-        id: 4,
-        name: "Eventos",
-        image:
-            "https://img.freepik.com/fotos-gratis/deliciosa-comida-de-rua-natureza-morta_23-2151535346.jpg?semt=ais_hybrid&w=740&q=80",
-    },
-]
+const CARD_GRADIENTS = [
+    "from-blue-600 via-blue-800 to-indigo-900",
+    "from-purple-600 via-purple-800 to-violet-900",
+    "from-rose-500 via-rose-700 to-red-900",
+    "from-amber-500 via-orange-600 to-orange-900",
+    "from-emerald-500 via-teal-700 to-cyan-900",
+    "from-sky-500 via-blue-700 to-blue-900",
+] as const;
 
-const CategoryCard = ({ category }: { category: typeof CATEGORIES[0] }) => {
+const CategoryCard = ({
+    category,
+    gradient,
+    onClick,
+}: {
+    category: EventCategoryDTO;
+    gradient: string;
+    onClick: () => void;
+}) => {
     return (
-        <div className="relative min-h-[250px] overflow-hidden rounded-[28px] shadow-2xl cursor-pointer hover:scale-105 transition-all duration-300">
-            <img
-                src={category.image}
-                alt=""
-                className="absolute inset-0 size-full object-cover brightness-85"
-                loading="lazy"
-            />
-            {[
-                { blur: 1, stop: "90%" },
-                { blur: 2, stop: "75%" },
-                { blur: 4, stop: "60%" },
-                { blur: 8, stop: "45%" },
-            ].map((layer) => (
-                <div
-                    key={layer.blur}
-                    className="pointer-events-none absolute inset-0"
-                    style={{
-                        backdropFilter: `blur(${layer.blur}px)`,
-                        WebkitBackdropFilter: `blur(${layer.blur}px)`,
-                        maskImage: `linear-gradient(to top, black 0%, transparent ${layer.stop})`,
-                        WebkitMaskImage: `linear-gradient(to top, black 0%, transparent ${layer.stop})`,
-                    }}
-                />
-            ))}
+        <div
+            onClick={onClick}
+            className={`relative min-h-[250px] overflow-hidden rounded-[28px] shadow-2xl cursor-pointer hover:scale-105 transition-all duration-300 bg-linear-to-br ${gradient}`}
+        >
+            <div className="absolute inset-0 bg-white/5" />
             <div
                 className="pointer-events-none absolute inset-0"
                 style={{
                     background:
-                        "linear-gradient(to top, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.15) 35%, transparent 60%)",
+                        "linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.1) 55%, transparent 80%)",
                 }}
             />
             <div className="relative z-10 flex min-h-[250px] items-end p-5">
-                <div className="flex items-center justify-center gap-2">
+                <div className="flex items-center gap-2">
                     <h3 className="text-3xl font-bold text-white drop-shadow-lg">
                         {category.name}
                     </h3>
@@ -72,24 +46,54 @@ const CategoryCard = ({ category }: { category: typeof CATEGORIES[0] }) => {
     );
 };
 
-const CategoriesGrid = () => {
-  return (
-    <section className="container mx-auto relative w-full px-2 py-16 sm:px-8 lg:px-4">
-        <div className="flex justify-between items-center w-full">
-            <h2 className="text-left text-3xl tracking-wide font-extrabold sm:text-3xl md:text-4xl px-2">
-                O que você busca hoje?
-            </h2>
-            <a href="/categories" className="text-muted-foreground text-lg text-left border-b border-muted-foreground/80">
-                Ver mais
-            </a>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 pt-8">
-            {CATEGORIES.map((category) => (
-                <CategoryCard key={category.id} category={category} />
-            ))}
-        </div>
-    </section>
-  )
-}
+const CategoryCardSkeleton = () => (
+    <div className="relative min-h-[250px] overflow-hidden rounded-[28px] shadow-2xl animate-pulse bg-muted" />
+);
 
-export default CategoriesGrid
+const CategoriesGrid = () => {
+    const navigate = useNavigate();
+    const { categories, isLoading, error } = useEventCategories();
+
+    return (
+        <section className="container mx-auto relative w-full px-2 py-16 sm:px-8 lg:px-4">
+            <div className="flex justify-between items-center w-full">
+                <h2 className="text-left text-3xl tracking-wide font-extrabold sm:text-3xl md:text-4xl px-2">
+                    O que você busca hoje?
+                </h2>
+                <a
+                    href="/categorias"
+                    className="text-muted-foreground text-lg text-left border-b border-muted-foreground/80"
+                >
+                    Ver mais
+                </a>
+            </div>
+
+            {error && (
+                <p className="mt-8 text-center text-sm text-destructive">
+                    {error}
+                </p>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 pt-8">
+                {isLoading
+                    ? Array.from({ length: 4 }).map((_, i) => (
+                          <CategoryCardSkeleton key={i} />
+                      ))
+                    : categories.map((category, index) => (
+                          <CategoryCard
+                              key={category.categoryId}
+                              category={category}
+                              gradient={
+                                  CARD_GRADIENTS[index % CARD_GRADIENTS.length]
+                              }
+                              onClick={() =>
+                                  navigate(`/categoria/${category.slug}`)
+                              }
+                          />
+                      ))}
+            </div>
+        </section>
+    );
+};
+
+export default CategoriesGrid;

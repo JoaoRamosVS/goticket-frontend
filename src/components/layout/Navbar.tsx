@@ -74,14 +74,14 @@ const Navbar = () => {
 
 					<div className="mx-3 min-w-0 max-w-lg flex-1">
 						<div className="relative">
-							<Search className="z-3 pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-accent-foreground/70" strokeWidth={3} />
+							<Search className="z-3 pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-white bg-linear-to-b from-primary to-[#2959b9] rounded-full w-6 h-6 p-1 mr-4" strokeWidth={3} />
 							<Input
 								type="search"
 								placeholder="Buscar eventos, shows, festivais..."
 								value={query}
 								onChange={(e) => setQuery(e.target.value)}
 								onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-								className="h-9 w-full rounded-full border-primary-foreground/40 bg-background/50 pl-9 pr-3 shadow-md backdrop-blur-xl placeholder:text-accent-foreground/60"
+								className="h-9 w-full rounded-full border-primary-foreground/40 bg-background/50 pl-12 pr-3 shadow-md backdrop-blur-xl placeholder:text-accent-foreground/60"
 							/>
 						</div>
 					</div>

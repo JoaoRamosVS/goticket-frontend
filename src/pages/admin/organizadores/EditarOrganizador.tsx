@@ -43,7 +43,7 @@ const EditarOrganizador = () => {
                 }
                 description={
                     organizer
-                        ? `ID ${organizer.userID} · última atualização ${new Date(
+                        ? `ID ${organizer.userId} · última atualização ${new Date(
                               organizer.lastUpdateDate
                           ).toLocaleString("pt-BR")}`
                         : "Carregando detalhes do organizador..."

@@ -188,6 +188,9 @@ body {
   radial-gradient(at 8% 10%, hsla(224,100%,55%,0.09) 0px, transparent 50%);
 }
 
+button { cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

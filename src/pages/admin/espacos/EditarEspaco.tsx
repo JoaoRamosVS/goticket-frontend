@@ -53,7 +53,7 @@ const EditarEspaco = () => {
                 title={venue ? `Editar: ${venue.name}` : "Editar espaço"}
                 description={
                     venue
-                        ? `ID ${venue.venueID} · última atualização ${new Date(
+                        ? `ID ${venue.venueId} · última atualização ${new Date(
                               venue.lastUpdateDate
                           ).toLocaleString("pt-BR")}`
                         : "Carregando detalhes do espaço..."

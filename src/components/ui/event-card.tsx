@@ -22,7 +22,7 @@ const EventCard = ({ event }: EventCardProps) => {
 
     return (
         <article
-            className="group relative overflow-hidden rounded-[48px] bg-white/25 shadow-4xl backdrop-blur-2xl transition-all duration-500 hover:shadow-4xl hover:bg-white/60"
+            className="group relative overflow-hidden rounded-[24px] bg-white/25 shadow-4xl backdrop-blur-2xl transition-all duration-500 hover:shadow-4xl hover:bg-white/60"
             style={{
                 boxShadow:
                     "0 8px 32px -8px rgba(0,46,71,0.10), 0 2px 8px -2px rgba(0,46,71,0.06), inset 0 1px 0 0 rgba(255,255,255,0.7)",
@@ -35,29 +35,8 @@ const EventCard = ({ event }: EventCardProps) => {
                     className="aspect-8/6 w-full object-cover transition-transform duration-700 group-hover:scale-105 brightness-95"
                     draggable={false}
                 />
-                {[
-                    { blur: 1, stop: "90%" },
-                    { blur: 2, stop: "25%" },
-                    { blur: 6, stop: "50%" },
-                    { blur: 8, stop: "75%" },
-                ].map((layer) => (
-                    <div
-                        key={layer.blur}
-                        className="pointer-events-none absolute inset-0"
-                        style={{
-                            backdropFilter: `blur(${layer.blur}px)`,
-                            WebkitBackdropFilter: `blur(${layer.blur}px)`,
-                            maskImage: `linear-gradient(to top, black 0%, transparent ${layer.stop})`,
-                            WebkitMaskImage: `linear-gradient(to top, black 0%, transparent ${layer.stop})`,
-                        }}
-                    />
-                ))}
                 <div
-                    className="pointer-events-none absolute inset-0"
-                    style={{
-                        background:
-                            "linear-gradient(to top, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.15) 35%, transparent 60%)",
-                    }}
+                    className="pointer-events-none absolute inset-0 bg-linear-to-b from-transparent via-transparent to-black"
                 />
                 <div className="absolute inset-0 z-10 flex items-end p-5">
                     <h3 className="text-xl font-bold sm:text-2xl text-white drop-shadow-lg">

@@ -779,7 +779,7 @@ const MetadataCard = ({ event }: MetadataCardProps) => (
 );
 
 const MetaRow = ({ label, value }: { label: string; value: string }) => (
-    <li className="flex items-start justify-between gap-3">
+    <li className="flex items-start justify-between gap-3 mt-2">
         <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#5e6c87] shrink-0">
             {label}
         </span>

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { SortOption, EventSearchFilters } from "../types/eventSearch.types";
-import { SORT_LABELS } from "../types/eventSearch.types";
+import type { SortOption, EventListFilters } from "@/utils/eventListing";
+import { SORT_LABELS } from "@/utils/eventListing";
 
 type EventFilterCardProps = {
-    filters: EventSearchFilters;
+    filters: EventListFilters;
     sort: SortOption;
     onFilterChange: (key: string, value: string) => void;
     onSortChange: (sort: SortOption) => void;

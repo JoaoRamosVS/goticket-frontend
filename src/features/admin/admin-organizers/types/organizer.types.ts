@@ -17,7 +17,7 @@ export interface CreateOrganizerDTO {
  * Espelha a entidade `tech.goticket.backendapi.organizer.Organizer`.
  */
 export interface OrganizerDetailDTO {
-    userID: string;
+    userId: string;
     email: string;
     role: { roleID: number; name: "ADMIN" | "ORGANIZER" | "CLIENT" };
     status: { statusID: number; name: StatusValue };

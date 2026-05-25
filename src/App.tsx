@@ -39,6 +39,8 @@ import OrganizerNovoEvento from '@/pages/organizer/eventos/NovoEvento';
 
 import { ToastProvider } from '@/components/ui/toast';
 import BuscaPage from '@/pages/public/BuscaPage';
+import CategoriaPage from '@/pages/public/CategoriaPage';
+import CategoriasIndexPage from '@/pages/public/CategoriasIndexPage';
 
 function AppContent() {
   const isAuth = useAuthStore((state) => state.isAuth)
@@ -53,6 +55,8 @@ function AppContent() {
 
         <Route path="/home" element={<Home />} />
         <Route path="/busca/:searchTerm" element={<MainLayout><BuscaPage /></MainLayout>} />
+        <Route path="/categorias" element={<MainLayout><CategoriasIndexPage /></MainLayout>} />
+        <Route path="/categoria/:slug" element={<MainLayout><CategoriaPage /></MainLayout>} />
         <Route path="/evento/:eventId" element={<MainLayout><EventPage /></MainLayout>} />
         <Route path="/evento/:eventId/data/:eventDateId/ingressos" element={<MainLayout><EventDateTicketsPage /></MainLayout>} />
         <Route path="/quem-somos" element={<QuemSomos />} />
