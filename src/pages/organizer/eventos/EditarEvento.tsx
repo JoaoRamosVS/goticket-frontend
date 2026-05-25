@@ -17,18 +17,30 @@ const OrganizerEditarEvento = () => {
         isLoading,
         isSaving,
         isTogglingVisibility,
+        isTogglingStatus,
         isUploadingImages,
         isSavingImageOrder,
         isDeleting,
+        isSavingDate,
+        isSavingSector,
+        venueSectors,
+        isLoadingVenueSectors,
         hasChanges,
         handleFieldChange,
         handleSave,
         handleReset,
         handleToggleVisibility,
+        handleChangeStatus,
         handleUploadImages,
         handleSaveImageOrder,
         handleChangeCategory,
         handleDeleteEvent,
+        handleCreateEventDate,
+        handleUpdateEventDate,
+        handleDeleteEventDate,
+        handleCreateEventSector,
+        handleUpdateEventSector,
+        handleDeleteEventSector,
     } = useEventForm(eventId);
 
     return (
@@ -65,20 +77,32 @@ const OrganizerEditarEvento = () => {
                 isLoading={isLoading}
                 isSaving={isSaving}
                 isTogglingVisibility={isTogglingVisibility}
+                isTogglingStatus={isTogglingStatus}
                 isUploadingImages={isUploadingImages}
                 isSavingImageOrder={isSavingImageOrder}
                 isDeleting={isDeleting}
+                isSavingDate={isSavingDate}
+                isSavingSector={isSavingSector}
+                venueSectors={venueSectors}
+                isLoadingVenueSectors={isLoadingVenueSectors}
                 hasChanges={hasChanges}
                 onFieldChange={handleFieldChange}
                 onSave={handleSave}
                 onReset={handleReset}
                 onToggleVisibility={handleToggleVisibility}
+                onChangeStatus={handleChangeStatus}
                 onChangeCategory={handleChangeCategory}
                 onDeleteEvent={() =>
                     handleDeleteEvent(() => navigate("/organizer/eventos"))
                 }
                 onUploadImages={handleUploadImages}
                 onSaveImageOrder={handleSaveImageOrder}
+                onCreateEventDate={handleCreateEventDate}
+                onUpdateEventDate={handleUpdateEventDate}
+                onDeleteEventDate={handleDeleteEventDate}
+                onCreateEventSector={handleCreateEventSector}
+                onUpdateEventSector={handleUpdateEventSector}
+                onDeleteEventSector={handleDeleteEventSector}
             />
         </div>
     );

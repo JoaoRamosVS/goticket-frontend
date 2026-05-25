@@ -1,13 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { isAdminToken } from "@/utils/auth";
 import {
+    CalendarDays,
+    Check,
     Eye,
     EyeOff,
     GripVertical,
     Hash,
     ImagePlus,
+    LayoutGrid,
     Loader2,
     MapPin,
+    Pencil,
+    Plus,
     Save,
     Star,
     Tags,
@@ -18,10 +23,17 @@ import {
 } from "lucide-react";
 import { buildEventImageUrl } from "@/utils/events";
 import type {
+    CreateEventDatePayload,
+    CreateEventSectorPayload,
+    EventDateFullDTO,
     EventFullDTO,
     EventImageDTO,
+    EventSectorSummaryDTO,
     EventStatusName,
     EventVisibilityValue,
+    UpdateEventDatePayload,
+    UpdateEventSectorPayload,
+    VenueSectorOptionDTO,
 } from "@/features/admin/admin-events/types/event.types";
 import type { EventCategoryDTO } from "@/features/admin/admin-categories/types/category.types";
 
@@ -47,6 +59,10 @@ type EventFormProps = {
     isUploadingImages: boolean;
     isSavingImageOrder: boolean;
     isDeleting: boolean;
+    isSavingDate: boolean;
+    isSavingSector: boolean;
+    venueSectors: VenueSectorOptionDTO[];
+    isLoadingVenueSectors: boolean;
     hasChanges: boolean;
     onFieldChange: <K extends keyof FormState>(
         field: K
@@ -59,6 +75,20 @@ type EventFormProps = {
     onDeleteEvent: () => void;
     onUploadImages: (files: File[], mainIndex: number) => void;
     onSaveImageOrder: (orderedS3Keys: string[]) => void | Promise<void>;
+    onCreateEventDate: (payload: CreateEventDatePayload) => void | Promise<void>;
+    onUpdateEventDate: (
+        eventDateId: number,
+        payload: UpdateEventDatePayload
+    ) => void | Promise<void>;
+    onDeleteEventDate: (eventDateId: number) => void | Promise<void>;
+    onCreateEventSector: (
+        payload: CreateEventSectorPayload
+    ) => void | Promise<void>;
+    onUpdateEventSector: (
+        sectorId: number,
+        payload: UpdateEventSectorPayload
+    ) => void | Promise<void>;
+    onDeleteEventSector: (sectorId: number) => void | Promise<void>;
 };
 
 const STATUS_LABELS: Record<EventStatusName, string> = {
@@ -143,6 +173,10 @@ export const EventForm = ({
     isUploadingImages,
     isSavingImageOrder,
     isDeleting,
+    isSavingDate,
+    isSavingSector,
+    venueSectors,
+    isLoadingVenueSectors,
     hasChanges,
     onFieldChange,
     onSave,
@@ -153,6 +187,12 @@ export const EventForm = ({
     onDeleteEvent,
     onUploadImages,
     onSaveImageOrder,
+    onCreateEventDate,
+    onUpdateEventDate,
+    onDeleteEventDate,
+    onCreateEventSector,
+    onUpdateEventSector,
+    onDeleteEventSector,
 }: EventFormProps) => {
     // Adapta category de EventFullDTO para o formato que CategoryCard espera
     const categoryForCard: EventCategoryDTO | null = event?.category
@@ -296,6 +336,28 @@ export const EventForm = ({
                                 Salvar alterações
                             </button>
                         </div>
+
+                        <GlassCard className="lg:col-span-3 mt-12">
+                            <EventDatesPanel
+                                eventDates={event.eventDates ?? []}
+                                isSaving={isSavingDate}
+                                onCreate={onCreateEventDate}
+                                onUpdate={onUpdateEventDate}
+                                onDelete={onDeleteEventDate}
+                            />
+                        </GlassCard>
+
+                        <GlassCard className="lg:col-span-3 mt-8">
+                            <EventSectorsPanel
+                                sectors={event.sectors ?? []}
+                                venueSectors={venueSectors}
+                                isLoadingVenueSectors={isLoadingVenueSectors}
+                                isSaving={isSavingSector}
+                                onCreate={onCreateEventSector}
+                                onUpdate={onUpdateEventSector}
+                                onDelete={onDeleteEventSector}
+                            />
+                        </GlassCard>
                     </GlassCard>
 
                     <div className="flex flex-col gap-5">
@@ -337,6 +399,7 @@ export const EventForm = ({
                             onSaveOrder={onSaveImageOrder}
                         />
                     </GlassCard>
+
                 </div>
             )}
         </>
@@ -1194,6 +1257,830 @@ const ImagesPanel = ({
                     )}
                 </div>
             </div>
+        </div>
+    );
+};
+
+function formatLocalDateTime(value: string | null | undefined): string {
+    if (!value) return "—";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+    return date.toLocaleString("pt-BR");
+}
+
+function isoToDateTimeLocalInput(value: string | null | undefined): string {
+    if (!value) return "";
+    const [date, time] = value.split("T");
+    if (!date || !time) return "";
+    return `${date}T${time.substring(0, 5)}`;
+}
+
+function dateTimeLocalToBackend(value: string): string {
+    return value.length === 16 ? `${value}:00` : value;
+}
+
+type EventDatesPanelProps = {
+    eventDates: EventDateFullDTO[];
+    isSaving: boolean;
+    onCreate: (payload: CreateEventDatePayload) => void | Promise<void>;
+    onUpdate: (
+        eventDateId: number,
+        payload: UpdateEventDatePayload
+    ) => void | Promise<void>;
+    onDelete: (eventDateId: number) => void | Promise<void>;
+};
+
+const EventDatesPanel = ({
+    eventDates,
+    isSaving,
+    onCreate,
+    onUpdate,
+    onDelete,
+}: EventDatesPanelProps) => {
+    const sorted = useMemo(
+        () =>
+            [...eventDates].sort((a, b) =>
+                a.startDate.localeCompare(b.startDate)
+            ),
+        [eventDates]
+    );
+
+    const [isAdding, setIsAdding] = useState(false);
+    const [newStart, setNewStart] = useState("");
+    const [newEnd, setNewEnd] = useState("");
+
+    const [editingId, setEditingId] = useState<number | null>(null);
+    const [editStart, setEditStart] = useState("");
+    const [editEnd, setEditEnd] = useState("");
+
+    const handleAdd = async () => {
+        if (!newStart || !newEnd) return;
+        await onCreate({
+            startDate: dateTimeLocalToBackend(newStart),
+            endDate: dateTimeLocalToBackend(newEnd),
+        });
+        setNewStart("");
+        setNewEnd("");
+        setIsAdding(false);
+    };
+
+    const startEditing = (date: EventDateFullDTO) => {
+        setEditingId(date.eventDateId);
+        setEditStart(isoToDateTimeLocalInput(date.startDate));
+        setEditEnd(isoToDateTimeLocalInput(date.endDate));
+    };
+
+    const cancelEditing = () => {
+        setEditingId(null);
+        setEditStart("");
+        setEditEnd("");
+    };
+
+    const handleSaveEdit = async (dateId: number) => {
+        if (!editStart || !editEnd) return;
+        await onUpdate(dateId, {
+            startDate: dateTimeLocalToBackend(editStart),
+            endDate: dateTimeLocalToBackend(editEnd),
+        });
+        cancelEditing();
+    };
+
+    const handleDelete = async (date: EventDateFullDTO) => {
+        const confirmed = window.confirm(
+            `Remover a data ${formatLocalDateTime(date.startDate)}?`
+        );
+        if (!confirmed) return;
+        await onDelete(date.eventDateId);
+        if (editingId === date.eventDateId) cancelEditing();
+    };
+
+    return (
+        <div>
+            <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0">
+                    <h2 className="text-lg font-bold text-[#00334d]">
+                        Datas do evento
+                    </h2>
+                    <p className="mt-0.5 text-xs text-[#5e6c87]">
+                        Gerencie as ocorrências (sessões) do evento. O intervalo
+                        geral é recalculado automaticamente.
+                    </p>
+                </div>
+                {!isAdding && (
+                    <button
+                        type="button"
+                        onClick={() => setIsAdding(true)}
+                        disabled={isSaving}
+                        className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-2xl px-4 py-2 text-sm font-bold text-white transition-all duration-300 hover:brightness-110 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
+                        style={{
+                            background:
+                                "linear-gradient(135deg, #4db8e8 0%, #2a8fd4 50%, #1c6fb5 100%)",
+                            boxShadow:
+                                "0 6px 18px -4px rgba(42,143,212,0.5), inset 0 1px 0 0 rgba(255,255,255,0.35)",
+                        }}
+                    >
+                        <Plus className="size-4" strokeWidth={2.6} />
+                        Adicionar data
+                    </button>
+                )}
+            </div>
+
+            {isAdding && (
+                <div
+                    className="mb-4 rounded-2xl border border-white/70 bg-white/60 p-4"
+                    style={{
+                        boxShadow:
+                            "0 4px 14px -6px rgba(0,46,71,0.14), inset 0 1px 0 0 rgba(255,255,255,0.8)",
+                    }}
+                >
+                    <p className="mb-3 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[#5e6c87]">
+                        <CalendarDays className="size-3.5 text-[#2a8fd4]" />
+                        Nova data
+                    </p>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <Field label="Início" htmlFor="newDateStart" required>
+                            <TextInput
+                                id="newDateStart"
+                                type="datetime-local"
+                                value={newStart}
+                                onChange={(e) => setNewStart(e.target.value)}
+                            />
+                        </Field>
+                        <Field label="Término" htmlFor="newDateEnd" required>
+                            <TextInput
+                                id="newDateEnd"
+                                type="datetime-local"
+                                value={newEnd}
+                                onChange={(e) => setNewEnd(e.target.value)}
+                            />
+                        </Field>
+                    </div>
+                    <div className="mt-4 flex flex-wrap justify-end gap-2">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setIsAdding(false);
+                                setNewStart("");
+                                setNewEnd("");
+                            }}
+                            disabled={isSaving}
+                            className="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-white/70 bg-muted/60 px-4 py-2 text-sm font-semibold text-[#00334d] transition-all hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            <X className="size-4" />
+                            Cancelar
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleAdd}
+                            disabled={isSaving || !newStart || !newEnd}
+                            className="inline-flex cursor-pointer items-center gap-2 rounded-2xl px-4 py-2 text-sm font-bold text-white transition-all duration-300 hover:brightness-110 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
+                            style={{
+                                background:
+                                    "linear-gradient(135deg, #4db8e8 0%, #2a8fd4 50%, #1c6fb5 100%)",
+                                boxShadow:
+                                    "0 6px 18px -4px rgba(42,143,212,0.5), inset 0 1px 0 0 rgba(255,255,255,0.35)",
+                            }}
+                        >
+                            {isSaving ? (
+                                <Loader2 className="size-4 animate-spin" />
+                            ) : (
+                                <Check className="size-4" strokeWidth={2.6} />
+                            )}
+                            Salvar nova data
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {sorted.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-[#2a8fd4]/30 bg-white/40 p-6 text-center text-xs text-[#5e6c87]">
+                    Nenhuma data cadastrada.
+                </div>
+            ) : (
+                <ul className="flex flex-col gap-2">
+                    {sorted.map((date) => {
+                        const isEditing = editingId === date.eventDateId;
+                        return (
+                            <li
+                                key={date.eventDateId}
+                                className="rounded-2xl border border-white/70 bg-white/55 px-4 py-3"
+                                style={{
+                                    boxShadow:
+                                        "0 4px 14px -6px rgba(0,46,71,0.12), inset 0 1px 0 0 rgba(255,255,255,0.8)",
+                                }}
+                            >
+                                {isEditing ? (
+                                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_1fr_auto]">
+                                        <Field
+                                            label="Início"
+                                            htmlFor={`editStart-${date.eventDateId}`}
+                                            required
+                                        >
+                                            <TextInput
+                                                id={`editStart-${date.eventDateId}`}
+                                                type="datetime-local"
+                                                value={editStart}
+                                                onChange={(e) =>
+                                                    setEditStart(e.target.value)
+                                                }
+                                            />
+                                        </Field>
+                                        <Field
+                                            label="Término"
+                                            htmlFor={`editEnd-${date.eventDateId}`}
+                                            required
+                                        >
+                                            <TextInput
+                                                id={`editEnd-${date.eventDateId}`}
+                                                type="datetime-local"
+                                                value={editEnd}
+                                                onChange={(e) =>
+                                                    setEditEnd(e.target.value)
+                                                }
+                                            />
+                                        </Field>
+                                        <div className="flex items-end gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={cancelEditing}
+                                                disabled={isSaving}
+                                                className="inline-flex cursor-pointer items-center gap-1.5 rounded-2xl border border-white/70 bg-white/60 px-3 py-2 text-xs font-semibold text-[#00334d] transition-all hover:bg-white disabled:opacity-50"
+                                            >
+                                                <X className="size-3.5" />
+                                                Cancelar
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    handleSaveEdit(
+                                                        date.eventDateId
+                                                    )
+                                                }
+                                                disabled={
+                                                    isSaving ||
+                                                    !editStart ||
+                                                    !editEnd
+                                                }
+                                                className="inline-flex cursor-pointer items-center gap-1.5 rounded-2xl px-3 py-2 text-xs font-bold text-white transition-all duration-300 hover:brightness-110 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
+                                                style={{
+                                                    background:
+                                                        "linear-gradient(135deg, #4db8e8 0%, #2a8fd4 50%, #1c6fb5 100%)",
+                                                    boxShadow:
+                                                        "0 6px 18px -4px rgba(42,143,212,0.5)",
+                                                }}
+                                            >
+                                                {isSaving ? (
+                                                    <Loader2 className="size-3.5 animate-spin" />
+                                                ) : (
+                                                    <Save className="size-3.5" />
+                                                )}
+                                                Salvar
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-wrap items-center justify-between gap-3">
+                                        <div className="min-w-0 flex items-center gap-3">
+                                            <div
+                                                className="flex size-10 shrink-0 items-center justify-center rounded-xl text-white"
+                                                style={{
+                                                    background:
+                                                        "linear-gradient(135deg, #4db8e8 0%, #2a8fd4 50%, #1c6fb5 100%)",
+                                                    boxShadow:
+                                                        "0 4px 12px -3px rgba(42,143,212,0.45), inset 0 1px 0 0 rgba(255,255,255,0.35)",
+                                                }}
+                                            >
+                                                <CalendarDays
+                                                    className="size-4"
+                                                    strokeWidth={2.6}
+                                                />
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className="text-sm font-bold text-[#00334d]">
+                                                    {formatLocalDateTime(
+                                                        date.startDate
+                                                    )}{" "}
+                                                    →{" "}
+                                                    {formatLocalDateTime(
+                                                        date.endDate
+                                                    )}
+                                                </p>
+                                                <p className="text-[11px] text-[#5e6c87]">
+                                                    {date.dateSectors.length}{" "}
+                                                    setor
+                                                    {date.dateSectors.length ===
+                                                    1
+                                                        ? ""
+                                                        : "es"}{" "}
+                                                    vinculado
+                                                    {date.dateSectors.length ===
+                                                    1
+                                                        ? ""
+                                                        : "s"}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    startEditing(date)
+                                                }
+                                                disabled={isSaving}
+                                                className="inline-flex cursor-pointer items-center gap-1.5 rounded-2xl border border-white/70 bg-muted/60 px-3 py-1.5 text-xs font-semibold text-[#00334d] transition-all hover:bg-muted disabled:opacity-50"
+                                            >
+                                                <Pencil className="size-3.5" />
+                                                Editar
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    handleDelete(date)
+                                                }
+                                                disabled={isSaving}
+                                                className="inline-flex cursor-pointer items-center gap-1.5 rounded-2xl border border-red-200/70 bg-red-50/70 px-3 py-1.5 text-xs font-semibold text-red-600 transition-all hover:bg-red-100 disabled:opacity-50"
+                                            >
+                                                <Trash2 className="size-3.5" />
+                                                Remover
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </li>
+                        );
+                    })}
+                </ul>
+            )}
+        </div>
+    );
+};
+
+type EventSectorsPanelProps = {
+    sectors: EventSectorSummaryDTO[];
+    venueSectors: VenueSectorOptionDTO[];
+    isLoadingVenueSectors: boolean;
+    isSaving: boolean;
+    onCreate: (payload: CreateEventSectorPayload) => void | Promise<void>;
+    onUpdate: (
+        sectorId: number,
+        payload: UpdateEventSectorPayload
+    ) => void | Promise<void>;
+    onDelete: (sectorId: number) => void | Promise<void>;
+};
+
+const EventSectorsPanel = ({
+    sectors,
+    venueSectors,
+    isLoadingVenueSectors,
+    isSaving,
+    onCreate,
+    onUpdate,
+    onDelete,
+}: EventSectorsPanelProps) => {
+    const sorted = useMemo(
+        () => [...sectors].sort((a, b) => a.name.localeCompare(b.name)),
+        [sectors]
+    );
+
+    const usedVenueSectorIds = useMemo(
+        () =>
+            new Set(
+                sectors
+                    .map((s) => s.venueSectorId)
+                    .filter((id): id is number => id !== null)
+            ),
+        [sectors]
+    );
+
+    const availableVenueSectors = useMemo(
+        () =>
+            venueSectors.filter((vs) => !usedVenueSectorIds.has(vs.sectorID)),
+        [venueSectors, usedVenueSectorIds]
+    );
+
+    const [isAdding, setIsAdding] = useState(false);
+    const [newVenueSectorId, setNewVenueSectorId] = useState("");
+    const [newName, setNewName] = useState("");
+    const [newDescription, setNewDescription] = useState("");
+    const [newHasNumbered, setNewHasNumbered] = useState(false);
+
+    const [editingId, setEditingId] = useState<number | null>(null);
+    const [editName, setEditName] = useState("");
+    const [editDescription, setEditDescription] = useState("");
+    const [editHasNumbered, setEditHasNumbered] = useState(false);
+
+    const resetNew = () => {
+        setIsAdding(false);
+        setNewVenueSectorId("");
+        setNewName("");
+        setNewDescription("");
+        setNewHasNumbered(false);
+    };
+
+    const handleVenueSectorChange = (value: string) => {
+        setNewVenueSectorId(value);
+        const found = venueSectors.find((vs) => String(vs.sectorID) === value);
+        if (found) {
+            if (!newName.trim()) setNewName(found.name);
+            if (!newDescription.trim()) setNewDescription(found.description);
+        }
+    };
+
+    const handleAdd = async () => {
+        if (!newVenueSectorId || !newName.trim() || !newDescription.trim())
+            return;
+        await onCreate({
+            name: newName.trim(),
+            description: newDescription.trim(),
+            hasNumberedSeats: newHasNumbered,
+            venueSectorId: Number(newVenueSectorId),
+        });
+        resetNew();
+    };
+
+    const startEditing = (sector: EventSectorSummaryDTO) => {
+        setEditingId(sector.sectorId);
+        setEditName(sector.name);
+        setEditDescription(sector.description);
+        setEditHasNumbered(sector.hasNumberedSeats);
+    };
+
+    const cancelEditing = () => {
+        setEditingId(null);
+        setEditName("");
+        setEditDescription("");
+        setEditHasNumbered(false);
+    };
+
+    const handleSaveEdit = async (sector: EventSectorSummaryDTO) => {
+        const payload: UpdateEventSectorPayload = {};
+        if (editName.trim() && editName.trim() !== sector.name) {
+            payload.name = editName.trim();
+        }
+        if (
+            editDescription.trim() &&
+            editDescription.trim() !== sector.description
+        ) {
+            payload.description = editDescription.trim();
+        }
+        if (editHasNumbered !== sector.hasNumberedSeats) {
+            payload.hasNumberedSeats = editHasNumbered;
+        }
+        if (Object.keys(payload).length === 0) {
+            cancelEditing();
+            return;
+        }
+        await onUpdate(sector.sectorId, payload);
+        cancelEditing();
+    };
+
+    const handleDelete = async (sector: EventSectorSummaryDTO) => {
+        const confirmed = window.confirm(
+            `Remover o setor "${sector.name}" deste evento?`
+        );
+        if (!confirmed) return;
+        await onDelete(sector.sectorId);
+        if (editingId === sector.sectorId) cancelEditing();
+    };
+
+    return (
+        <div>
+            <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0">
+                    <h2 className="text-lg font-bold text-[#00334d]">
+                        Setores do evento
+                    </h2>
+                    <p className="mt-0.5 text-xs text-[#5e6c87]">
+                        Crie setores deste evento a partir dos setores
+                        configurados no espaço. Renomeie ou ajuste a numeração
+                        de assentos sem alterar o espaço.
+                    </p>
+                </div>
+                {!isAdding && (
+                    <button
+                        type="button"
+                        onClick={() => setIsAdding(true)}
+                        disabled={
+                            isSaving ||
+                            isLoadingVenueSectors ||
+                            availableVenueSectors.length === 0
+                        }
+                        className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-2xl px-4 py-2 text-sm font-bold text-white transition-all duration-300 hover:brightness-110 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
+                        style={{
+                            background:
+                                "linear-gradient(135deg, #4db8e8 0%, #2a8fd4 50%, #1c6fb5 100%)",
+                            boxShadow:
+                                "0 6px 18px -4px rgba(42,143,212,0.5), inset 0 1px 0 0 rgba(255,255,255,0.35)",
+                        }}
+                    >
+                        <Plus className="size-4" strokeWidth={2.6} />
+                        Adicionar setor
+                    </button>
+                )}
+            </div>
+
+            {isAdding && (
+                <div
+                    className="mb-4 rounded-2xl border border-white/70 bg-white/60 p-4"
+                    style={{
+                        boxShadow:
+                            "0 4px 14px -6px rgba(0,46,71,0.14), inset 0 1px 0 0 rgba(255,255,255,0.8)",
+                    }}
+                >
+                    <p className="mb-3 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[#5e6c87]">
+                        <LayoutGrid className="size-3.5 text-[#2a8fd4]" />
+                        Novo setor
+                    </p>
+                    <div className="flex flex-col gap-3">
+                        <Field
+                            label="Setor do espaço"
+                            htmlFor="newVenueSectorId"
+                            required
+                        >
+                            <select
+                                id="newVenueSectorId"
+                                value={newVenueSectorId}
+                                onChange={(e) =>
+                                    handleVenueSectorChange(e.target.value)
+                                }
+                                disabled={isSaving}
+                                className="h-11 w-full cursor-pointer rounded-2xl border border-white/70 bg-white/60 px-4 text-sm text-[#00334d] backdrop-blur-xl shadow-xs outline-none transition-all duration-300 focus:border-[#2a8fd4]/50 focus:bg-white/90 focus:shadow-[0_0_0_4px_rgba(42,143,212,0.12)] disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                                <option value="" disabled>
+                                    Selecione um setor do espaço
+                                </option>
+                                {availableVenueSectors.map((vs) => (
+                                    <option key={vs.sectorID} value={vs.sectorID}>
+                                        {vs.name} (capacidade {vs.maxCapacity})
+                                    </option>
+                                ))}
+                            </select>
+                        </Field>
+
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <Field
+                                label="Nome do setor no evento"
+                                htmlFor="newSectorName"
+                                required
+                            >
+                                <TextInput
+                                    id="newSectorName"
+                                    value={newName}
+                                    onChange={(e) =>
+                                        setNewName(e.target.value)
+                                    }
+                                    placeholder="Ex: Pista Premium"
+                                />
+                            </Field>
+                            <Field label="Possui assentos numerados?" htmlFor="newHasNumbered">
+                                <div className="flex h-11 items-center gap-3 rounded-2xl border border-white/70 bg-white/60 px-4">
+                                    <input
+                                        id="newHasNumbered"
+                                        type="checkbox"
+                                        checked={newHasNumbered}
+                                        onChange={(e) =>
+                                            setNewHasNumbered(e.target.checked)
+                                        }
+                                        className="size-4 cursor-pointer accent-[#2a8fd4]"
+                                    />
+                                    <span className="text-sm text-[#00334d]">
+                                        {newHasNumbered ? "Sim" : "Não"}
+                                    </span>
+                                </div>
+                            </Field>
+                        </div>
+
+                        <Field
+                            label="Descrição"
+                            htmlFor="newSectorDescription"
+                            required
+                        >
+                            <TextAreaInput
+                                id="newSectorDescription"
+                                rows={3}
+                                value={newDescription}
+                                onChange={(e) =>
+                                    setNewDescription(e.target.value)
+                                }
+                                placeholder="Detalhes específicos deste setor neste evento..."
+                            />
+                        </Field>
+                    </div>
+
+                    <div className="mt-4 flex flex-wrap justify-end gap-2">
+                        <button
+                            type="button"
+                            onClick={resetNew}
+                            disabled={isSaving}
+                            className="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-white/70 bg-muted/60 px-4 py-2 text-sm font-semibold text-[#00334d] transition-all hover:bg-muted disabled:opacity-50"
+                        >
+                            <X className="size-4" />
+                            Cancelar
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleAdd}
+                            disabled={
+                                isSaving ||
+                                !newVenueSectorId ||
+                                !newName.trim() ||
+                                !newDescription.trim()
+                            }
+                            className="inline-flex cursor-pointer items-center gap-2 rounded-2xl px-4 py-2 text-sm font-bold text-white transition-all duration-300 hover:brightness-110 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
+                            style={{
+                                background:
+                                    "linear-gradient(135deg, #4db8e8 0%, #2a8fd4 50%, #1c6fb5 100%)",
+                                boxShadow:
+                                    "0 6px 18px -4px rgba(42,143,212,0.5), inset 0 1px 0 0 rgba(255,255,255,0.35)",
+                            }}
+                        >
+                            {isSaving ? (
+                                <Loader2 className="size-4 animate-spin" />
+                            ) : (
+                                <Check className="size-4" strokeWidth={2.6} />
+                            )}
+                            Criar setor
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {availableVenueSectors.length === 0 &&
+                !isLoadingVenueSectors &&
+                !isAdding && (
+                    <p className="mb-3 text-xs text-[#5e6c87]">
+                        Todos os setores do espaço já foram adicionados a este
+                        evento.
+                    </p>
+                )}
+
+            {sorted.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-[#2a8fd4]/30 bg-white/40 p-6 text-center text-xs text-[#5e6c87]">
+                    Este evento ainda não possui setores cadastrados.
+                </div>
+            ) : (
+                <ul className="grid grid-cols-1 gap-2 md:grid-cols-2">
+                    {sorted.map((sector) => {
+                        const isEditing = editingId === sector.sectorId;
+                        return (
+                            <li
+                                key={sector.sectorId}
+                                className="rounded-2xl border border-white/70 bg-white/55 px-4 py-3"
+                                style={{
+                                    boxShadow:
+                                        "0 4px 14px -6px rgba(0,46,71,0.12), inset 0 1px 0 0 rgba(255,255,255,0.8)",
+                                }}
+                            >
+                                {isEditing ? (
+                                    <div className="flex flex-col gap-3">
+                                        <Field
+                                            label="Nome"
+                                            htmlFor={`editSectorName-${sector.sectorId}`}
+                                            required
+                                        >
+                                            <TextInput
+                                                id={`editSectorName-${sector.sectorId}`}
+                                                value={editName}
+                                                onChange={(e) =>
+                                                    setEditName(e.target.value)
+                                                }
+                                            />
+                                        </Field>
+                                        <Field
+                                            label="Descrição"
+                                            htmlFor={`editSectorDesc-${sector.sectorId}`}
+                                            required
+                                        >
+                                            <TextAreaInput
+                                                id={`editSectorDesc-${sector.sectorId}`}
+                                                rows={3}
+                                                value={editDescription}
+                                                onChange={(e) =>
+                                                    setEditDescription(
+                                                        e.target.value
+                                                    )
+                                                }
+                                            />
+                                        </Field>
+                                        <label className="inline-flex cursor-pointer items-center gap-2 text-xs text-[#00334d]">
+                                            <input
+                                                type="checkbox"
+                                                checked={editHasNumbered}
+                                                onChange={(e) =>
+                                                    setEditHasNumbered(
+                                                        e.target.checked
+                                                    )
+                                                }
+                                                className="size-4 cursor-pointer accent-[#2a8fd4]"
+                                            />
+                                            Possui assentos numerados
+                                        </label>
+                                        <div className="flex flex-wrap justify-end gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={cancelEditing}
+                                                disabled={isSaving}
+                                                className="inline-flex cursor-pointer items-center gap-1.5 rounded-2xl border border-white/70 bg-white/60 px-3 py-2 text-xs font-semibold text-[#00334d] transition-all hover:bg-white disabled:opacity-50"
+                                            >
+                                                <X className="size-3.5" />
+                                                Cancelar
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    handleSaveEdit(sector)
+                                                }
+                                                disabled={
+                                                    isSaving ||
+                                                    !editName.trim() ||
+                                                    !editDescription.trim()
+                                                }
+                                                className="inline-flex cursor-pointer items-center gap-1.5 rounded-2xl px-3 py-2 text-xs font-bold text-white transition-all duration-300 hover:brightness-110 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
+                                                style={{
+                                                    background:
+                                                        "linear-gradient(135deg, #4db8e8 0%, #2a8fd4 50%, #1c6fb5 100%)",
+                                                    boxShadow:
+                                                        "0 6px 18px -4px rgba(42,143,212,0.5)",
+                                                }}
+                                            >
+                                                {isSaving ? (
+                                                    <Loader2 className="size-3.5 animate-spin" />
+                                                ) : (
+                                                    <Save className="size-3.5" />
+                                                )}
+                                                Salvar
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-start gap-3">
+                                        <div
+                                            className="flex size-10 shrink-0 items-center justify-center rounded-xl text-white"
+                                            style={{
+                                                background:
+                                                    "linear-gradient(135deg, #4db8e8 0%, #2a8fd4 50%, #1c6fb5 100%)",
+                                                boxShadow:
+                                                    "0 4px 12px -3px rgba(42,143,212,0.45), inset 0 1px 0 0 rgba(255,255,255,0.35)",
+                                            }}
+                                        >
+                                            <LayoutGrid
+                                                className="size-4"
+                                                strokeWidth={2.6}
+                                            />
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                <p className="truncate text-sm font-bold text-[#00334d]">
+                                                    {sector.name}
+                                                </p>
+                                                {sector.hasNumberedSeats && (
+                                                    <span className="inline-flex items-center gap-1 rounded-md bg-[#e5f1ff] px-2 py-0.5 text-[10px] font-bold uppercase text-[#1c6fb5]">
+                                                        Numerado
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <p className="mt-0.5 line-clamp-2 text-xs text-[#5e6c87]">
+                                                {sector.description}
+                                            </p>
+                                            <p className="mt-1 inline-flex items-center gap-1 text-[11px] text-[#5e6c87] font-mono">
+                                                <Hash className="size-3" />
+                                                {sector.venueSectorId ?? "—"} ·
+                                                cap.{" "}
+                                                {sector.venueSectorMaxCapacity ??
+                                                    "—"}
+                                            </p>
+                                        </div>
+                                        <div className="flex shrink-0 flex-col gap-1.5">
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    startEditing(sector)
+                                                }
+                                                disabled={isSaving}
+                                                className="inline-flex cursor-pointer items-center gap-1.5 rounded-2xl border border-white/70 bg-muted/60 px-3 py-1.5 text-xs font-semibold text-[#00334d] transition-all hover:bg-muted disabled:opacity-50"
+                                            >
+                                                <Pencil className="size-3.5" />
+                                                Editar
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    handleDelete(sector)
+                                                }
+                                                disabled={isSaving}
+                                                className="inline-flex cursor-pointer items-center gap-1.5 rounded-2xl border border-red-200/70 bg-red-50/70 px-3 py-1.5 text-xs font-semibold text-red-600 transition-all hover:bg-red-100 disabled:opacity-50"
+                                            >
+                                                <Trash2 className="size-3.5" />
+                                                Remover
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </li>
+                        );
+                    })}
+                </ul>
+            )}
         </div>
     );
 };

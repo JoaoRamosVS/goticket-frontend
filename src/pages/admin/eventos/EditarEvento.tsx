@@ -20,6 +20,10 @@ const EditarEvento = () => {
         isUploadingImages,
         isSavingImageOrder,
         isDeleting,
+        isSavingDate,
+        isSavingSector,
+        venueSectors,
+        isLoadingVenueSectors,
         hasChanges,
         handleFieldChange,
         handleSave,
@@ -30,6 +34,12 @@ const EditarEvento = () => {
         handleSaveImageOrder,
         handleChangeCategory,
         handleDeleteEvent,
+        handleCreateEventDate,
+        handleUpdateEventDate,
+        handleDeleteEventDate,
+        handleCreateEventSector,
+        handleUpdateEventSector,
+        handleDeleteEventSector,
     } = useEventForm(eventId);
 
     return (
@@ -70,6 +80,10 @@ const EditarEvento = () => {
                 isUploadingImages={isUploadingImages}
                 isSavingImageOrder={isSavingImageOrder}
                 isDeleting={isDeleting}
+                isSavingDate={isSavingDate}
+                isSavingSector={isSavingSector}
+                venueSectors={venueSectors}
+                isLoadingVenueSectors={isLoadingVenueSectors}
                 hasChanges={hasChanges}
                 onFieldChange={handleFieldChange}
                 onSave={handleSave}
@@ -82,6 +96,12 @@ const EditarEvento = () => {
                 }
                 onUploadImages={handleUploadImages}
                 onSaveImageOrder={handleSaveImageOrder}
+                onCreateEventDate={handleCreateEventDate}
+                onUpdateEventDate={handleUpdateEventDate}
+                onDeleteEventDate={handleDeleteEventDate}
+                onCreateEventSector={handleCreateEventSector}
+                onUpdateEventSector={handleUpdateEventSector}
+                onDeleteEventSector={handleDeleteEventSector}
             />
         </div>
     );

@@ -20,7 +20,7 @@ export interface OrganizerDetailDTO {
     userId: string;
     email: string;
     role: { roleID: number; name: "ADMIN" | "ORGANIZER" | "CLIENT" };
-    status: { statusID: number; name: StatusValue };
+    status: { statusId: number; name: StatusValue };
     organizerName: string;
     legalName: string;
     CNPJ: string;
@@ -74,5 +74,5 @@ export interface UpdateOrganizerPayload {
     state?: string | null;
     country?: string | null;
     zipCode?: string | null;
-    status?: { statusID: number; name: StatusValue };
+    status?: { statusId: number; name: StatusValue };
 }

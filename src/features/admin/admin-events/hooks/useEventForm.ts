@@ -4,12 +4,17 @@ import eventService from "@/features/admin/admin-events/services/event.service";
 import categoryService from "@/features/admin/admin-categories/services/category.service";
 import { useToast } from "@/components/ui/toast";
 import type {
+    CreateEventDatePayload,
+    CreateEventSectorPayload,
     EventFullDTO,
     EventImageDTO,
     EventImageOrderItemDTO,
     EventStatusName,
     EventVisibilityValue,
+    UpdateEventDatePayload,
     UpdateEventPayload,
+    UpdateEventSectorPayload,
+    VenueSectorOptionDTO,
 } from "@/features/admin/admin-events/types/event.types";
 import type { EventCategoryDTO } from "@/features/admin/admin-categories/types/category.types";
 
@@ -132,6 +137,11 @@ export const useEventForm = (eventId?: string) => {
     const [isUploadingImages, setIsUploadingImages] = useState(false);
     const [isSavingImageOrder, setIsSavingImageOrder] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isSavingDate, setIsSavingDate] = useState(false);
+    const [isSavingSector, setIsSavingSector] = useState(false);
+
+    const [venueSectors, setVenueSectors] = useState<VenueSectorOptionDTO[]>([]);
+    const [isLoadingVenueSectors, setIsLoadingVenueSectors] = useState(false);
 
     const [error, setError] = useState<string | null>(null);
 
@@ -182,6 +192,28 @@ export const useEventForm = (eventId?: string) => {
             });
         return () => controller.abort();
     }, []);
+
+    const venueId = event?.venue?.venueID ?? null;
+
+    useEffect(() => {
+        if (!venueId) {
+            setVenueSectors([]);
+            return;
+        }
+        const controller = new AbortController();
+        setIsLoadingVenueSectors(true);
+        eventService
+            .listVenueSectors(venueId, controller.signal)
+            .then((data) => setVenueSectors(data ?? []))
+            .catch((err: unknown) => {
+                if (axios.isCancel(err)) return;
+                setVenueSectors([]);
+            })
+            .finally(() => {
+                if (!controller.signal.aborted) setIsLoadingVenueSectors(false);
+            });
+        return () => controller.abort();
+    }, [venueId]);
 
     const patchPayload = useMemo(() => {
         if (!event) return {};
@@ -373,6 +405,96 @@ export const useEventForm = (eventId?: string) => {
         }
     };
 
+    const runDateAction = async (
+        action: () => Promise<unknown>,
+        successMessage: string,
+        fallbackMessage: string
+    ) => {
+        if (!eventId) return;
+        setIsSavingDate(true);
+        setError(null);
+        try {
+            await action();
+            await fetchEvent();
+            showToast({ type: "success", message: successMessage });
+        } catch (err) {
+            const message = getAxiosErrorMessage(err, fallbackMessage);
+            setError(message);
+            showToast({ type: "error", message });
+        } finally {
+            setIsSavingDate(false);
+        }
+    };
+
+    const handleCreateEventDate = (payload: CreateEventDatePayload) =>
+        runDateAction(
+            () => eventService.createEventDate(eventId!, payload),
+            "Data adicionada ao evento.",
+            "Não foi possível adicionar a data."
+        );
+
+    const handleUpdateEventDate = (
+        eventDateId: number,
+        payload: UpdateEventDatePayload
+    ) =>
+        runDateAction(
+            () => eventService.updateEventDate(eventId!, eventDateId, payload),
+            "Data atualizada.",
+            "Não foi possível atualizar a data."
+        );
+
+    const handleDeleteEventDate = (eventDateId: number) =>
+        runDateAction(
+            () => eventService.deleteEventDate(eventId!, eventDateId),
+            "Data removida.",
+            "Não foi possível remover a data."
+        );
+
+    const runSectorAction = async (
+        action: () => Promise<unknown>,
+        successMessage: string,
+        fallbackMessage: string
+    ) => {
+        if (!eventId) return;
+        setIsSavingSector(true);
+        setError(null);
+        try {
+            await action();
+            await fetchEvent();
+            showToast({ type: "success", message: successMessage });
+        } catch (err) {
+            const message = getAxiosErrorMessage(err, fallbackMessage);
+            setError(message);
+            showToast({ type: "error", message });
+        } finally {
+            setIsSavingSector(false);
+        }
+    };
+
+    const handleCreateEventSector = (payload: CreateEventSectorPayload) =>
+        runSectorAction(
+            () => eventService.createEventSector(eventId!, payload),
+            "Setor do evento criado.",
+            "Não foi possível criar o setor do evento."
+        );
+
+    const handleUpdateEventSector = (
+        sectorId: number,
+        payload: UpdateEventSectorPayload
+    ) =>
+        runSectorAction(
+            () => eventService.updateEventSector(eventId!, sectorId, payload),
+            "Setor do evento atualizado.",
+            "Não foi possível atualizar o setor do evento."
+        );
+
+    const handleDeleteEventSector = (sectorId: number) =>
+        runSectorAction(
+            () => eventService.deleteEventSector(eventId!, sectorId),
+            "Setor do evento removido.",
+            "Não foi possível remover o setor do evento."
+        );
+
     const handleDeleteEvent = async (onDeleted: () => void) => {
         if (!event || !eventId) return;
         const confirmed = window.confirm(
@@ -410,6 +532,10 @@ export const useEventForm = (eventId?: string) => {
         isUploadingImages,
         isSavingImageOrder,
         isDeleting,
+        isSavingDate,
+        isSavingSector,
+        venueSectors,
+        isLoadingVenueSectors,
         error,
         hasChanges,
         handleFieldChange,
@@ -421,5 +547,11 @@ export const useEventForm = (eventId?: string) => {
         handleSaveImageOrder,
         handleChangeCategory,
         handleDeleteEvent,
+        handleCreateEventDate,
+        handleUpdateEventDate,
+        handleDeleteEventDate,
+        handleCreateEventSector,
+        handleUpdateEventSector,
+        handleDeleteEventSector,
     };
 };

@@ -1,11 +1,17 @@
 import goTicketApi from "@/services/api";
 import type {
+    CreateEventDatePayload,
+    CreateEventSectorPayload,
     EventFullDTO,
     EventImageOrderItemDTO,
     EventMinListDTO,
+    EventSectorSummaryDTO,
     EventStatusName,
     EventVisibilityValue,
+    UpdateEventDatePayload,
     UpdateEventPayload,
+    UpdateEventSectorPayload,
+    VenueSectorOptionDTO,
 } from "@/features/admin/admin-events/types/event.types";
 
 /**
@@ -149,6 +155,106 @@ const deleteEvent = async (eventId: number | string): Promise<void> => {
     });
 };
 
+/**
+ * `POST /events/{eventId}/dates` — adiciona nova data ao evento.
+ */
+const createEventDate = async (
+    eventId: number | string,
+    payload: CreateEventDatePayload
+): Promise<void> => {
+    await goTicketApi.post(`/events/${eventId}/dates`, payload, {
+        headers: authHeaders(),
+    });
+};
+
+/**
+ * `PATCH /events/{eventId}/dates/{eventDateId}` — atualiza intervalo de uma data.
+ */
+const updateEventDate = async (
+    eventId: number | string,
+    eventDateId: number | string,
+    payload: UpdateEventDatePayload
+): Promise<void> => {
+    await goTicketApi.patch(
+        `/events/${eventId}/dates/${eventDateId}`,
+        payload,
+        { headers: authHeaders() }
+    );
+};
+
+/**
+ * `DELETE /events/{eventId}/dates/{eventDateId}` — remove uma data do evento.
+ */
+const deleteEventDate = async (
+    eventId: number | string,
+    eventDateId: number | string
+): Promise<void> => {
+    await goTicketApi.delete(`/events/${eventId}/dates/${eventDateId}`, {
+        headers: authHeaders(),
+    });
+};
+
+/**
+ * `GET /venues/{venueId}/sectors` — lista os setores configurados para o espaço,
+ * usados como base para criar setores do evento.
+ */
+const listVenueSectors = async (
+    venueId: number | string,
+    signal?: AbortSignal
+): Promise<VenueSectorOptionDTO[]> => {
+    const response = await goTicketApi.get<VenueSectorOptionDTO[]>(
+        `/venues/${venueId}/sectors`,
+        { signal }
+    );
+    return response.data;
+};
+
+/**
+ * `POST /events/{eventId}/sectors` — cria um setor do evento a partir de um
+ * setor existente no espaço.
+ */
+const createEventSector = async (
+    eventId: number | string,
+    payload: CreateEventSectorPayload
+): Promise<EventSectorSummaryDTO> => {
+    const response = await goTicketApi.post<EventSectorSummaryDTO>(
+        `/events/${eventId}/sectors`,
+        payload,
+        { headers: authHeaders() }
+    );
+    return response.data;
+};
+
+/**
+ * `PATCH /events/{eventId}/sectors/{sectorId}` — atualiza nome/descrição/numeração
+ * de um setor do evento.
+ */
+const updateEventSector = async (
+    eventId: number | string,
+    sectorId: number | string,
+    payload: UpdateEventSectorPayload
+): Promise<EventSectorSummaryDTO> => {
+    const response = await goTicketApi.patch<EventSectorSummaryDTO>(
+        `/events/${eventId}/sectors/${sectorId}`,
+        payload,
+        { headers: authHeaders() }
+    );
+    return response.data;
+};
+
+/**
+ * `DELETE /events/{eventId}/sectors/{sectorId}` — remove um setor do evento
+ * (só permitido se não houver datas vinculadas a ele).
+ */
+const deleteEventSector = async (
+    eventId: number | string,
+    sectorId: number | string
+): Promise<void> => {
+    await goTicketApi.delete(`/events/${eventId}/sectors/${sectorId}`, {
+        headers: authHeaders(),
+    });
+};
+
 export default {
     getEvents,
     getAdminEvents,
@@ -158,4 +264,11 @@ export default {
     updateEventStatus,
     replaceEventImages,
     deleteEvent,
+    createEventDate,
+    updateEventDate,
+    deleteEventDate,
+    listVenueSectors,
+    createEventSector,
+    updateEventSector,
+    deleteEventSector,
 };

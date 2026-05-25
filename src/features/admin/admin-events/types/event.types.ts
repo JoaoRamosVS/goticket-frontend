@@ -51,6 +51,39 @@ export interface EventImageOrderItemDTO {
  * Espelha `tech.goticket.backendapi.event.dto.EventFullDTO`
  * retornado por `GET /events/{eventId}/details`.
  */
+export interface EventDateSectorSummaryDTO {
+    eventDateSectorId: number;
+    name: string;
+    description: string;
+    hasNumberedSeats: boolean;
+    venueSectorId: number | null;
+    mapElementId: string | null;
+    totalTickets: number | null;
+    soldTickets: number | null;
+    availableTickets: number | null;
+}
+
+export interface EventDateFullDTO {
+    eventDateId: number;
+    startDate: string;
+    endDate: string;
+    statusId: number | null;
+    statusName: string | null;
+    registerDate: string;
+    lastUpdateDate: string;
+    dateSectors: EventDateSectorSummaryDTO[];
+}
+
+export interface EventSectorSummaryDTO {
+    sectorId: number;
+    name: string;
+    description: string;
+    hasNumberedSeats: boolean;
+    venueSectorId: number | null;
+    mapElementId: string | null;
+    venueSectorMaxCapacity: number | null;
+}
+
 export interface EventFullDTO {
     eventId: number;
     title: string;
@@ -88,7 +121,40 @@ export interface EventFullDTO {
         sectorMapS3Key: string | null;
         sectorMapUrl: string | null;
     } | null;
+    eventDates: EventDateFullDTO[];
+    sectors: EventSectorSummaryDTO[];
     images: EventImageDTO[];
+}
+
+export interface CreateEventDatePayload {
+    startDate: string;
+    endDate: string;
+}
+
+export interface UpdateEventDatePayload {
+    startDate: string;
+    endDate: string;
+}
+
+export interface CreateEventSectorPayload {
+    name: string;
+    description: string;
+    hasNumberedSeats: boolean;
+    venueSectorId: number;
+}
+
+export interface UpdateEventSectorPayload {
+    name?: string;
+    description?: string;
+    hasNumberedSeats?: boolean;
+}
+
+export interface VenueSectorOptionDTO {
+    sectorID: number;
+    name: string;
+    description: string;
+    maxCapacity: number;
+    mapElementId: string | null;
 }
 
 /**
