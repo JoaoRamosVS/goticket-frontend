@@ -36,7 +36,7 @@ export default function HolderItemFields({ index, eligibilityTypes }: HolderItem
   const eligibilityTypeId = useWatch({ control, name: `holders.${index}.eligibilityTypeId` });
 
   return (
-    <div className="rounded-2xl border bg-background/60 backdrop-blur-md p-5 shadow-sm space-y-4">
+    <div className="rounded-4xl border bg-background/60 backdrop-blur-md p-5 shadow-sm space-y-4">
       <div className="flex items-center gap-2 mb-1">
         <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
           Ingresso {index + 1}

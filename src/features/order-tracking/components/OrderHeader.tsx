@@ -36,20 +36,20 @@ export default function OrderHeader({ orderId, status, totalPrice, currency }: O
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-      <div>
+      <div className="rounded-full border border-foreground/5 shadow-sm bg-white/50 p-6">
         <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">
           Pedido
         </p>
         <h1 className="text-3xl font-extrabold text-foreground">#{orderId}</h1>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 rounded-full border border-foreground/5 shadow-sm bg-white/50 p-6">
         <span
           className={`text-xs font-semibold px-3 py-1 rounded-full border ${badge.className}`}
         >
           {badge.label}
         </span>
-        <span className="text-2xl font-bold tabular-nums text-foreground">
+        <span className="text-3xl font-extrabold tabular-nums text-foreground">
           {formatCurrency(totalPrice, currency)}
         </span>
       </div>

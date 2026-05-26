@@ -24,8 +24,8 @@ export default function StripePaymentArea({ clientSecret, publishableKey }: Stri
   if (!stripePromise) return null;
 
   return (
-    <div className="rounded-2xl border bg-background/60 backdrop-blur-md p-5 shadow-sm space-y-4">
-      <h2 className="text-base font-semibold text-foreground">Pagamento</h2>
+    <div className="rounded-4xl border bg-white/60 backdrop-blur-md p-8 shadow-md space-y-4">
+      <h2 className="text-2xl font-bold text-foreground pb-2">Pagamento:</h2>
       <Elements stripe={stripePromise} options={{ clientSecret }}>
         <PaymentElementWrapper />
       </Elements>

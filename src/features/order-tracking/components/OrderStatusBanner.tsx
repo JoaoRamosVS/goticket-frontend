@@ -14,32 +14,32 @@ const BANNER: Record<OrderStatus, BannerConfig> = {
     title: "Aguardando confirmação de pagamento",
     description:
       "Seu pedido foi criado e os ingressos estão reservados. O status será atualizado automaticamente quando o pagamento for confirmado.",
-    className: "from-primary/20 to-[#2959b9]/20 border-primary/30 text-primary-foreground",
+    className: "from-primary to-[#2959b9] border-primary/10 text-white font-semibold",
   },
   PAID: {
-    icon: <CheckCircle2 className="size-6" />,
+    icon: <CheckCircle2 className="size-12" strokeWidth={2.5} />,
     title: "Pagamento confirmado!",
     description: "Seus ingressos foram gerados e estão disponíveis abaixo.",
-    className: "from-emerald-500/20 to-emerald-600/20 border-emerald-500/30 text-emerald-100",
+    className: "from-emerald-500 to-emerald-700 text-white font-semibold",
   },
   CANCELED: {
-    icon: <XCircle className="size-6" />,
+    icon: <XCircle className="size-12" strokeWidth={2.5} />,
     title: "Pedido cancelado",
     description: "Este pedido foi cancelado. Os ingressos reservados foram liberados.",
-    className: "from-red-500/20 to-red-600/20 border-red-500/30 text-red-100",
+    className: "from-red-500/20 to-red-600/20 border-red-500/30 text-white font-semibold",
   },
   EXPIRED: {
-    icon: <Clock className="size-6" />,
+    icon: <Clock className="size-12" strokeWidth={2.5} />,
     title: "Reserva expirada",
     description:
       "O tempo de 10 minutos para concluir o pagamento expirou. Os ingressos foram liberados.",
-    className: "from-zinc-500/20 to-zinc-600/20 border-zinc-500/30 text-zinc-300",
+    className: "from-zinc-500 to-zinc-700 border-zinc-500/30 text-white font-semibold",
   },
   REFUNDED: {
-    icon: <RefreshCw className="size-6" />,
+    icon: <RefreshCw className="size-12" strokeWidth={2.5} />,
     title: "Pedido reembolsado",
     description: "O valor pago foi estornado ao método de pagamento utilizado.",
-    className: "from-amber-500/20 to-amber-600/20 border-amber-500/30 text-amber-100",
+    className: "from-amber-500/20 to-amber-600/20 border-amber-500/30 text-white font-semibold",
   },
 };
 
@@ -52,11 +52,11 @@ export default function OrderStatusBanner({ status }: OrderStatusBannerProps) {
 
   return (
     <div
-      className={`rounded-2xl border bg-linear-to-r p-5 flex items-start gap-4 ${config.className}`}
+      className={`rounded-4xl shadow-2xl bg-linear-to-b px-8 py-6 flex items-start gap-4 ${config.className}`}
     >
       <div className="mt-0.5 shrink-0">{config.icon}</div>
       <div>
-        <p className="font-semibold">{config.title}</p>
+        <p className="font-extrabold text-3xl tracking-wider">{config.title}</p>
         <p className="text-sm opacity-80 mt-0.5">{config.description}</p>
       </div>
     </div>

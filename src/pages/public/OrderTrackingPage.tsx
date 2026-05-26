@@ -72,6 +72,7 @@ export default function OrderTrackingPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-6 md:px-12 py-12 mt-24 space-y-6">
+      <OrderStatusBanner status={order.status} />
       <OrderHeader
         orderId={order.orderId}
         status={order.status}
@@ -79,13 +80,12 @@ export default function OrderTrackingPage() {
         currency={order.currency}
       />
 
-      <OrderStatusBanner status={order.status} />
 
       {order.status === "PENDING_PAYMENT" && (
         <div className="flex items-center gap-2">
           <ExpirationCountdown expiresAt={order.expiresAt} />
           {isPolling && (
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs text-muted-foreground font-semibold">
               Verificando status...
             </span>
           )}

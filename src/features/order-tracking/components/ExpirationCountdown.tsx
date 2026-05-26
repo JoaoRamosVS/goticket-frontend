@@ -33,12 +33,12 @@ export default function ExpirationCountdown({ expiresAt }: ExpirationCountdownPr
 
   return (
     <div
-      className={`inline-flex items-center gap-2 text-sm font-semibold px-3 py-1.5 rounded-full border ${
+      className={`inline-flex items-center gap-2 text-lg font-bold text-white shadow-md px-3 py-1.5 rounded-full ${
         isExpired
-          ? "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"
+          ? "bg-linear-to-r from-zinc-500 to-zinc-400"
           : isUrgent
-          ? "bg-red-500/10 text-red-400 border-red-500/20 animate-pulse"
-          : "bg-amber-500/10 text-amber-400 border-amber-500/20"
+          ? "bg-linear-to-l from-red-800 to-red-400"
+          : "bg-linear-to-r from-amber-500 to-amber-400"
       }`}
     >
       <Timer className="size-4" />
