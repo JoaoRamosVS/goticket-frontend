@@ -25,7 +25,7 @@ function generateDateRowId(): string {
     return `date-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-export const useNewOrganizerEvent = (onCreated: (eventId?: number) => void) => {
+export const useNewOrganizerEvent = (onCreated: (eventId: number) => void) => {
     const [step, setStep] = useState<NewEventStepIndex>(0);
     const [maxStepReached, setMaxStepReached] = useState<NewEventStepIndex>(0);
     const [form, setForm] = useState<NewEventFormState>(EMPTY_NEW_EVENT_FORM);
@@ -154,8 +154,8 @@ export const useNewOrganizerEvent = (onCreated: (eventId?: number) => void) => {
             setIsSubmitting(true);
             setError(null);
             try {
-                await newEventService.createEvent(payload);
-                onCreated();
+                const eventId = await newEventService.createEvent(payload);
+                onCreated(eventId);
             } catch (err: unknown) {
                 const message =
                     axios.isAxiosError(err) && err.response?.data?.errors?.length

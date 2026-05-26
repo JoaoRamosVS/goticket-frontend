@@ -415,7 +415,7 @@ const Navbar = () => {
 									<Button
 										variant="ghost"
 										size="sm"
-										className="rounded-full font-medium text-sm px-3 font-semibold"
+										className="rounded-full text-sm px-3 font-semibold"
 									>
 										Cadastrar-se
 									</Button>

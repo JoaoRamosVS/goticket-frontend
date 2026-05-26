@@ -35,7 +35,8 @@ import OrganizerLayout from '@/layouts/OrganizerLayout';
 import OrganizerDashboard from '@/pages/organizer/Dashboard';
 import OrganizerEventosList from '@/pages/organizer/eventos/EventosList';
 import OrganizerEditarEvento from '@/pages/organizer/eventos/EditarEvento';
-import OrganizerNovoEvento from '@/pages/organizer/eventos/NovoEvento';
+import OrganizerNovoEvento from '@/pages/organizer/eventos/NovoEvento'
+import OrganizerConfigurarEvento from '@/pages/organizer/eventos/ConfigurarEvento';
 
 import { ToastProvider } from '@/components/ui/toast';
 import BuscaPage from '@/pages/public/BuscaPage';
@@ -96,6 +97,7 @@ function AppContent() {
           <Route path="eventos/:eventId" element={<OrganizerEditarEvento />} />
 
           <Route path="novo-evento" element={<OrganizerNovoEvento />} />
+          <Route path="eventos/:eventId/configurar" element={<OrganizerConfigurarEvento />} />
         </Route>
       </Routes>
     </SmoothScroll>

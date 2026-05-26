@@ -38,13 +38,12 @@ const OrganizerNovoEvento = () => {
     const navigate = useNavigate();
     const { showToast } = useToast();
 
-    const flow = useNewOrganizerEvent(() => {
+    const flow = useNewOrganizerEvent((eventId) => {
         showToast({
             type: "success",
-            message:
-                "Evento enviado para aprovação. Acompanhe pelo dashboard ou pela lista de eventos.",
+            message: "Evento enviado para aprovação. Configure os setores e lotes agora.",
         });
-        navigate("/organizer/dashboard");
+        navigate(`/organizer/eventos/${eventId}/configurar`);
     });
 
     const handleVoltar = () => {
