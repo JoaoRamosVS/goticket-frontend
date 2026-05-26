@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import EventDateHeader from "@/features/ticket-purchase/components/EventDateHeader";
 import SectorList from "@/features/ticket-purchase/components/SectorList";
 import SectorMapViewer from "@/features/ticket-purchase/components/SectorMapViewer";
@@ -6,10 +6,11 @@ import TicketTypePicker from "@/features/ticket-purchase/components/TicketTypePi
 import useEventDateTickets from "@/features/ticket-purchase/hooks/useEventDateTickets";
 import useSectorMap from "@/features/ticket-purchase/hooks/useSectorMap";
 import useTicketSelection from "@/features/ticket-purchase/hooks/useTicketSelection";
-import { useToast } from "@/components/ui/toast";
+import type { CheckoutNavigationState } from "@/features/checkout/types/checkout-state.types";
 
 const EventDateTicketsPage = () => {
     const { eventId, eventDateId } = useParams();
+    const navigate = useNavigate();
     const { data, isLoading, error } = useEventDateTickets(eventId, eventDateId);
     const sectors = data?.sectors ?? [];
     const {
@@ -25,7 +26,6 @@ const EventDateTicketsPage = () => {
     const { map: sectorMap, isLoading: isMapLoading } = useSectorMap(
         data?.venueId ?? null
     );
-    const { showToast } = useToast();
 
     if (isLoading) {
         return (
@@ -62,11 +62,18 @@ const EventDateTicketsPage = () => {
 
     const handleConfirm = () => {
         if (totals.totalQuantity <= 0) return;
-        showToast({
-            type: "info",
-            title: "Em breve",
-            message:
-                "O fluxo de checkout ainda está sendo construído. Sua seleção foi registrada.",
+        navigate("/checkout", {
+            state: {
+                eventId: data!.eventId,
+                eventTitle: data!.eventTitle,
+                eventImage: data!.eventImage,
+                eventDateId: data!.eventDateId,
+                startDate: data!.startDate,
+                venueName: data!.venueName,
+                venueCity: data!.venueCity,
+                sectorName: selectedSector?.name ?? "",
+                lines: totals.lines,
+            } satisfies CheckoutNavigationState,
         });
     };
 
