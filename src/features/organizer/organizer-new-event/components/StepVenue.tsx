@@ -42,7 +42,7 @@ export const StepVenue = ({
     const selectedVenue = useMemo(
         () =>
             form.venueId
-                ? venues.find((v) => String(v.venueID) === form.venueId)
+                ? venues.find((v) => String(v.venueId) === form.venueId)
                 : null,
         [form.venueId, venues]
     );
@@ -79,13 +79,13 @@ export const StepVenue = ({
                 >
                     {filteredVenues.map((venue) => {
                         const isSelected =
-                            form.venueId === String(venue.venueID);
+                            form.venueId === String(venue.venueId);
                         return (
                             <button
-                                key={venue.venueID}
+                                key={venue.venueId}
                                 type="button"
                                 onClick={() =>
-                                    onChange("venueId", String(venue.venueID))
+                                    onChange("venueId", String(venue.venueId))
                                 }
                                 className={`group relative flex items-start gap-3 rounded-2xl cursor-pointer hover:scale-95 border p-3 text-left transition-all duration-300 ${
                                     isSelected

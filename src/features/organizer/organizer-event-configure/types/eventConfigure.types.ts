@@ -55,7 +55,7 @@ export interface EventDateFull {
 export interface EventConfigureResponse {
     eventId: number;
     title: string;
-    venue: { venueID: number; name: string };
+    venue: { venueId: number; name: string };
     sectors: EventSectorSummary[];
     eventDates: EventDateFull[];
 }

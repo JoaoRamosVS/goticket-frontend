@@ -44,7 +44,7 @@ export const useEventConfigure = (eventId: number) => {
 
     useEffect(() => {
         if (!event) return;
-        const venueId = event.venue.venueID;
+        const venueId = event.venue.venueId;
         const controller = new AbortController();
         setVenueSectorsLoading(true);
         eventConfigureService
@@ -58,7 +58,7 @@ export const useEventConfigure = (eventId: number) => {
                 if (!controller.signal.aborted) setVenueSectorsLoading(false);
             });
         return () => controller.abort();
-    }, [event?.venue.venueID]);
+    }, [event?.venue.venueId]);
 
     const refresh = useCallback(async () => {
         const data = await fetchEvent();

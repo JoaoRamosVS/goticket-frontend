@@ -30,7 +30,7 @@ export const StepReview = ({ form, categories, venues }: StepReviewProps) => {
     const category =
         categories.find((c) => String(c.categoryId) === form.categoryId) ?? null;
     const venue =
-        venues.find((v) => String(v.venueID) === form.venueId) ?? null;
+        venues.find((v) => String(v.venueId) === form.venueId) ?? null;
 
     return (
         <div className="flex flex-col gap-4">

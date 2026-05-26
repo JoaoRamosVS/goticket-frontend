@@ -51,7 +51,7 @@ export const useVenues = () => {
     const filteredVenues = useMemo(() => {
         if (!normalizedSearch) return venues;
         return venues.filter((venue) => {
-            const idMatch = String(venue.venueID).toLowerCase().includes(normalizedSearch);
+            const idMatch = String(venue.venueId).toLowerCase().includes(normalizedSearch);
             const nameMatch = venue.name?.toLowerCase().includes(normalizedSearch);
             const legalMatch = venue.legalName?.toLowerCase().includes(normalizedSearch);
             const cnpjMatch = venue.CNPJ?.toLowerCase().includes(normalizedSearch);

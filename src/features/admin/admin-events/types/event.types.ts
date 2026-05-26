@@ -107,7 +107,7 @@ export interface EventFullDTO {
         cnpj: string;
     } | null;
     venue: {
-        venueID: number;
+        venueId: number;
         name: string;
         cnpj: string | null;
         description: string | null;

@@ -139,7 +139,7 @@ export const VenuesTable = ({
                         ) : (
                             filteredVenues.map((venue) => (
                                 <VenueRow
-                                    key={venue.venueID}
+                                    key={venue.venueId}
                                     venue={venue}
                                     onEdit={onEdit}
                                 />
@@ -264,7 +264,7 @@ const VenueRow = ({ venue, onEdit }: VenueRowProps) => {
                 <div className="flex items-center justify-start gap-2">
                     <button
                         type="button"
-                        onClick={() => onEdit(venue.venueID)}
+                        onClick={() => onEdit(venue.venueId)}
                         className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold text-white transition-all duration-300 hover:brightness-110 hover:shadow-lg"
                         style={{
                             background:

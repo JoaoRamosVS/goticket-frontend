@@ -436,7 +436,7 @@ const MetadataCard = ({ venue }: MetadataCardProps) => (
     <GlassCard>
         <SectionHeader title="Metadados" />
         <ul className="flex flex-col gap-2.5 text-sm">
-            <MetaRow label="ID do espaço" value={String(venue.venueID)} mono />
+            <MetaRow label="ID do espaço" value={String(venue.venueId)} mono />
             <MetaRow
                 label="Organizador"
                 value={

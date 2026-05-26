@@ -152,7 +152,7 @@ export default function NewVenue() {
                     )}
                     {venueFlow.step === 4 && venueFlow.createdVenue && (
                         <StepVenueMapSvg
-                            venueId={venueFlow.createdVenue.venueID}
+                            venueId={venueFlow.createdVenue.venueId}
                             venue={venueFlow.venueForMap ?? venueFlow.createdVenue}
                             mapCompleted={venueFlow.mapCompleted}
                             onMapSaved={venueFlow.onMapSaved}

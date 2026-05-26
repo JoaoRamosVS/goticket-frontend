@@ -69,11 +69,11 @@ export const useVenueMapEditor = ({
 
         const loadSectors = venueService.listVenueSectors(venueId, controller.signal);
         const loadSvgText = async (): Promise<string> => {
-            if (!venue?.venueID) return "";
+            if (!venue?.venueId) return "";
             try {
                 const accessToken = localStorage.getItem("accessToken");
                 const response = await fetch(
-                    `${import.meta.env.VITE_API_URL}/venues/${venue.venueID}/sector-map`,
+                    `${import.meta.env.VITE_API_URL}/venues/${venue.venueId}/sector-map`,
                     {
                         signal: controller.signal,
                         headers: accessToken
@@ -137,7 +137,7 @@ export const useVenueMapEditor = ({
             });
 
         return () => controller.abort();
-    }, [venueId, venue?.venueID]);
+    }, [venueId, venue?.venueId]);
 
     useEffect(() => {
         if (!baseImage || baseImage.naturalWidth <= 0 || baseImage.naturalHeight <= 0) {

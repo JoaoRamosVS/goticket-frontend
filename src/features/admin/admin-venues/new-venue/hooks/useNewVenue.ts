@@ -143,18 +143,18 @@ export function useNewVenue() {
     useEffect(() => {
         if (step !== 3 || !createdVenue) return;
         const ac = new AbortController();
-        syncSectorsFromApi(createdVenue.venueID, ac.signal).catch(() => {
+        syncSectorsFromApi(createdVenue.venueId, ac.signal).catch(() => {
             if (!ac.signal.aborted) {
                 setDraftSectors((prev) => (prev.length > 0 ? prev : [newDraftSector(0)]));
             }
         });
         return () => ac.abort();
-    }, [step, createdVenue?.venueID, syncSectorsFromApi]);
+    }, [step, createdVenue?.venueId, syncSectorsFromApi]);
 
     useEffect(() => {
         if (step === 4 && createdVenue) {
             const ac = new AbortController();
-            refreshVenueDetail(createdVenue.venueID, ac.signal)
+            refreshVenueDetail(createdVenue.venueId, ac.signal)
                 .then(setVenueForMap)
                 .catch(() => {
                     if (!ac.signal.aborted) setVenueForMap(createdVenue);
@@ -218,7 +218,7 @@ export function useNewVenue() {
                     };
                     venue = await persistNewVenue(payload);
                 }
-                if (!venue?.venueID) {
+                if (!venue?.venueId) {
                     throw new Error("Não foi possível obter o identificador do espaço criado.");
                 }
                 setCreatedVenue(venue);
@@ -234,7 +234,7 @@ export function useNewVenue() {
                 if (isDuplicateCnpj) {
                     try {
                         const recoveredVenue = await findVenueByCnpjForNewVenue(form.CNPJ);
-                        if (recoveredVenue?.venueID) {
+                        if (recoveredVenue?.venueId) {
                             setCreatedVenue(recoveredVenue);
                             const next = 3 as NewVenueStepIndex;
                             setStep(next);
@@ -266,8 +266,8 @@ export function useNewVenue() {
                     maxCapacity: d.maxCapacity,
                     mapElementId: d.mapElementId.trim(),
                 }));
-                await venueService.replaceVenueSectors(createdVenue.venueID, sectorsPayload);
-                const refreshed = await refreshVenueDetail(createdVenue.venueID);
+                await venueService.replaceVenueSectors(createdVenue.venueId, sectorsPayload);
+                const refreshed = await refreshVenueDetail(createdVenue.venueId);
                 setCreatedVenue(refreshed);
                 const next = 4 as NewVenueStepIndex;
                 setStep(next);
@@ -305,7 +305,7 @@ export function useNewVenue() {
     const onMapSaved = useCallback(() => {
         setMapCompleted(true);
         if (createdVenue) {
-            void refreshVenueDetail(createdVenue.venueID).then(setCreatedVenue);
+            void refreshVenueDetail(createdVenue.venueId).then(setCreatedVenue);
         }
     }, [createdVenue]);
 

@@ -40,7 +40,7 @@ export function StepOrganizer({
                             Espaço já criado no sistema
                         </p>
                         <p className="mt-1 text-xs font-medium text-emerald-800/90">
-                            {createdVenue.name} · ID {createdVenue.venueID}
+                            {createdVenue.name} · ID {createdVenue.venueId}
                         </p>
                         <p className="mt-2 text-[11px] text-emerald-800/75">
                             Você pode voltar às etapas anteriores para revisar dados. O cadastro não

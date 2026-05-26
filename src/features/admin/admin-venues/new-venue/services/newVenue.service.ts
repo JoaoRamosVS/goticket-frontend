@@ -58,7 +58,7 @@ export async function findVenueByCnpjForNewVenue(
             (venue) => normalizeCnpjDigits(venue.CNPJ) === wanted
         );
         if (match) {
-            return venueService.getVenueById(match.venueID, signal);
+            return venueService.getVenueById(match.venueId, signal);
         }
 
         page += 1;

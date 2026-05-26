@@ -3,7 +3,7 @@
  * Espelha `tech.goticket.backendapi.venue.dto.VenueMinDTO`.
  */
 export interface VenueMinDTO {
-    venueID: number;
+    venueId: number;
     name: string;
     legalName: string;
     CNPJ: string;

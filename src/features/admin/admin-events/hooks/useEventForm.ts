@@ -193,7 +193,7 @@ export const useEventForm = (eventId?: string) => {
         return () => controller.abort();
     }, []);
 
-    const venueId = event?.venue?.venueID ?? null;
+    const venueId = event?.venue?.venueId ?? null;
 
     useEffect(() => {
         if (!venueId) {
