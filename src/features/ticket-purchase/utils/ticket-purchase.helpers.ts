@@ -54,7 +54,7 @@ function pickStartingPriceForSector(
 
 function mapSector(sector: EventPageDateSectorDTO): EventDateSectorOption {
     return {
-        eventDateSectorId: sector.eventDateSectorID,
+        eventDateSectorId: sector.eventDateSectorId,
         name: sector.name,
         description: sector.description ?? "",
         hasNumberedSeats: sector.hasNumberedSeats,
@@ -73,7 +73,7 @@ export function mapEventDateTickets(
     eventId: string,
     eventDateId: number
 ): EventDateTickets | null {
-    const date = dto.dates?.find((d) => d.eventDateID === eventDateId);
+    const date = dto.dates?.find((d) => d.eventDateId === eventDateId);
     if (!date) return null;
 
     const orderedImages = [...(dto.images ?? [])].sort(
@@ -92,7 +92,7 @@ export function mapEventDateTickets(
         venueName: dto.venue?.name ?? "Local a confirmar",
         venueCity: dto.venue?.city ?? "",
         venueState: dto.venue?.state ?? "",
-        eventDateId: date.eventDateID,
+        eventDateId: date.eventDateId,
         startDate: date.startDate,
         endDate: date.endDate,
         statusId: date.statusId ?? null,
@@ -158,7 +158,7 @@ export function computeTotals(
             label: ticketTypeLabel(type),
             quantity,
             unitPrice,
-            allotmentId: allotment.allotmentID,
+            allotmentId: allotment.allotmentId,
             batchNumber: allotment.batchNumber,
         });
     }

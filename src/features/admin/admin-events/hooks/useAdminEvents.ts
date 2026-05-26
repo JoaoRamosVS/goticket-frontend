@@ -56,7 +56,7 @@ export const useAdminEvents = () => {
     const filteredEvents = useMemo(() => {
         if (!normalizedSearch) return events;
         return events.filter((event) => {
-            const idMatch = String(event.eventID).includes(normalizedSearch);
+            const idMatch = String(event.eventId).includes(normalizedSearch);
             const titleMatch = event.title
                 ?.toLowerCase()
                 .includes(normalizedSearch);
@@ -66,13 +66,13 @@ export const useAdminEvents = () => {
 
     const handleDelete = async (event: EventMinDTO) => {
         const confirmed = window.confirm(
-            `Excluir permanentemente o evento "${event.title}" (ID ${event.eventID})?`
+            `Excluir permanentemente o evento "${event.title}" (ID ${event.eventId})?`
         );
         if (!confirmed) return;
 
         try {
-            setDeletingId(event.eventID);
-            await eventService.deleteEvent(event.eventID);
+            setDeletingId(event.eventId);
+            await eventService.deleteEvent(event.eventId);
             await loadEvents(page);
             showToast({
                 type: "success",

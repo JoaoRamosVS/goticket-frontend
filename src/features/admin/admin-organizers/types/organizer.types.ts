@@ -19,7 +19,7 @@ export interface CreateOrganizerDTO {
 export interface OrganizerDetailDTO {
     userId: string;
     email: string;
-    role: { roleID: number; name: "ADMIN" | "ORGANIZER" | "CLIENT" };
+    role: { roleId: number; name: "ADMIN" | "ORGANIZER" | "CLIENT" };
     status: { statusId: number; name: StatusValue };
     organizerName: string;
     legalName: string;
@@ -40,7 +40,7 @@ export interface OrganizerDetailDTO {
  * Espelha `tech.goticket.backendapi.organizer.dto.OrganizerMinDTO`.
  */
 export interface OrganizerMinDTO {
-    userID: string;
+    userId: string;
     email: string;
     organizerName: string;
     legalName: string;

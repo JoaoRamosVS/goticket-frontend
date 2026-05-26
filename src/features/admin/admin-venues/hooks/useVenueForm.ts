@@ -37,10 +37,10 @@ const EMPTY_FORM: FormState = {
 
 const STATUS_OPTIONS: Record<
     StatusValue,
-    { statusID: number; name: StatusValue }
+    { statusId: number; name: StatusValue }
 > = {
-    ACTIVE: { statusID: 1, name: "ACTIVE" },
-    INACTIVE: { statusID: 2, name: "INACTIVE" },
+    ACTIVE: { statusId: 1, name: "ACTIVE" },
+    INACTIVE: { statusId: 2, name: "INACTIVE" },
 };
 
 function venueToFormState(venue: VenueDetailDTO): FormState {

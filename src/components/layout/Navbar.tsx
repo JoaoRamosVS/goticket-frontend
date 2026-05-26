@@ -70,11 +70,11 @@ const SuggestionsPanel = ({
 					<>
 						<ul>
 							{suggestions.map((event) => (
-								<li key={event.eventID}>
+								<li key={event.eventId}>
 									<button
 										className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-accent/50 transition-colors text-left"
 										onMouseDown={(e) => e.preventDefault()}
-										onClick={() => onSuggestionClick(event.eventID)}
+										onClick={() => onSuggestionClick(event.eventId)}
 									>
 										<Search className="size-3.5 text-muted-foreground shrink-0" strokeWidth={3}/>
 										<span className="flex-1 text-sm truncate">{event.title}</span>

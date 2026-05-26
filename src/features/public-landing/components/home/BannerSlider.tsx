@@ -234,7 +234,7 @@ const BannerSlider = ({ events }: BannerSliderProps) => {
 
                             return (
                                 <article
-                                    key={`${banner.eventID}-${index}`}
+                                    key={`${banner.eventId}-${index}`}
                                     style={{
                                         width:
                                             slideWidthPx > 0
@@ -311,7 +311,7 @@ const BannerSlider = ({ events }: BannerSliderProps) => {
                                                     background: "linear-gradient(135deg, #4db8e8 0%, #2a8fd4 50%, #1c6fb5 100%)",
                                                     boxShadow: "0 4px 14px -3px rgba(42,143,212,0.45)",
                                                 }}
-                                                onClick={() => navigate(`/evento/${currentEvent.eventID}`)}
+                                                onClick={() => navigate(`/evento/${currentEvent.eventId}`)}
                                             >
                                                 a partir de {formatEventStartingPrice(banner)}
                                                 <ArrowIcon className="size-4" strokeWidth={4} />
@@ -360,7 +360,7 @@ const BannerSlider = ({ events }: BannerSliderProps) => {
 
                                 return (
                                     <button
-                                        key={banner.eventID}
+                                        key={banner.eventId}
                                         type="button"
                                         role="tab"
                                         aria-selected={isActive}

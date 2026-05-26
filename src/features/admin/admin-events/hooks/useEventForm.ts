@@ -97,8 +97,8 @@ function buildPatchPayload(
 
 function sortEventImages(images: EventImageDTO[]): EventImageDTO[] {
     return [...images].sort((a, b) => {
-        const oa = a.ordination ?? a.eventImageID ?? 0;
-        const ob = b.ordination ?? b.eventImageID ?? 0;
+        const oa = a.ordination ?? a.eventImageId ?? 0;
+        const ob = b.ordination ?? b.eventImageId ?? 0;
         return oa - ob;
     });
 }

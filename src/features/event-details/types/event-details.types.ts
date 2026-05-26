@@ -69,7 +69,7 @@ interface EventPageOrganizerDTO {
 }
 
 interface EventPageStatusDTO {
-  statusID: number;
+  statusId: number;
   name: string;
 }
 
@@ -91,7 +91,7 @@ interface EventPageVenueDTO {
 }
 
 export interface EventPageAllotmentDTO {
-  allotmentID: number;
+  allotmentId: number;
   batchNumber: number;
   price: number;
   availableTickets: number;
@@ -102,7 +102,7 @@ export type EventPageAllotmentsByType = Partial<
 >;
 
 export interface EventPageDateSectorDTO {
-  eventDateSectorID: number;
+  eventDateSectorId: number;
   name: string;
   description: string;
   hasNumberedSeats: boolean;
@@ -114,7 +114,7 @@ export interface EventPageDateSectorDTO {
 }
 
 export interface EventPageDateDTO {
-  eventDateID: number;
+  eventDateId: number;
   startDate: string;
   endDate: string;
   statusId: number | null;
@@ -122,7 +122,7 @@ export interface EventPageDateDTO {
 }
 
 interface EventPageImageDTO {
-  eventImageID: number;
+  eventImageId: number;
   s3Key: string;
   ordination: number;
 }

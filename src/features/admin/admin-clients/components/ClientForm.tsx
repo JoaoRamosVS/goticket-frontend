@@ -428,7 +428,7 @@ const MetadataCard = ({ client }: MetadataCardProps) => (
         <SectionHeader title="Metadados" />
         <ul className="flex flex-col gap-2.5 text-sm">
             <MetaRow label="Papel" value={client.role?.name ?? "—"} />
-            <MetaRow label="ID do usuário" value={client.userID ?? "—"} mono />
+            <MetaRow label="ID do usuário" value={client.userId ?? "—"} mono />
             <MetaRow
                 label="Cadastrado em"
                 value={

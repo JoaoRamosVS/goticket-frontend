@@ -54,7 +54,7 @@ function mapDateSummary(date: EventPageDateDTO): EventDateSummary {
     );
 
     return {
-        eventDateId: date.eventDateID,
+        eventDateId: date.eventDateId,
         start: date.startDate,
         end: date.endDate,
         statusId: date.statusId ?? null,

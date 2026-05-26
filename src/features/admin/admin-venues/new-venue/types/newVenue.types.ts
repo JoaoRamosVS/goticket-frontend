@@ -45,8 +45,8 @@ export type NewVenueDraftSector = {
     mapElementId: string;
 };
 
-export type NewVenueFormState = Omit<CreateVenuePayload, "organizerID"> & {
-    organizerID: string;
+export type NewVenueFormState = Omit<CreateVenuePayload, "organizerId"> & {
+    organizerId: string;
 };
 
 export const EMPTY_NEW_VENUE_FORM: NewVenueFormState = {
@@ -61,5 +61,5 @@ export const EMPTY_NEW_VENUE_FORM: NewVenueFormState = {
     state: "",
     country: "Brasil",
     zipCode: "",
-    organizerID: "",
+    organizerId: "",
 };

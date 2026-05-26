@@ -5,7 +5,7 @@ import type {
 
 export type EditableSector = {
     localId: string;
-    sectorID?: number;
+    sectorId?: number;
     name: string;
     description: string;
     maxCapacity: number;

@@ -15,7 +15,7 @@ const EventGrid = ({ events, className }: EventGridProps) => (
         )}
     >
         {events.map((event) => (
-            <EventCard key={event.eventID} event={event} />
+            <EventCard key={event.eventId} event={event} />
         ))}
     </div>
 );

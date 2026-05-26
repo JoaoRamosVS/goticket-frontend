@@ -410,7 +410,7 @@ const MetadataCard = ({ organizer }: MetadataCardProps) => (
             <MetaRow label="Papel" value={organizer.role?.name ?? "—"} />
             <MetaRow
                 label="ID do usuário"
-                value={organizer.userID ?? "—"}
+                value={organizer.userId ?? "—"}
                 mono
             />
             <MetaRow

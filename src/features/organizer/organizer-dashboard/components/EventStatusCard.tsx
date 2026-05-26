@@ -20,7 +20,7 @@ export const EventStatusCard = ({ event, onOpen }: EventStatusCardProps) => {
     return (
         <button
             type="button"
-            onClick={() => onOpen(event.eventID)}
+            onClick={() => onOpen(event.eventId)}
             className="cursor-pointer group relative w-full overflow-hidden rounded-2xl border border-white/70 bg-white/55 text-left transition-all duration-300 hover:scale-[1.01] hover:bg-white/80 hover:shadow-lg"
             style={{
                 boxShadow:
@@ -47,7 +47,7 @@ export const EventStatusCard = ({ event, onOpen }: EventStatusCardProps) => {
                         {event.title}
                     </p>
                     <p className="truncate text-[10px] font-semibold uppercase tracking-[0.1em] text-[#5e6c87]/80">
-                        #{event.eventID} · {event.categoryName ?? "Sem categoria"}
+                        #{event.eventId} · {event.categoryName ?? "Sem categoria"}
                     </p>
                 </div>
             </div>

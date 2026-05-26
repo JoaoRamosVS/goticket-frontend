@@ -194,7 +194,7 @@ const EventsCarousel = ({ title, events }: EventsCarouselProps) => {
                 >
                     {events.map((event) => (
                         <div
-                            key={event.eventID}
+                            key={event.eventId}
                             style={{
                                 width: cardWidthPx > 0 ? cardWidthPx : undefined,
                                 flex: "0 0 auto",

@@ -54,7 +54,7 @@ export const useOrganizers = () => {
     const filteredOrganizers = useMemo(() => {
         if (!normalizedSearch) return organizers;
         return organizers.filter((organizer) => {
-            const idMatch = String(organizer.userID).toLowerCase().includes(normalizedSearch);
+            const idMatch = String(organizer.userId).toLowerCase().includes(normalizedSearch);
             const emailMatch = organizer.email?.toLowerCase().includes(normalizedSearch);
             const nameMatch = organizer.organizerName?.toLowerCase().includes(normalizedSearch);
             const legalMatch = organizer.legalName?.toLowerCase().includes(normalizedSearch);

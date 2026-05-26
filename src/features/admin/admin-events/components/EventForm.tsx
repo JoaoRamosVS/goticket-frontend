@@ -138,8 +138,8 @@ const STATUS_COLORS: Record<
 
 function sortEventImages(images: EventImageDTO[]): EventImageDTO[] {
     return [...images].sort((a, b) => {
-        const oa = a.ordination ?? a.eventImageID ?? 0;
-        const ob = b.ordination ?? b.eventImageID ?? 0;
+        const oa = a.ordination ?? a.eventImageId ?? 0;
+        const ob = b.ordination ?? b.eventImageId ?? 0;
         return oa - ob;
     });
 }
@@ -1654,7 +1654,7 @@ const EventSectorsPanel = ({
 
     const availableVenueSectors = useMemo(
         () =>
-            venueSectors.filter((vs) => !usedVenueSectorIds.has(vs.sectorID)),
+            venueSectors.filter((vs) => !usedVenueSectorIds.has(vs.sectorId)),
         [venueSectors, usedVenueSectorIds]
     );
 
@@ -1679,7 +1679,7 @@ const EventSectorsPanel = ({
 
     const handleVenueSectorChange = (value: string) => {
         setNewVenueSectorId(value);
-        const found = venueSectors.find((vs) => String(vs.sectorID) === value);
+        const found = venueSectors.find((vs) => String(vs.sectorId) === value);
         if (found) {
             if (!newName.trim()) setNewName(found.name);
             if (!newDescription.trim()) setNewDescription(found.description);
@@ -1810,7 +1810,7 @@ const EventSectorsPanel = ({
                                     Selecione um setor do espaço
                                 </option>
                                 {availableVenueSectors.map((vs) => (
-                                    <option key={vs.sectorID} value={vs.sectorID}>
+                                    <option key={vs.sectorId} value={vs.sectorId}>
                                         {vs.name} (capacidade {vs.maxCapacity})
                                     </option>
                                 ))}

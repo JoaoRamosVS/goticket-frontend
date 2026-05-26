@@ -23,7 +23,7 @@ export const StepSectors = ({
     const linkedVenueSectorIds = new Set(event.sectors.map((s) => s.venueSectorId));
 
     const handleAdd = async (venueSector: VenueSectorDTO) => {
-        setLoadingId(venueSector.sectorID);
+        setLoadingId(venueSector.sectorId);
         try {
             await onAdd(venueSector);
         } finally {
@@ -60,12 +60,12 @@ export const StepSectors = ({
                 ) : (
                     <div className="flex flex-col gap-2">
                         {venueSectors.map((vs) => {
-                            const isLinked = linkedVenueSectorIds.has(vs.sectorID);
-                            const isLoading = loadingId === vs.sectorID;
+                            const isLinked = linkedVenueSectorIds.has(vs.sectorId);
+                            const isLoading = loadingId === vs.sectorId;
 
                             return (
                                 <div
-                                    key={vs.sectorID}
+                                    key={vs.sectorId}
                                     className="flex items-center justify-between rounded-2xl border border-white/70 bg-white/50 px-4 py-3 backdrop-blur-xl shadow-sm"
                                 >
                                     <div>

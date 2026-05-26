@@ -1,5 +1,5 @@
 export interface EventMinDTO {
-    eventID: number;
+    eventId: number;
     title: string;
     startDate: string;
     statusId: number | null;
@@ -31,7 +31,7 @@ export type EventStatusName =
     | "POSTPONED";
 
 export interface EventImageDTO {
-    eventImageID?: number;
+    eventImageId?: number;
     s3Key: string;
     ordination?: number;
 }
@@ -150,7 +150,7 @@ export interface UpdateEventSectorPayload {
 }
 
 export interface VenueSectorOptionDTO {
-    sectorID: number;
+    sectorId: number;
     name: string;
     description: string;
     maxCapacity: number;

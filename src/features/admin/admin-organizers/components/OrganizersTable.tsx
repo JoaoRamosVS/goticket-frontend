@@ -139,7 +139,7 @@ export const OrganizersTable = ({
                         ) : (
                             filteredOrganizers.map((organizer) => (
                                 <OrganizerRow
-                                    key={organizer.userID}
+                                    key={organizer.userId}
                                     organizer={organizer}
                                     onEdit={onEdit}
                                 />
@@ -260,7 +260,7 @@ const OrganizerRow = ({ organizer, onEdit }: OrganizerRowProps) => {
                 <div className="flex items-center justify-start gap-2">
                     <button
                         type="button"
-                        onClick={() => onEdit(organizer.userID)}
+                        onClick={() => onEdit(organizer.userId)}
                         className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold text-white transition-all duration-300 hover:brightness-110 hover:shadow-lg"
                         style={{
                             background:

@@ -70,7 +70,7 @@ const EventCard = ({ event }: EventCardProps) => {
                     boxShadow:
                         "0 4px 14px -3px rgba(42,143,212,0.45), 0 1px 3px rgba(42,143,212,0.2)",
                 }}
-                onClick={() => navigate(`/evento/${event.eventID}`)}
+                onClick={() => navigate(`/evento/${event.eventId}`)}
             >
                 {formattedPrice
                     ? `Preços a partir de ${formattedPrice}`

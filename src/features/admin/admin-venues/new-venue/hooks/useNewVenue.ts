@@ -104,7 +104,7 @@ export function useNewVenue() {
                 }
             }
             if (s === 2) {
-                if (!form.organizerID.trim()) return "Selecione um organizador.";
+                if (!form.organizerId.trim()) return "Selecione um organizador.";
             }
             if (s === 3) {
                 if (draftSectors.length === 0) return "Adicione ao menos um setor.";
@@ -133,7 +133,7 @@ export function useNewVenue() {
                     name: r.name,
                     description: r.description,
                     maxCapacity: r.maxCapacity,
-                    mapElementId: r.mapElementId?.trim() || `poly-${r.sectorID}`,
+                    mapElementId: r.mapElementId?.trim() || `poly-${r.sectorId}`,
                 }))
             );
         },
@@ -214,7 +214,7 @@ export function useNewVenue() {
                         state: form.state.trim(),
                         country: form.country.trim(),
                         zipCode: form.zipCode.trim(),
-                        organizerID: form.organizerID.trim(),
+                        organizerId: form.organizerId.trim(),
                     };
                     venue = await persistNewVenue(payload);
                 }

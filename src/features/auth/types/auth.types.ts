@@ -28,12 +28,12 @@ type RoleValue = "ADMIN" | "ORGANIZER" | "CLIENT";
 type StatusValue = "ACTIVE" | "INACTIVE";
 
 interface RoleDTO {
-    roleID: number;
+    roleId: number;
     name: RoleValue;
 }
 
 interface StatusDTO {
-    statusID: number;
+    statusId: number;
     name: StatusValue;
 }
 

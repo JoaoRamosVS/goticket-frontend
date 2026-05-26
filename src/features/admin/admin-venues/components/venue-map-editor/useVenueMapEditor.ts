@@ -240,7 +240,7 @@ export const useVenueMapEditor = ({
         setError(null);
         try {
             const payload: UpsertVenueSectorDTO[] = sectors.map((sector) => ({
-                sectorID: sector.sectorID,
+                sectorId: sector.sectorId,
                 name: sector.name.trim(),
                 description: sector.description.trim(),
                 maxCapacity: Number(sector.maxCapacity) || 0,

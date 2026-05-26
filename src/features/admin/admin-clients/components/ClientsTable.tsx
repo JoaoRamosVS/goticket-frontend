@@ -152,7 +152,7 @@ export const ClientsTable = ({
                         ) : (
                             filteredClients.map((client) => (
                                 <ClientRow
-                                    key={client.userID}
+                                    key={client.userId}
                                     client={client}
                                     onEdit={onEdit}
                                 />
@@ -279,7 +279,7 @@ const ClientRow = ({ client, onEdit }: ClientRowProps) => {
                 <div className="flex items-center justify-start gap-2">
                     <button
                         type="button"
-                        onClick={() => onEdit(client.userID)}
+                        onClick={() => onEdit(client.userId)}
                         className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold text-white transition-all duration-300 hover:brightness-110 hover:shadow-lg"
                         style={{
                             background:

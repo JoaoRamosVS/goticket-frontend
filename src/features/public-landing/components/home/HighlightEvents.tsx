@@ -29,7 +29,7 @@ const HighlightEvents = ({ title, events }: HighlightEventsProps) => {
 
             <div className="mx-auto grid grid-cols-1 gap-8 md:grid-cols-2 px-2 sm:px-0">
                 {highlights.map((event) => (
-                    <EventCardLarge key={event.eventID} event={event} />
+                    <EventCardLarge key={event.eventId} event={event} />
                 ))}
             </div>
         </section>

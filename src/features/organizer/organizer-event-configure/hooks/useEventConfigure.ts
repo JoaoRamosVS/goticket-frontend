@@ -72,7 +72,7 @@ export const useEventConfigure = (eventId: number) => {
                 name: venueSector.name,
                 description: venueSector.description,
                 hasNumberedSeats: false,
-                venueSectorId: venueSector.sectorID,
+                venueSectorId: venueSector.sectorId,
             });
             await refresh();
         },

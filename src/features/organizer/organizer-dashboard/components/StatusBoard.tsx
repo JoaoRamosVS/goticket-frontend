@@ -98,7 +98,7 @@ export const StatusBoard = ({
                             ) : (
                                 group.events.map((event) => (
                                     <EventStatusCard
-                                        key={event.eventID}
+                                        key={event.eventId}
                                         event={event}
                                         onOpen={onOpenEvent}
                                     />

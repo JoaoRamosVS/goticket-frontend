@@ -53,7 +53,7 @@ export const useClients = () => {
     const filteredClients = useMemo(() => {
         if (!normalizedSearch) return clients;
         return clients.filter((client) => {
-            const idMatch = String(client.userID).toLowerCase().includes(normalizedSearch);
+            const idMatch = String(client.userId).toLowerCase().includes(normalizedSearch);
             const emailMatch = client.email?.toLowerCase().includes(normalizedSearch);
             const nameMatch = client.fullName?.toLowerCase().includes(normalizedSearch);
             const cpfMatch = client.identityDocument?.toLowerCase().includes(normalizedSearch);

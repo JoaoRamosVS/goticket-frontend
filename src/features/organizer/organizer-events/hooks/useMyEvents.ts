@@ -56,7 +56,7 @@ export const useMyEvents = () => {
     const filteredEvents = useMemo(() => {
         if (!normalizedSearch) return events;
         return events.filter((event) => {
-            const idMatch = String(event.eventID).includes(normalizedSearch);
+            const idMatch = String(event.eventId).includes(normalizedSearch);
             const titleMatch = event.title
                 ?.toLowerCase()
                 .includes(normalizedSearch);

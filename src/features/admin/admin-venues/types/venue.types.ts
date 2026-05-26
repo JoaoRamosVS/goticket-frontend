@@ -44,9 +44,9 @@ export interface VenueDetailDTO {
     approvalDate: string | null;
     registerDate: string;
     lastUpdateDate: string;
-    status: { statusID: number; name: "ACTIVE" | "INACTIVE" } | null;
+    status: { statusId: number; name: "ACTIVE" | "INACTIVE" } | null;
     organizer: {
-        userID: string;
+        userId: string;
         organizerName?: string;
         legalName?: string;
         CNPJ?: string;
@@ -54,7 +54,7 @@ export interface VenueDetailDTO {
 }
 
 export interface VenueSectorDTO {
-    sectorID: number;
+    sectorId: number;
     name: string;
     description: string;
     maxCapacity: number;
@@ -62,7 +62,7 @@ export interface VenueSectorDTO {
 }
 
 export interface UpsertVenueSectorDTO {
-    sectorID?: number;
+    sectorId?: number;
     name: string;
     description: string;
     maxCapacity: number;
@@ -85,7 +85,7 @@ export interface CreateVenuePayload {
     state: string;
     country: string;
     zipCode: string;
-    organizerID: string | null;
+    organizerId: string | null;
 }
 
 /**
@@ -103,6 +103,6 @@ export interface UpdateVenuePayload {
     state?: string;
     country?: string;
     zipCode?: string;
-    status?: { statusID: number; name: "ACTIVE" | "INACTIVE" };
+    status?: { statusId: number; name: "ACTIVE" | "INACTIVE" };
 }
 

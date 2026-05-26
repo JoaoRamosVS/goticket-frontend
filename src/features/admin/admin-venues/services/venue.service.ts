@@ -40,7 +40,7 @@ const listVenues = async (
 const createVenue = async (payload: CreateVenuePayload): Promise<VenueDetailDTO> => {
     const body = {
         ...payload,
-        organizerID: payload.organizerID ?? undefined,
+        organizerId: payload.organizerId ?? undefined,
     };
     const response = await goTicketApi.post<VenueDetailDTO>("/venues", body, {
         headers: authHeaders(),

@@ -20,8 +20,8 @@ export interface ClientDTO {
 export interface ClientDetailDTO {
     userId: string;
     email: string;
-    role: { roleID: number; name: "ADMIN" | "ORGANIZER" | "CLIENT" };
-    status: { statusID: number; name: StatusValue };
+    role: { roleId: number; name: "ADMIN" | "ORGANIZER" | "CLIENT" };
+    status: { statusId: number; name: StatusValue };
     fullName: string;
     sex: number;
     identityDocument: string;
@@ -42,7 +42,7 @@ export interface ClientDetailDTO {
  * Espelha `tech.goticket.backendapi.client.dto.ClientMinDTO`.
  */
 export interface ClientMinDTO {
-    userID: string;
+    userId: string;
     email: string;
     fullName: string;
     identityDocument: string;
@@ -78,7 +78,7 @@ export interface UpdateClientPayload {
     state?: string | null;
     country?: string | null;
     zipCode?: string | null;
-    status?: { statusID: number; name: StatusValue };
+    status?: { statusId: number; name: StatusValue };
 }
 
 export interface ClientLoginResponse {

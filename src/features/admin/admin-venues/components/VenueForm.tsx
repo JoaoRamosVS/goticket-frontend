@@ -445,10 +445,10 @@ const MetadataCard = ({ venue }: MetadataCardProps) => (
                     "—"
                 }
             />
-            {venue.organizer?.userID && (
+            {venue.organizer?.userId && (
                 <MetaRow
                     label="ID do organizador"
-                    value={venue.organizer.userID}
+                    value={venue.organizer.userId}
                     mono
                 />
             )}

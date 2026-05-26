@@ -12,7 +12,7 @@ export type EventVisibilityValue = "PUBLIC" | "PRIVATE";
  * Item do payload `GET /events/mine` — espelha `tech.goticket.backendapi.event.dto.OrganizerEventListItemDTO`.
  */
 export interface OrganizerEventListItemDTO {
-    eventID: number;
+    eventId: number;
     title: string;
     statusName: EventStatusName | null;
     visibilityName: EventVisibilityValue | null;

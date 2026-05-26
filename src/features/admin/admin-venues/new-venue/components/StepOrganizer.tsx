@@ -58,15 +58,15 @@ export function StepOrganizer({
                     <Building2 className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#2a8fd4]/80" />
                     <select
                         className={`${selectClass} h-11 appearance-none pl-10 pr-4`}
-                        value={form.organizerID}
-                        onChange={onChange("organizerID")}
+                        value={form.organizerId}
+                        onChange={onChange("organizerId")}
                         disabled={organizersLoading || !!createdVenue}
                     >
                         <option value="">
                             {organizersLoading ? "Carregando..." : "Selecione um organizador"}
                         </option>
                         {organizers.map((org) => (
-                            <option key={org.userID} value={org.userID}>
+                            <option key={org.userId} value={org.userId}>
                                 {org.organizerName} — {org.email}
                             </option>
                         ))}

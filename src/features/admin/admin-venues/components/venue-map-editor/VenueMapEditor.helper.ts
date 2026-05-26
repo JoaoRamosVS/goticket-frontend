@@ -128,11 +128,11 @@ export function fromVenueSector(
 ): EditableSector {
     return {
         localId: crypto.randomUUID(),
-        sectorID: row.sectorID,
+        sectorId: row.sectorId,
         name: row.name,
         description: row.description,
         maxCapacity: row.maxCapacity,
-        mapElementId: row.mapElementId ?? `sector-${row.sectorID}`,
+        mapElementId: row.mapElementId ?? `sector-${row.sectorId}`,
         points: points && points.length >= 6 ? points : defaultSquare(mapW, mapH),
         color: randomColor(),
     };
