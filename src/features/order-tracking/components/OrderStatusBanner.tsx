@@ -39,7 +39,7 @@ const BANNER: Record<OrderStatus, BannerConfig> = {
     icon: <RefreshCw className="size-12" strokeWidth={2.5} />,
     title: "Pedido reembolsado",
     description: "O valor pago foi estornado ao método de pagamento utilizado.",
-    className: "from-amber-500/20 to-amber-600/20 border-amber-500/30 text-white font-semibold",
+    className: "from-amber-500 to-amber-600 border-amber-500/30 text-white font-semibold",
   },
 };
 

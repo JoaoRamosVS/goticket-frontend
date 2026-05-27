@@ -1,4 +1,5 @@
-import { Elements, PaymentElement } from "@stripe/react-stripe-js";
+import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { useState } from "react";
 import useStripeInstance from "../hooks/useStripeInstance";
 
 interface StripePaymentAreaProps {
@@ -7,14 +8,44 @@ interface StripePaymentAreaProps {
 }
 
 function PaymentElementWrapper() {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!stripe || !elements) return;
+
+    setIsSubmitting(true);
+    setErrorMessage(null);
+
+    const { error } = await stripe.confirmPayment({
+      elements,
+      confirmParams: { return_url: window.location.href },
+    });
+
+    if (error) {
+      setErrorMessage(error.message ?? "Erro ao processar pagamento.");
+      setIsSubmitting(false);
+    }
+    // sem erro → Stripe redireciona para return_url
+  }
+
   return (
-    <div className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <PaymentElement options={{ layout: "tabs" }} />
-      <p className="text-xs text-muted-foreground">
-        Em ambiente de desenvolvimento, confirme o pagamento via Stripe CLI. O status acima
-        atualiza automaticamente quando o webhook for recebido.
-      </p>
-    </div>
+      {errorMessage && (
+        <p className="text-sm text-red-500">{errorMessage}</p>
+      )}
+      <button
+        type="submit"
+        disabled={!stripe || isSubmitting}
+        className="w-full py-3 px-6 rounded-2xl font-semibold text-white text-base bg-linear-to-t from-blue-700 to-blue-400 shadow-md hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {isSubmitting ? "Processando..." : "Finalizar Pagamento"}
+      </button>
+    </form>
   );
 }
 
