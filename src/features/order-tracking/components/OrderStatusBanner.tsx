@@ -26,7 +26,7 @@ const BANNER: Record<OrderStatus, BannerConfig> = {
     icon: <XCircle className="size-12" strokeWidth={2.5} />,
     title: "Pedido cancelado",
     description: "Este pedido foi cancelado. Os ingressos reservados foram liberados.",
-    className: "from-red-500/20 to-red-600/20 border-red-500/30 text-white font-semibold",
+    className: "from-red-400 to-red-700 border-red-500/30 text-white font-semibold",
   },
   EXPIRED: {
     icon: <Clock className="size-12" strokeWidth={2.5} />,
