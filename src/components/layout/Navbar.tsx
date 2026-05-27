@@ -1,4 +1,5 @@
 ﻿import { useAuthStore } from "@/stores/authStore";
+import { useLogout } from "@/features/auth/hooks/useLogout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -124,7 +125,7 @@ const Navbar = () => {
 
 	const isAuth = useAuthStore((state) => state.isAuth);
 	const userFullName = useAuthStore((state) => state.userFullName);
-	const logout = useAuthStore((state) => state.logout);
+	const logout = useLogout();
 	const { categories } = useEventCategories();
 
 	useEffect(() => {
@@ -272,7 +273,7 @@ const Navbar = () => {
 					{/* Search bar — tablet + desktop */}
 					<div
 						ref={desktopSearchRef}
-						className="hidden sm:block flex-1 min-w-0 max-w-md relative mx-2"
+						className="hidden sm:block flex-1 min-w-0 max-w-lg relative mx-2"
 					>
 						<div className="relative">
 							<Search
@@ -288,7 +289,7 @@ const Navbar = () => {
 								onFocus={() =>
 									suggestions.length > 0 && setShowSuggestions(true)
 								}
-								className="h-9 w-full rounded-full border-primary-foreground/40 bg-background/50 pl-11 pr-3 shadow-md backdrop-blur-xl placeholder:text-accent-foreground/60"
+								className="h-9 w-full rounded-full border-accent/60 bg-background/50 pl-11 pr-3 shadow-lg backdrop-blur-xl placeholder:text-accent-foreground/60"
 							/>
 						</div>
 						<SuggestionsPanel
@@ -415,7 +416,7 @@ const Navbar = () => {
 									<Button
 										variant="ghost"
 										size="sm"
-										className="rounded-full text-sm px-3 font-semibold"
+										className="rounded-full text-sm px-3 font-semibold bg-white/60 shadow-2xl border border-accent/40"
 									>
 										Cadastrar-se
 									</Button>
@@ -424,7 +425,7 @@ const Navbar = () => {
 									<Button
 										size="sm"
 										className="rounded-full font-medium gap-2 bg-linear-to-r from-primary to-[#2959b9]
-											hover:scale-95 shadow-2xs hover:shadow-xl transition-all duration-300 ease-out px-3"
+											hover:scale-95 shadow-2xl hover:shadow-xl transition-all duration-300 ease-out px-3"
 									>
 										<LogIn strokeWidth={2.5} className="size-4" />
 										<span className="hidden sm:block text-sm font-semibold">Entrar</span>

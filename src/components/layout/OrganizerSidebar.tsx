@@ -1,4 +1,4 @@
-import { NavLink, Link, useNavigate } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import {
     LayoutDashboard,
     CalendarDays,
@@ -10,6 +10,7 @@ import type { LucideIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
+import { useLogout } from "@/features/auth/hooks/useLogout";
 
 type NavItem = {
     to: string;
@@ -27,20 +28,14 @@ const SECONDARY_ITEMS: NavItem[] = [
 ];
 
 const OrganizerSidebar = () => {
-    const navigate = useNavigate();
     const userFullName = useAuthStore((state) => state.userFullName);
-    const logout = useAuthStore((state) => state.logout);
+    const handleLogout = useLogout();
 
     const initials = (userFullName || "GT")
         .split(" ")
         .slice(0, 2)
         .map((name) => name.charAt(0).toUpperCase())
         .join("");
-
-    const handleLogout = () => {
-        logout();
-        navigate("/login");
-    };
 
     return (
         <aside className="fixed left-0 top-0 bottom-0 z-40 w-72 p-4">
