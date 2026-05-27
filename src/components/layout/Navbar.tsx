@@ -1,4 +1,4 @@
-import { useAuthStore } from "@/stores/authStore";
+﻿import { useAuthStore } from "@/stores/authStore";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -393,7 +393,7 @@ const Navbar = () => {
 										</Link>
 									</DropdownMenuItem>
 									<DropdownMenuItem asChild className="cursor-pointer rounded-lg">
-										<Link to="/minhas-compras">
+										<Link to="/minha-conta/pedidos">
 											<ShoppingBag className="size-4" />
 											Minhas Compras
 										</Link>

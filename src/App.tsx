@@ -46,6 +46,12 @@ import CategoriasIndexPage from '@/pages/public/CategoriasIndexPage';
 import CheckoutPage from '@/pages/public/CheckoutPage';
 import OrderTrackingPage from '@/pages/public/OrderTrackingPage';
 
+import MyAccountLayout from '@/layouts/MyAccountLayout';
+import MyAccountProfilePage from '@/pages/client/MyAccountProfilePage';
+import MyAccountAddressPage from '@/pages/client/MyAccountAddressPage';
+import MyAccountSecurityPage from '@/pages/client/MyAccountSecurityPage';
+import MyAccountOrdersPage from '@/pages/client/MyAccountOrdersPage';
+
 function AppContent() {
   const isAuth = useAuthStore((state) => state.isAuth)
 
@@ -66,7 +72,15 @@ function AppContent() {
         <Route path="/checkout" element={<MainLayout><CheckoutPage /></MainLayout>} />
         <Route path="/pedidos/:orderId" element={<MainLayout><OrderTrackingPage /></MainLayout>} />
         <Route path="/quem-somos" element={<QuemSomos />} />
-        
+
+        <Route path="/minha-conta" element={<MyAccountLayout><Outlet /></MyAccountLayout>}>
+          <Route index element={<Navigate to="perfil" replace />} />
+          <Route path="perfil" element={<MyAccountProfilePage />} />
+          <Route path="endereco" element={<MyAccountAddressPage />} />
+          <Route path="seguranca" element={<MyAccountSecurityPage />} />
+          <Route path="pedidos" element={<MyAccountOrdersPage />} />
+        </Route>
+
         <Route path="/admin" element={<AdminLayout><Outlet /></AdminLayout>}>
           <Route index element={<Navigate to="dashboard" replace />} />
           
