@@ -99,7 +99,7 @@ const SectorMapViewer = ({
             : null;
 
     return (
-        <section className="rounded-4xl border bg-card/40 backdrop-blur-xl p-6 md:p-7 shadow-xs">
+        <section className="rounded-4xl border bg-white/60 backdrop-blur-xl p-6 md:p-7 shadow-xs">
             <header className="mb-4 flex items-center gap-3">
                 <span className="flex size-10 items-center justify-center rounded-2xl bg-primary/15 text-primary">
                     <MapIcon className="size-5" />

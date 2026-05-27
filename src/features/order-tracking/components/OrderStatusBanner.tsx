@@ -1,4 +1,4 @@
-import { CheckCircle2, Clock, XCircle, AlertTriangle, RefreshCw, Loader2 } from "lucide-react";
+import { CheckCircle2, Clock, XCircle, RefreshCw, Loader2 } from "lucide-react";
 import type { OrderStatus } from "../types/order-response.types";
 
 interface BannerConfig {

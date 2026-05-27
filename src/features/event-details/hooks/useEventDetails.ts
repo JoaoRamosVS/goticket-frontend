@@ -86,7 +86,6 @@ function mapEventDetails(dto: EventPageDTO): EventDetails {
         date: {
             start: dto.startDate,
             end: dto.endDate,
-            doorsOpen: dto.salesStartDate ?? undefined,
         },
         venue: {
             name: dto.venue?.name ?? "Local a confirmar",

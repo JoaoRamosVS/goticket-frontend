@@ -25,11 +25,6 @@ const EventInfo = ({ date, venue }: EventInfoProps) => {
             <p className="text-foreground font-bold">
               {formatTime(date.start)} - {formatTime(date.end)}
             </p>
-            {date.doorsOpen && (
-              <p className="text-sm">
-                Abertura dos portões: {formatTime(date.doorsOpen)}
-              </p>
-            )}
           </div>
         </div>
 

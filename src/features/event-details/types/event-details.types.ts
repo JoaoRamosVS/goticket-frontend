@@ -3,7 +3,6 @@ export type TicketTypeName = "FULL" | "HALF" | "SOLIDARY";
 interface EventDate {
   start: string;
   end: string;
-  doorsOpen?: string;
 }
 
 interface EventVenue {
