@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
 
 // import SessionWatcher from '@/components/shared/SessionWatcher';
@@ -39,7 +40,7 @@ import OrganizerEditarEvento from '@/pages/organizer/eventos/EditarEvento';
 import OrganizerNovoEvento from '@/pages/organizer/eventos/NovoEvento'
 import OrganizerConfigurarEvento from '@/pages/organizer/eventos/ConfigurarEvento';
 
-import { ToastProvider } from '@/components/ui/toast';
+import { ToastProvider, useToast } from '@/components/ui/toast';
 import BuscaPage from '@/pages/public/BuscaPage';
 import CategoriaPage from '@/pages/public/CategoriaPage';
 import CategoriasIndexPage from '@/pages/public/CategoriasIndexPage';
@@ -51,6 +52,29 @@ import MyAccountProfilePage from '@/pages/client/MyAccountProfilePage';
 import MyAccountAddressPage from '@/pages/client/MyAccountAddressPage';
 import MyAccountSecurityPage from '@/pages/client/MyAccountSecurityPage';
 import MyAccountOrdersPage from '@/pages/client/MyAccountOrdersPage';
+
+function ProtectedRoute() {
+    const isAuth = useAuthStore((state) => state.isAuth)
+    const { showToast } = useToast()
+
+    const hasShownToast = useRef(false)
+
+    useEffect(() => {
+        if (!isAuth && !hasShownToast.current) {
+            hasShownToast.current = true
+
+            showToast({
+                type: 'warning',
+                title: 'Acesso restrito',
+                message: 'Você precisa estar logado para acessar esta seção.',
+            })
+        }
+    }, [isAuth, showToast])
+
+    if (!isAuth) return <Navigate to="/login" replace />
+
+    return <Outlet />
+}
 
 function AppContent() {
   const isAuth = useAuthStore((state) => state.isAuth)
@@ -68,9 +92,11 @@ function AppContent() {
         <Route path="/categorias" element={<MainLayout><CategoriasIndexPage /></MainLayout>} />
         <Route path="/categoria/:slug" element={<MainLayout><CategoriaPage /></MainLayout>} />
         <Route path="/evento/:eventId" element={<MainLayout><EventPage /></MainLayout>} />
-        <Route path="/evento/:eventId/data/:eventDateId/ingressos" element={<MainLayout><EventDateTicketsPage /></MainLayout>} />
-        <Route path="/checkout" element={<MainLayout><CheckoutPage /></MainLayout>} />
-        <Route path="/pedidos/:orderId" element={<MainLayout><OrderTrackingPage /></MainLayout>} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/evento/:eventId/data/:eventDateId/ingressos" element={<MainLayout><EventDateTicketsPage /></MainLayout>} />
+          <Route path="/checkout" element={<MainLayout><CheckoutPage /></MainLayout>} />
+          <Route path="/pedidos/:orderId" element={<MainLayout><OrderTrackingPage /></MainLayout>} />
+        </Route>
         <Route path="/quem-somos" element={<QuemSomos />} />
 
         <Route path="/minha-conta" element={<MyAccountLayout><Outlet /></MyAccountLayout>}>
