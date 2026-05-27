@@ -10,14 +10,13 @@ export default function useOrderPolling(orderId: number, initial: OrderResponse 
   const [order, setOrder] = useState<OrderResponse | null>(initial);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const initializedRef = useRef(false);
-
-  // Aplica o `initial` apenas no primeiro mount para não causar loop
+  
   useEffect(() => {
     if (!initializedRef.current && initial !== null) {
       initializedRef.current = true;
       setOrder(initial);
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (order && isTerminal(order.status)) {
@@ -30,9 +29,9 @@ export default function useOrderPolling(orderId: number, initial: OrderResponse 
 
     intervalRef.current = setInterval(async () => {
       try {
-        const fresh = await orderTrackingService.getOrder(orderId);
-        setOrder(fresh);
-        if (isTerminal(fresh.status)) {
+        const { status } = await orderTrackingService.getOrderStatus(orderId);
+        setOrder((prev) => (prev ? { ...prev, status } : prev));
+        if (isTerminal(status)) {
           clearInterval(intervalRef.current!);
           intervalRef.current = null;
         }
@@ -47,7 +46,7 @@ export default function useOrderPolling(orderId: number, initial: OrderResponse 
         intervalRef.current = null;
       }
     };
-  }, [orderId, order?.status]);
+  }, [orderId, order, order?.status]);
 
   const isPolling = order !== null && !isTerminal(order.status);
 

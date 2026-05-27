@@ -63,3 +63,8 @@ export interface OrderResponse {
   paidAt: string | null;
   items: OrderItemResponse[];
 }
+
+export interface OrderStatusResponse {
+  orderId: number;
+  status: OrderStatus;
+}
