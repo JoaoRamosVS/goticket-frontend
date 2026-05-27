@@ -16,7 +16,7 @@ export default function useOrderPolling(orderId: number, initial: OrderResponse 
       initializedRef.current = true;
       setOrder(initial);
     }
-  }, []);
+  }, [initial]);
 
   useEffect(() => {
     if (order && isTerminal(order.status)) {
