@@ -19,6 +19,15 @@ import {
     refreshVenueDetail,
 } from "@/features/admin/admin-venues/new-venue/services/newVenue.service";
 import { normalizeCnpjDigits } from "@/features/admin/admin-venues/new-venue/utils/cnpj";
+import { maskCnpj, maskCep, stripMask } from "@/utils/validation";
+import { fetchCep } from "@/services/cep.service";
+
+type MaskFn = (value: string) => string;
+
+const FIELD_MASKS: Partial<Record<keyof NewVenueFormState, MaskFn>> = {
+    CNPJ: maskCnpj,
+    zipCode: maskCep,
+};
 
 function newDraftSector(index: number): NewVenueDraftSector {
     const slug = crypto.randomUUID().replace(/-/g, "").slice(0, 10);
@@ -57,6 +66,8 @@ export function useNewVenue() {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [isCepLoading, setIsCepLoading] = useState(false);
+    const [cepError, setCepError] = useState<string | null>(null);
 
     const [mapCompleted, setMapCompleted] = useState(false);
     const [venueForMap, setVenueForMap] = useState<VenueDetailDTO | null>(null);
@@ -164,10 +175,39 @@ export function useNewVenue() {
         return undefined;
     }, [step, createdVenue]);
 
+    const fetchAndFillAddress = useCallback(async (digits: string) => {
+        setIsCepLoading(true);
+        setCepError(null);
+        const result = await fetchCep(digits);
+        setIsCepLoading(false);
+        if (!result) {
+            setCepError("CEP não encontrado.");
+            return;
+        }
+        setForm((prev) => ({
+            ...prev,
+            streetAddress: result.streetAddress || prev.streetAddress,
+            neighborhood: result.neighborhood || prev.neighborhood,
+            city: result.city || prev.city,
+            state: result.state || prev.state,
+        }));
+    }, []);
+
     const handleFieldChange =
         <K extends keyof NewVenueFormState>(field: K) =>
         (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-            setForm((prev) => ({ ...prev, [field]: e.target.value }));
+            const maskFn = FIELD_MASKS[field];
+            const value = maskFn ? maskFn(e.target.value) : e.target.value;
+            setForm((prev) => ({ ...prev, [field]: value }));
+
+            if (field === "zipCode") {
+                const digits = stripMask(value);
+                if (digits.length === 8) {
+                    fetchAndFillAddress(digits);
+                } else {
+                    setCepError(null);
+                }
+            }
         };
 
     const goToStep = useCallback(
@@ -328,6 +368,8 @@ export function useNewVenue() {
         isSubmitting,
         error,
         setError,
+        isCepLoading,
+        cepError,
         goBack,
         goNext,
         goToStep,

@@ -19,6 +19,8 @@ const EditarEspaco = () => {
         isLoading,
         isSaving,
         isTogglingStatus,
+        isCepLoading,
+        cepError,
         hasChanges,
         handleFieldChange,
         handleSave,
@@ -66,6 +68,8 @@ const EditarEspaco = () => {
                 isLoading={isLoading}
                 isSaving={isSaving}
                 isTogglingStatus={isTogglingStatus}
+                isCepLoading={isCepLoading}
+                cepError={cepError}
                 hasChanges={hasChanges}
                 onFieldChange={handleFieldChange}
                 onSave={handleSave}

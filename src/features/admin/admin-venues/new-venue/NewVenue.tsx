@@ -131,7 +131,12 @@ export default function NewVenue() {
                         <StepIdentification form={venueFlow.form} onChange={venueFlow.handleFieldChange} />
                     )}
                     {venueFlow.step === 1 && (
-                        <StepAddress form={venueFlow.form} onChange={venueFlow.handleFieldChange} />
+                        <StepAddress
+                            form={venueFlow.form}
+                            isCepLoading={venueFlow.isCepLoading}
+                            cepError={venueFlow.cepError}
+                            onChange={venueFlow.handleFieldChange}
+                        />
                     )}
                     {venueFlow.step === 2 && (
                         <StepOrganizer

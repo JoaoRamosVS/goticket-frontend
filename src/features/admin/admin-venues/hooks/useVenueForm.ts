@@ -4,6 +4,8 @@ import { useToast } from "@/components/ui/toast";
 
 import venueService from "@/features/admin/admin-venues/services/venue.service";
 import type { UpdateVenuePayload, VenueDetailDTO } from "@/features/admin/admin-venues/types/venue.types";
+import { maskCnpj, maskCep, stripMask } from "@/utils/validation";
+import { fetchCep } from "@/services/cep.service";
 
 type StatusValue = "ACTIVE" | "INACTIVE";
 
@@ -35,6 +37,13 @@ const EMPTY_FORM: FormState = {
     zipCode: "",
 };
 
+type MaskFn = (value: string) => string;
+
+const FIELD_MASKS: Partial<Record<keyof FormState, MaskFn>> = {
+    CNPJ: maskCnpj,
+    zipCode: maskCep,
+};
+
 const STATUS_OPTIONS: Record<
     StatusValue,
     { statusId: number; name: StatusValue }
@@ -47,7 +56,7 @@ function venueToFormState(venue: VenueDetailDTO): FormState {
     return {
         name: venue.name ?? "",
         legalName: venue.legalName ?? "",
-        CNPJ: venue.CNPJ ?? "",
+        CNPJ: maskCnpj(venue.CNPJ ?? ""),
         description: venue.description ?? "",
         streetAddress: venue.streetAddress ?? "",
         streetAddressNumber: venue.streetAddressNumber ?? "",
@@ -55,7 +64,7 @@ function venueToFormState(venue: VenueDetailDTO): FormState {
         city: venue.city ?? "",
         state: venue.state ?? "",
         country: venue.country ?? "",
-        zipCode: venue.zipCode ?? "",
+        zipCode: maskCep(venue.zipCode ?? ""),
     };
 }
 
@@ -76,8 +85,9 @@ function buildPatchPayload(
     if (form.legalName.trim() !== (original.legalName ?? "")) {
         payload.legalName = form.legalName.trim();
     }
-    if (form.CNPJ.trim() !== (original.CNPJ ?? "")) {
-        payload.CNPJ = form.CNPJ.trim();
+    const rawCnpj = stripMask(form.CNPJ);
+    if (rawCnpj !== (original.CNPJ ?? "")) {
+        payload.CNPJ = rawCnpj;
     }
 
     const nextDescription = normalizeOptional(form.description);
@@ -108,7 +118,8 @@ function buildPatchPayload(
     ];
 
     addressFields.forEach((field) => {
-        const next = form[field].trim();
+        const raw = field === "zipCode" ? stripMask(form[field]) : form[field];
+        const next = raw.trim();
         const current = (original[field] as string | null) ?? "";
         if (next !== current) {
             (payload as Record<string, unknown>)[field] = next;
@@ -139,6 +150,8 @@ export const useVenueForm = (venueId?: string) => {
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [isTogglingStatus, setIsTogglingStatus] = useState(false);
+    const [isCepLoading, setIsCepLoading] = useState(false);
+    const [cepError, setCepError] = useState<string | null>(null);
 
     const [error, setError] = useState<string | null>(null);
 
@@ -181,12 +194,41 @@ export const useVenueForm = (venueId?: string) => {
 
     const hasChanges = Object.keys(patchPayload).length > 0;
 
+    const fetchAndFillAddress = useCallback(async (digits: string) => {
+        setIsCepLoading(true);
+        setCepError(null);
+        const result = await fetchCep(digits);
+        setIsCepLoading(false);
+        if (!result) {
+            setCepError("CEP não encontrado.");
+            return;
+        }
+        setForm((prev) => ({
+            ...prev,
+            streetAddress: result.streetAddress || prev.streetAddress,
+            neighborhood: result.neighborhood || prev.neighborhood,
+            city: result.city || prev.city,
+            state: result.state || prev.state,
+        }));
+    }, []);
+
     const handleFieldChange =
         <K extends keyof FormState>(field: K) =>
         (
-            e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+            e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
         ) => {
-            setForm((prev) => ({ ...prev, [field]: e.target.value }));
+            const maskFn = FIELD_MASKS[field];
+            const value = maskFn ? maskFn(e.target.value) : e.target.value;
+            setForm((prev) => ({ ...prev, [field]: value }));
+
+            if (field === "zipCode") {
+                const digits = stripMask(value);
+                if (digits.length === 8) {
+                    fetchAndFillAddress(digits);
+                } else {
+                    setCepError(null);
+                }
+            }
         };
 
     const handleSave = async () => {
@@ -252,6 +294,8 @@ export const useVenueForm = (venueId?: string) => {
         isLoading,
         isSaving,
         isTogglingStatus,
+        isCepLoading,
+        cepError,
         error,
         hasChanges,
         handleFieldChange,

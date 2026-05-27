@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { STUDENT_ELIGIBILITY_NAME } from "./eligibility.constants";
-
-const cpfDigitsRegex = /^\d{11,20}$/;
+import { cpfSchema } from "@/utils/validation";
 
 const holderSchema = z
   .object({
@@ -12,10 +11,7 @@ const holderSchema = z
       .string()
       .min(3, "Nome deve ter pelo menos 3 caracteres")
       .max(200, "Nome muito longo"),
-    holderDocument: z
-      .string()
-      .transform((v) => v.replace(/\D/g, ""))
-      .pipe(z.string().regex(cpfDigitsRegex, "Documento inválido (min. 11 dígitos)")),
+    holderDocument: cpfSchema,
     eligibilityTypeId: z.number().nullable(),
     eligibilityTypeName: z.string().nullable(),
     eligibilityDocumentNumber: z.string().max(50).nullable(),

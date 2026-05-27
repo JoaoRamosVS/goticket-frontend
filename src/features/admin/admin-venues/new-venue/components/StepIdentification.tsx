@@ -52,8 +52,9 @@ export function StepIdentification({ form, onChange }: Props) {
                     className={`${fieldClass} h-11`}
                     value={form.CNPJ}
                     onChange={onChange("CNPJ")}
-                    placeholder="Somente números ou formatado"
+                    placeholder="00.000.000/0000-00"
                     maxLength={18}
+                    inputMode="numeric"
                 />
             </label>
             <label className="flex flex-col">

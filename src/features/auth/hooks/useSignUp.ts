@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import authService from "@/features/auth/services/auth.service";
 import type { RegisterRequest } from "@/features/auth/types/auth.types";
 import { useAuthStore } from "@/stores/authStore";
+import { maskCpf, stripMask } from "@/utils/validation";
 
 const useSignUp = () => {
     const login = useAuthStore((state) => state.login);
@@ -15,6 +16,10 @@ const useSignUp = () => {
     const [fullName, setFullName] = useState("");
     const [sex, setSex] = useState<number>(3);
     const [identityDocument, setIdentityDocument] = useState("");
+
+    const handleIdentityDocumentChange = (value: string) => {
+        setIdentityDocument(maskCpf(value));
+    };
     const [birthDate, setBirthDate] = useState("");
 
     const [isLoading, setIsLoading] = useState(false);
@@ -31,7 +36,7 @@ const useSignUp = () => {
                 password,
                 fullName,
                 sex,
-                identityDocument,
+                identityDocument: stripMask(identityDocument),
                 birthDate,
             };
 
@@ -71,7 +76,7 @@ const useSignUp = () => {
         setPassword,
         setFullName,
         setSex,
-        setIdentityDocument,
+        setIdentityDocument: handleIdentityDocumentChange,
         setBirthDate,
         handleSignUpSubmit,
     };

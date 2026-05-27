@@ -14,6 +14,8 @@ const EditarOrganizador = () => {
         isLoading,
         isSaving,
         isTogglingStatus,
+        isCepLoading,
+        cepError,
         hasChanges,
         handleFieldChange,
         handleSave,
@@ -56,6 +58,8 @@ const EditarOrganizador = () => {
                 isLoading={isLoading}
                 isSaving={isSaving}
                 isTogglingStatus={isTogglingStatus}
+                isCepLoading={isCepLoading}
+                cepError={cepError}
                 hasChanges={hasChanges}
                 onFieldChange={handleFieldChange}
                 onSave={handleSave}

@@ -7,6 +7,8 @@ import type {
     StatusValue,
     UpdateClientPayload,
 } from "@/features/admin/admin-clients/types/client.types";
+import { maskCpf, maskCep, stripMask } from "@/utils/validation";
+import { fetchCep } from "@/services/cep.service";
 
 type FormState = {
     email: string;
@@ -38,6 +40,13 @@ const EMPTY_FORM: FormState = {
     zipCode: "",
 };
 
+type MaskFn = (value: string) => string;
+
+const FIELD_MASKS: Partial<Record<keyof FormState, MaskFn>> = {
+    identityDocument: maskCpf,
+    zipCode: maskCep,
+};
+
 const STATUS_OPTIONS: Record<StatusValue, { statusId: number; name: StatusValue }> = {
     ACTIVE: { statusId: 1, name: "ACTIVE" },
     INACTIVE: { statusId: 2, name: "INACTIVE" },
@@ -48,7 +57,7 @@ function clientToFormState(client: ClientDetailDTO): FormState {
         email: client.email ?? "",
         fullName: client.fullName ?? "",
         sex: String(client.sex ?? 1),
-        identityDocument: client.identityDocument ?? "",
+        identityDocument: maskCpf(client.identityDocument ?? ""),
         birthDate: client.birthDate ?? "",
         streetAddress: client.streetAddress ?? "",
         streetAddressNumber: client.streetAddressNumber ?? "",
@@ -56,7 +65,7 @@ function clientToFormState(client: ClientDetailDTO): FormState {
         city: client.city ?? "",
         state: client.state ?? "",
         country: client.country ?? "",
-        zipCode: client.zipCode ?? "",
+        zipCode: maskCep(client.zipCode ?? ""),
     };
 }
 
@@ -83,8 +92,9 @@ function buildPatchPayload(
         payload.sex = sexValue;
     }
 
-    if (form.identityDocument.trim() !== (original.identityDocument ?? "")) {
-        payload.identityDocument = form.identityDocument.trim();
+    const rawDoc = stripMask(form.identityDocument);
+    if (rawDoc !== (original.identityDocument ?? "")) {
+        payload.identityDocument = rawDoc;
     }
 
     if (form.birthDate !== (original.birthDate ?? "")) {
@@ -113,7 +123,8 @@ function buildPatchPayload(
     ];
 
     addressFields.forEach((field) => {
-        const next = normalizeOptional(form[field]);
+        const raw = field === "zipCode" ? stripMask(form[field]) : form[field];
+        const next = normalizeOptional(raw);
         const current = (original[field] as string | null) ?? null;
         if (next !== current) {
             (payload as Record<string, unknown>)[field] = next;
@@ -141,6 +152,8 @@ export const useClientForm = (clientId?: string) => {
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [isTogglingStatus, setIsTogglingStatus] = useState(false);
+    const [isCepLoading, setIsCepLoading] = useState(false);
+    const [cepError, setCepError] = useState<string | null>(null);
 
     const [error, setError] = useState<string | null>(null);
 
@@ -183,10 +196,39 @@ export const useClientForm = (clientId?: string) => {
 
     const hasChanges = Object.keys(patchPayload).length > 0;
 
+    const fetchAndFillAddress = useCallback(async (digits: string) => {
+        setIsCepLoading(true);
+        setCepError(null);
+        const result = await fetchCep(digits);
+        setIsCepLoading(false);
+        if (!result) {
+            setCepError("CEP não encontrado.");
+            return;
+        }
+        setForm((prev) => ({
+            ...prev,
+            streetAddress: result.streetAddress || prev.streetAddress,
+            neighborhood: result.neighborhood || prev.neighborhood,
+            city: result.city || prev.city,
+            state: result.state || prev.state,
+        }));
+    }, []);
+
     const handleFieldChange =
         <K extends keyof FormState>(field: K) =>
         (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-            setForm((prev) => ({ ...prev, [field]: e.target.value }));
+            const maskFn = FIELD_MASKS[field];
+            const value = maskFn ? maskFn(e.target.value) : e.target.value;
+            setForm((prev) => ({ ...prev, [field]: value }));
+
+            if (field === "zipCode") {
+                const digits = stripMask(value);
+                if (digits.length === 8) {
+                    fetchAndFillAddress(digits);
+                } else {
+                    setCepError(null);
+                }
+            }
         };
 
     const handleSave = async () => {
@@ -252,6 +294,8 @@ export const useClientForm = (clientId?: string) => {
         isLoading,
         isSaving,
         isTogglingStatus,
+        isCepLoading,
+        cepError,
         error,
         hasChanges,
         handleFieldChange,

@@ -3,8 +3,10 @@ import {
     Save,
     ShieldCheck,
     ShieldOff,
+    MapPin,
 } from "lucide-react";
 import type { VenueDetailDTO } from "@/features/admin/admin-venues/types/venue.types";
+import { BRAZILIAN_STATES } from "@/utils/validation";
 
 type StatusValue = "ACTIVE" | "INACTIVE";
 
@@ -28,10 +30,12 @@ type VenueFormProps = {
     isLoading: boolean;
     isSaving: boolean;
     isTogglingStatus: boolean;
+    isCepLoading: boolean;
+    cepError: string | null;
     hasChanges: boolean;
     onFieldChange: <K extends keyof FormState>(
         field: K
-    ) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+    ) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
     onSave: () => void;
     onReset: () => void;
     onToggleStatus: (value: StatusValue) => void;
@@ -43,6 +47,8 @@ export const VenueForm = ({
     isLoading,
     isSaving,
     isTogglingStatus,
+    isCepLoading,
+    cepError,
     hasChanges,
     onFieldChange,
     onSave,
@@ -105,6 +111,7 @@ export const VenueForm = ({
                                     onChange={onFieldChange("CNPJ")}
                                     placeholder="00.000.000/0000-00"
                                     maxLength={18}
+                                    inputMode="numeric"
                                 />
                             </Field>
 
@@ -122,36 +129,37 @@ export const VenueForm = ({
                         <div className="mt-8">
                             <SectionHeader
                                 title="Endereço"
-                                description="Localização completa do espaço."
+                                description="Digite o CEP para preencher automaticamente."
                             />
 
                             <div className="flex flex-col gap-4">
-                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_auto]">
-                                    <Field
-                                        label="Logradouro"
-                                        htmlFor="streetAddress"
-                                        required
-                                    >
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-[auto_1fr_auto]">
+                                    <Field label="CEP" htmlFor="zipCode" required>
+                                        <CepInput
+                                            id="zipCode"
+                                            value={form.zipCode}
+                                            onChange={onFieldChange("zipCode")}
+                                            isLoading={isCepLoading}
+                                        />
+                                        {cepError && (
+                                            <p className="mt-1 text-[11px] text-red-400">
+                                                {cepError}
+                                            </p>
+                                        )}
+                                    </Field>
+                                    <Field label="Logradouro" htmlFor="streetAddress" required>
                                         <TextInput
                                             id="streetAddress"
                                             value={form.streetAddress}
-                                            onChange={onFieldChange(
-                                                "streetAddress"
-                                            )}
+                                            onChange={onFieldChange("streetAddress")}
                                             placeholder="Rua, Avenida..."
                                         />
                                     </Field>
-                                    <Field
-                                        label="Número"
-                                        htmlFor="streetAddressNumber"
-                                        required
-                                    >
+                                    <Field label="Número" htmlFor="streetAddressNumber" required>
                                         <TextInput
                                             id="streetAddressNumber"
                                             value={form.streetAddressNumber}
-                                            onChange={onFieldChange(
-                                                "streetAddressNumber"
-                                            )}
+                                            onChange={onFieldChange("streetAddressNumber")}
                                             placeholder="Nº"
                                             className="sm:w-28"
                                         />
@@ -159,71 +167,42 @@ export const VenueForm = ({
                                 </div>
 
                                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                    <Field
-                                        label="Bairro"
-                                        htmlFor="neighborhood"
-                                        required
-                                    >
+                                    <Field label="Bairro" htmlFor="neighborhood" required>
                                         <TextInput
                                             id="neighborhood"
                                             value={form.neighborhood}
-                                            onChange={onFieldChange(
-                                                "neighborhood"
-                                            )}
+                                            onChange={onFieldChange("neighborhood")}
                                         />
                                     </Field>
-                                    <Field
-                                        label="CEP"
-                                        htmlFor="zipCode"
-                                        required
-                                    >
-                                        <TextInput
-                                            id="zipCode"
-                                            value={form.zipCode}
-                                            onChange={onFieldChange(
-                                                "zipCode"
-                                            )}
-                                            placeholder="00000-000"
-                                        />
-                                    </Field>
-                                </div>
-
-                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                                    <Field
-                                        label="Cidade"
-                                        htmlFor="city"
-                                        required
-                                    >
+                                    <Field label="Cidade" htmlFor="city" required>
                                         <TextInput
                                             id="city"
                                             value={form.city}
                                             onChange={onFieldChange("city")}
                                         />
                                     </Field>
-                                    <Field
-                                        label="Estado"
-                                        htmlFor="state"
-                                        required
-                                    >
-                                        <TextInput
+                                </div>
+
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                    <Field label="Estado" htmlFor="state" required>
+                                        <SelectInput
                                             id="state"
                                             value={form.state}
-                                            onChange={onFieldChange(
-                                                "state"
-                                            )}
-                                        />
+                                            onChange={onFieldChange("state")}
+                                        >
+                                            <option value="">Selecione</option>
+                                            {BRAZILIAN_STATES.map((s) => (
+                                                <option key={s.value} value={s.value}>
+                                                    {s.label}
+                                                </option>
+                                            ))}
+                                        </SelectInput>
                                     </Field>
-                                    <Field
-                                        label="País"
-                                        htmlFor="country"
-                                        required
-                                    >
+                                    <Field label="País" htmlFor="country" required>
                                         <TextInput
                                             id="country"
                                             value={form.country}
-                                            onChange={onFieldChange(
-                                                "country"
-                                            )}
+                                            onChange={onFieldChange("country")}
                                         />
                                     </Field>
                                 </div>
@@ -344,6 +323,38 @@ const TextArea = (
         {...props}
         className={`${baseInputClasses} resize-y ${props.className ?? ""}`}
     />
+);
+
+const SelectInput = (
+    props: React.SelectHTMLAttributes<HTMLSelectElement>
+) => (
+    <select
+        {...props}
+        className={`${baseInputClasses} h-11 ${props.className ?? ""}`}
+    />
+);
+
+type CepInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
+    isLoading?: boolean;
+};
+
+const CepInput = ({ isLoading, ...props }: CepInputProps) => (
+    <div className="relative">
+        <input
+            {...props}
+            maxLength={9}
+            placeholder="00000-000"
+            inputMode="numeric"
+            className={`${baseInputClasses} h-11 pr-10`}
+        />
+        <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+            {isLoading ? (
+                <Loader2 className="size-4 animate-spin text-[#2a8fd4]" />
+            ) : (
+                <MapPin className="size-4 text-[#5e6c87]/40" />
+            )}
+        </div>
+    </div>
 );
 
 type StatusCardProps = {

@@ -102,6 +102,7 @@ const SignUpForm = ({
                             required
                             placeholder="000.000.000-00"
                             value={identityDocument}
+                            maxLength={14}
                             onChange={(e) => onIdentityDocumentChange(e.target.value)}
                             className="pl-10"
                         />

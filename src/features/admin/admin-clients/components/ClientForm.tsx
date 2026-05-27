@@ -3,11 +3,13 @@ import {
     Save,
     ShieldCheck,
     ShieldOff,
+    MapPin,
 } from "lucide-react";
 import type {
     ClientDetailDTO,
     StatusValue,
 } from "@/features/admin/admin-clients/types/client.types";
+import { BRAZILIAN_STATES } from "@/utils/validation";
 
 type FormState = {
     email: string;
@@ -30,6 +32,8 @@ type ClientFormProps = {
     isLoading: boolean;
     isSaving: boolean;
     isTogglingStatus: boolean;
+    isCepLoading: boolean;
+    cepError: string | null;
     hasChanges: boolean;
     onFieldChange: <K extends keyof FormState>(
         field: K
@@ -45,6 +49,8 @@ export const ClientForm = ({
     isLoading,
     isSaving,
     isTogglingStatus,
+    isCepLoading,
+    cepError,
     hasChanges,
     onFieldChange,
     onSave,
@@ -134,11 +140,24 @@ export const ClientForm = ({
                         <div className="mt-8">
                             <SectionHeader
                                 title="Endereço"
-                                description="Endereço residencial do cliente (opcional)."
+                                description="Digite o CEP para preencher automaticamente (opcional)."
                             />
 
                             <div className="flex flex-col gap-4">
-                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_auto]">
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-[auto_1fr_auto]">
+                                    <Field label="CEP" htmlFor="zipCode">
+                                        <CepInput
+                                            id="zipCode"
+                                            value={form.zipCode}
+                                            onChange={onFieldChange("zipCode")}
+                                            isLoading={isCepLoading}
+                                        />
+                                        {cepError && (
+                                            <p className="mt-1 text-[11px] text-red-400">
+                                                {cepError}
+                                            </p>
+                                        )}
+                                    </Field>
                                     <Field
                                         label="Logradouro"
                                         htmlFor="streetAddress"
@@ -146,9 +165,7 @@ export const ClientForm = ({
                                         <TextInput
                                             id="streetAddress"
                                             value={form.streetAddress}
-                                            onChange={onFieldChange(
-                                                "streetAddress"
-                                            )}
+                                            onChange={onFieldChange("streetAddress")}
                                             placeholder="Rua, Avenida..."
                                         />
                                     </Field>
@@ -159,9 +176,7 @@ export const ClientForm = ({
                                         <TextInput
                                             id="streetAddressNumber"
                                             value={form.streetAddressNumber}
-                                            onChange={onFieldChange(
-                                                "streetAddressNumber"
-                                            )}
+                                            onChange={onFieldChange("streetAddressNumber")}
                                             placeholder="Nº"
                                             className="sm:w-28"
                                         />
@@ -169,31 +184,13 @@ export const ClientForm = ({
                                 </div>
 
                                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                    <Field
-                                        label="Bairro"
-                                        htmlFor="neighborhood"
-                                    >
+                                    <Field label="Bairro" htmlFor="neighborhood">
                                         <TextInput
                                             id="neighborhood"
                                             value={form.neighborhood}
-                                            onChange={onFieldChange(
-                                                "neighborhood"
-                                            )}
+                                            onChange={onFieldChange("neighborhood")}
                                         />
                                     </Field>
-                                    <Field label="CEP" htmlFor="zipCode">
-                                        <TextInput
-                                            id="zipCode"
-                                            value={form.zipCode}
-                                            onChange={onFieldChange(
-                                                "zipCode"
-                                            )}
-                                            placeholder="00000-000"
-                                        />
-                                    </Field>
-                                </div>
-
-                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                                     <Field label="Cidade" htmlFor="city">
                                         <TextInput
                                             id="city"
@@ -201,20 +198,28 @@ export const ClientForm = ({
                                             onChange={onFieldChange("city")}
                                         />
                                     </Field>
+                                </div>
+
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                     <Field label="Estado" htmlFor="state">
-                                        <TextInput
+                                        <SelectInput
                                             id="state"
                                             value={form.state}
                                             onChange={onFieldChange("state")}
-                                        />
+                                        >
+                                            <option value="">Selecione</option>
+                                            {BRAZILIAN_STATES.map((s) => (
+                                                <option key={s.value} value={s.value}>
+                                                    {s.label}
+                                                </option>
+                                            ))}
+                                        </SelectInput>
                                     </Field>
                                     <Field label="País" htmlFor="country">
                                         <TextInput
                                             id="country"
                                             value={form.country}
-                                            onChange={onFieldChange(
-                                                "country"
-                                            )}
+                                            onChange={onFieldChange("country")}
                                         />
                                     </Field>
                                 </div>
@@ -335,6 +340,28 @@ const SelectInput = (
         {...props}
         className={`${baseInputClasses} h-11 ${props.className ?? ""}`}
     />
+);
+
+type CepInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
+    isLoading?: boolean;
+};
+
+const CepInput = ({ isLoading, ...props }: CepInputProps) => (
+    <div className="relative">
+        <input
+            {...props}
+            maxLength={9}
+            placeholder="00000-000"
+            className={`${baseInputClasses} h-11 pr-10`}
+        />
+        <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+            {isLoading ? (
+                <Loader2 className="size-4 animate-spin text-[#2a8fd4]" />
+            ) : (
+                <MapPin className="size-4 text-[#5e6c87]/40" />
+            )}
+        </div>
+    </div>
 );
 
 type StatusCardProps = {
