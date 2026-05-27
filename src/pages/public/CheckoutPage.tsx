@@ -89,7 +89,7 @@ export default function CheckoutPage() {
             <QuoteSummaryCard
               quote={quote}
               isLoading={quoteLoading}
-              sectorName={selection.sectorName}
+              selection={selection}
             />
           }
         />

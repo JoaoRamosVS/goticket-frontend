@@ -1,4 +1,4 @@
-import { ArrowLeft, Pencil } from "lucide-react";
+import { ArrowLeft, Pencil, Settings2 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import AdminPageHeader from "@/components/layout/AdminPageHeader";
 import { EventForm } from "@/features/admin/admin-events/components/EventForm";

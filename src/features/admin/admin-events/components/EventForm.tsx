@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { isAdminToken } from "@/utils/auth";
 import {
+    ArrowRight,
     CalendarDays,
     Check,
     Eye,
@@ -14,6 +15,7 @@ import {
     Pencil,
     Plus,
     Save,
+    Settings2,
     Star,
     Tags,
     Trash2,
@@ -36,6 +38,7 @@ import type {
     VenueSectorOptionDTO,
 } from "@/features/admin/admin-events/types/event.types";
 import type { EventCategoryDTO } from "@/features/admin/admin-categories/types/category.types";
+import { useNavigate } from "react-router-dom";
 
 type FormState = {
     title: string;
@@ -203,6 +206,8 @@ export const EventForm = ({
           }
         : null;
 
+    const navigate = useNavigate();
+
     return (
         <>
             {isLoading && !event ? (
@@ -358,6 +363,30 @@ export const EventForm = ({
                                 onDelete={onDeleteEventSector}
                             />
                         </GlassCard>
+
+                        {event.eventId && (
+                            <button
+                                type="button"
+                                onClick={() => navigate(`/admin/eventos/${event.eventId}/configurar`)}
+                                className="inline-flex mt-8 cursor-pointer w-full items-center gap-6 rounded-2xl px-6 py-4 shadow-md border border-accent/20 bg-white/60 transition-all duration-300 hover:scale-98 hover:pr-10"
+                            >
+                                    <div className="bg-linear-to-b from-primary to-[#1c6fb5] rounded-2xl p-3 shadow-2xl text-white">
+                                        <Settings2 className="size-8" strokeWidth={2} />
+                                    </div>
+                                    <div className="flex w-full justify-between items-center">
+                                        <div className="flex flex-col justify-start">
+                                            <span className="font-bold text-lg text-left">
+                                                Configurar evento
+                                            </span>
+                                            <span className="mt-0.5 text-xs text-[#5e6c87]">
+                                                Defina setores, vincule às datas e configure lotes de ingressos.
+                                            </span>
+                                        </div>
+                                        <ArrowRight className="size-5" strokeWidth={2.5} />
+                                    </div>
+                            </button>
+                        )}
+
                     </GlassCard>
 
                     <div className="flex flex-col gap-5">

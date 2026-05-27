@@ -19,6 +19,7 @@ import AdminLayout from '@/layouts/AdminLayout';
 import AdminDashboard from '@/pages/admin/Dashboard';
 import AdminEventos from '@/pages/admin/eventos/EventosList';
 import AdminEditarEvento from '@/pages/admin/eventos/EditarEvento';
+import AdminConfigurarEvento from '@/pages/admin/eventos/ConfigurarEvento';
 import AdminClientes from '@/pages/admin/clientes/ClientesList';
 import AdminEditarCliente from '@/pages/admin/clientes/EditarCliente';
 import AdminOrganizadores from '@/pages/admin/organizadores/OrganizadoresList';
@@ -73,6 +74,7 @@ function AppContent() {
           
           <Route path="eventos" element={<AdminEventos />} />
           <Route path="eventos/:eventId" element={<AdminEditarEvento />} />
+          <Route path="eventos/:eventId/configurar" element={<AdminConfigurarEvento />} />
           
           <Route path="espacos" element={<AdminEspacos />} />
           <Route path="new-venue" element={<AdminNewVenue />} />

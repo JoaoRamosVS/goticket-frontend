@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
-import eventConfigureService from "@/features/organizer/organizer-event-configure/services/eventConfigure.service";
+import eventConfigureService from "@/features/event-configure/services/eventConfigure.service";
 import {
     CONFIGURE_STEPS,
     type ConfigureStepIndex,
     type CreateTicketBatchPayload,
     type EventConfigureResponse,
-} from "@/features/organizer/organizer-event-configure/types/eventConfigure.types";
+} from "@/features/event-configure/types/eventConfigure.types";
 import type { VenueSectorDTO } from "@/features/admin/admin-venues/types/venue.types";
 
 export const useEventConfigure = (eventId: number) => {

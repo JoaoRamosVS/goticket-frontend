@@ -7,7 +7,7 @@ import type {
     EventDateSectorFull,
     CreateTicketBatchPayload,
     TicketBatchFull,
-} from "@/features/organizer/organizer-event-configure/types/eventConfigure.types";
+} from "@/features/event-configure/types/eventConfigure.types";
 import type { VenueSectorDTO } from "@/features/admin/admin-venues/types/venue.types";
 
 const getEventDetails = async (

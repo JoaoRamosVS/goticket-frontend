@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import EventConfigurePage from "@/features/organizer/organizer-event-configure/EventConfigurePage";
+import EventConfigurePage from "@/features/event-configure/EventConfigurePage";
 
 const OrganizerConfigurarEvento = () => {
     const { eventId } = useParams<{ eventId: string }>();

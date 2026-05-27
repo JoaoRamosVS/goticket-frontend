@@ -57,7 +57,7 @@ export default function OrderStatusBanner({ status }: OrderStatusBannerProps) {
       <div className="mt-0.5 shrink-0">{config.icon}</div>
       <div>
         <p className="font-extrabold text-3xl tracking-wider">{config.title}</p>
-        <p className="text-sm opacity-80 mt-0.5">{config.description}</p>
+        <p className="text-sm opacity-80 mt-4 font-normal">{config.description}</p>
       </div>
     </div>
   );

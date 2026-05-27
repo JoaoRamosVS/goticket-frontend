@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Plus, Trash2, CheckCircle2, Loader2 } from "lucide-react";
-import type { EventConfigureResponse } from "@/features/organizer/organizer-event-configure/types/eventConfigure.types";
+import type { EventConfigureResponse } from "@/features/event-configure/types/eventConfigure.types";
 import type { VenueSectorDTO } from "@/features/admin/admin-venues/types/venue.types";
 
 type Props = {

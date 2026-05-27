@@ -2,11 +2,11 @@ import { ArrowLeft, ArrowRight, CheckCircle2, Loader2, Settings2 } from "lucide-
 import { useNavigate } from "react-router-dom";
 import AdminPageHeader from "@/components/layout/AdminPageHeader";
 import { useToast } from "@/components/ui/toast";
-import { useEventConfigure } from "@/features/organizer/organizer-event-configure/hooks/useEventConfigure";
-import { StepSectors } from "@/features/organizer/organizer-event-configure/components/StepSectors";
-import { StepDateSectors } from "@/features/organizer/organizer-event-configure/components/StepDateSectors";
-import { StepBatches } from "@/features/organizer/organizer-event-configure/components/StepBatches";
-import type { ConfigureStepIndex } from "@/features/organizer/organizer-event-configure/types/eventConfigure.types";
+import { useEventConfigure } from "@/features/event-configure/hooks/useEventConfigure";
+import { StepSectors } from "@/features/event-configure/components/StepSectors";
+import { StepDateSectors } from "@/features/event-configure/components/StepDateSectors";
+import { StepBatches } from "@/features/event-configure/components/StepBatches";
+import type { ConfigureStepIndex } from "@/features/event-configure/types/eventConfigure.types";
 
 const shellClass =
     "rounded-[1.75rem] border border-white/80 bg-white/20 p-6 shadow-[0_16px_48px_-24px_rgba(0,51,77,0.35)] backdrop-blur-2xl sm:p-8";
@@ -24,9 +24,9 @@ function stepNavButtonClass(isActive: boolean, isDone: boolean, clickable: boole
     return `${stepNavButtonBase} cursor-not-allowed border-white/40 bg-black/5 opacity-35`;
 }
 
-type Props = { eventId: number };
+type Props = { eventId: number; backPath?: string };
 
-const EventConfigurePage = ({ eventId }: Props) => {
+const EventConfigurePage = ({ eventId, backPath = "/organizer/eventos" }: Props) => {
     const navigate = useNavigate();
     const { showToast } = useToast();
     const flow = useEventConfigure(eventId);
@@ -41,7 +41,7 @@ const EventConfigurePage = ({ eventId }: Props) => {
 
     const handleFinish = () => {
         showToast({ type: "success", message: "Evento configurado com sucesso!" });
-        navigate("/organizer/eventos");
+        navigate(backPath);
     };
 
     if (flow.loading) {
@@ -67,11 +67,11 @@ const EventConfigurePage = ({ eventId }: Props) => {
             <div className="mb-4 flex flex-wrap items-center gap-3">
                 <button
                     type="button"
-                    onClick={() => navigate("/organizer/eventos")}
+                    onClick={() => navigate(backPath)}
                     className="inline-flex cursor-pointer items-center gap-1.5 rounded-2xl border border-white/75 bg-white/55 px-3 py-1.5 text-xs font-bold text-[#00334d] shadow-[0_6px_20px_-10px_rgba(42,143,212,0.35)] backdrop-blur-xl transition-all duration-200 hover:scale-[0.98] hover:bg-white hover:shadow-lg"
                 >
                     <ArrowLeft className="size-3.5" strokeWidth={2.6} />
-                    Meus eventos
+                    Voltar
                 </button>
             </div>
 
@@ -199,7 +199,7 @@ const EventConfigurePage = ({ eventId }: Props) => {
                 <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-white/50 pt-6">
                     <button
                         type="button"
-                        onClick={flow.step === 0 ? () => navigate("/organizer/eventos") : flow.goBack}
+                        onClick={flow.step === 0 ? () => navigate(backPath) : flow.goBack}
                         className={`cursor-pointer inline-flex items-center gap-2 rounded-2xl bg-white/50 px-5 py-2.5 text-sm font-bold text-[#00334d] shadow-2xl backdrop-blur-xl transition-all duration-200 hover:scale-[0.98] hover:bg-white ${
                             flow.step === 0
                                 ? "bg-linear-to-r from-red-500 to-red-700 text-white"

@@ -4,7 +4,7 @@ import type {
     EventConfigureResponse,
     EventDateSectorFull,
     CreateTicketBatchPayload,
-} from "@/features/organizer/organizer-event-configure/types/eventConfigure.types";
+} from "@/features/event-configure/types/eventConfigure.types";
 
 type Props = {
     event: EventConfigureResponse;

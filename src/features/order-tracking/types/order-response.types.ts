@@ -1,3 +1,32 @@
+export interface OrderSummaryItemDTO {
+  orderItemId: number;
+  sectorName: string;
+  ticketTypeName: string;
+  unitPrice: number;
+  feeAmount: number;
+  itemTotal: number;
+  holderName: string;
+  ticketId: string | null;
+  qrToken: string | null;
+}
+
+export interface OrderSummaryResponse {
+  orderId: number;
+  status: string;
+  eventId: number;
+  eventTitle: string;
+  eventImageS3Key: string | null;
+  eventStartDate: string;
+  venueName: string;
+  venueCity: string;
+  subtotal: number;
+  feesTotal: number;
+  totalPrice: number;
+  currency: string;
+  paidAt: string | null;
+  items: OrderSummaryItemDTO[];
+}
+
 export type OrderStatus =
   | "PENDING_PAYMENT"
   | "PAID"

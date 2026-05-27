@@ -11,8 +11,8 @@ interface HoldersFormProps {
 export default function HoldersForm({ fields, eligibilityTypes }: HoldersFormProps) {
   return (
     <div className="flex flex-col gap-4">
-      <div>
-        <h2 className="text-xl font-bold text-foreground">Dados dos portadores</h2>
+      <div className="pb-4">
+        <h2 className="text-4xl font-extrabold text-foreground">Dados dos portadores</h2>
         <p className="text-sm text-muted-foreground mt-1">
           Preencha nome e documento de cada ingresso selecionado.
         </p>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ToggleLeft, ToggleRight, Loader2, CalendarDays } from "lucide-react";
-import type { EventConfigureResponse } from "@/features/organizer/organizer-event-configure/types/eventConfigure.types";
+import type { EventConfigureResponse } from "@/features/event-configure/types/eventConfigure.types";
 
 type Props = {
     event: EventConfigureResponse;

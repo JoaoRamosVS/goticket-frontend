@@ -2,11 +2,13 @@ import { useParams, useLocation, Link } from "react-router-dom";
 import type { PlaceOrderResponse } from "@/features/checkout/types/order-api.types";
 import useOrder from "@/features/order-tracking/hooks/useOrder";
 import useOrderPolling from "@/features/order-tracking/hooks/useOrderPolling";
+import useOrderSummary from "@/features/order-tracking/hooks/useOrderSummary";
 import OrderHeader from "@/features/order-tracking/components/OrderHeader";
 import OrderStatusBanner from "@/features/order-tracking/components/OrderStatusBanner";
 import OrderItemsList from "@/features/order-tracking/components/OrderItemsList";
 import ExpirationCountdown from "@/features/order-tracking/components/ExpirationCountdown";
 import StripePaymentArea from "@/features/order-tracking/components/StripePaymentArea";
+import OrderSummarySidebar from "@/features/order-tracking/components/OrderSummarySidebar";
 import type { OrderResponse } from "@/features/order-tracking/types/order-response.types";
 
 export default function OrderTrackingPage() {
@@ -39,6 +41,7 @@ export default function OrderTrackingPage() {
 
   const { order: fetchedOrder, isLoading, error } = useOrder(parsedOrderId, initialOrder);
   const { order, isPolling } = useOrderPolling(parsedOrderId, fetchedOrder);
+  const { summary, isLoading: summaryLoading } = useOrderSummary(parsedOrderId);
 
   if (isLoading || (!order && !error)) {
     return (
@@ -71,32 +74,39 @@ export default function OrderTrackingPage() {
   const publishableKey = order.publishableKey ?? placeOrderState?.publishableKey;
 
   return (
-    <div className="max-w-4xl mx-auto px-6 md:px-12 py-12 mt-24 space-y-6">
-      <OrderStatusBanner status={order.status} />
-      <OrderHeader
-        orderId={order.orderId}
-        status={order.status}
-        totalPrice={order.totalPrice}
-        currency={order.currency}
-      />
+    <div className="max-w-7xl mx-auto px-6 md:px-12 py-12 mt-24">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-12 items-start">
+        <div className="flex flex-col gap-6">
+          <OrderStatusBanner status={order.status} />
+          <OrderHeader
+            orderId={order.orderId}
+            status={order.status}
+            totalPrice={order.totalPrice}
+            currency={order.currency}
+          />
 
+          {order.status === "PENDING_PAYMENT" && (
+            <div className="flex items-center gap-2">
+              <ExpirationCountdown expiresAt={order.expiresAt} />
+              {isPolling && (
+                <span className="text-xs text-muted-foreground font-semibold">
+                  Verificando status...
+                </span>
+              )}
+            </div>
+          )}
 
-      {order.status === "PENDING_PAYMENT" && (
-        <div className="flex items-center gap-2">
-          <ExpirationCountdown expiresAt={order.expiresAt} />
-          {isPolling && (
-            <span className="text-xs text-muted-foreground font-semibold">
-              Verificando status...
-            </span>
+          {order.items.length > 0 && <OrderItemsList items={order.items} />}
+
+          {clientSecret && publishableKey && order.status === "PENDING_PAYMENT" && (
+            <StripePaymentArea clientSecret={clientSecret} publishableKey={publishableKey} />
           )}
         </div>
-      )}
 
-      {order.items.length > 0 && <OrderItemsList items={order.items} />}
-
-      {clientSecret && publishableKey && order.status === "PENDING_PAYMENT" && (
-        <StripePaymentArea clientSecret={clientSecret} publishableKey={publishableKey} />
-      )}
+        <aside className="lg:sticky lg:top-28">
+          <OrderSummarySidebar summary={summary} isLoading={summaryLoading} />
+        </aside>
+      </div>
     </div>
   );
 }
