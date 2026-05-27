@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
 
 // import SessionWatcher from '@/components/shared/SessionWatcher';
@@ -13,7 +13,6 @@ import SignUp from '@/pages/auth/SignUp';
 import QuemSomos from '@/pages/public/QuemSomos';
 
 import EventPage from '@/pages/public/EventPage';
-
 import EventDateTicketsPage from '@/pages/public/EventDateTicketsPage';
 
 import AdminLayout from '@/layouts/AdminLayout';
@@ -53,97 +52,143 @@ import MyAccountAddressPage from '@/pages/client/MyAccountAddressPage';
 import MyAccountSecurityPage from '@/pages/client/MyAccountSecurityPage';
 import MyAccountOrdersPage from '@/pages/client/MyAccountOrdersPage';
 
-function ProtectedRoute() {
-    const isAuth = useAuthStore((state) => state.isAuth)
-    const { showToast } = useToast()
+/** Rotas exclusivas para clientes. Admin/Organizer são redirecionados para sua área. */
+function ProtectedClientRoute() {
+  const isAuth = useAuthStore((state) => state.isAuth)
+  const userScope = useAuthStore((state) => state.userScope)
+  const { showToast } = useToast()
 
-    const hasShownToast = useRef(false)
+  useEffect(() => {
+    if (!isAuth) {
+      showToast({ type: 'warning', title: 'Acesso restrito', message: 'Você precisa estar logado para acessar esta seção.' })
+    } else if (userScope === 'ADMIN' || userScope === 'ORGANIZER') {
+      showToast({ type: 'warning', title: 'Área incorreta', message: 'Para acessar esta área, você precisa estar logado como um cliente.' })
+    }
+  }, [isAuth, userScope, showToast])
 
-    useEffect(() => {
-        if (!isAuth && !hasShownToast.current) {
-            hasShownToast.current = true
+  if (!isAuth) return <Navigate to="/login" replace />
+  if (userScope === 'ADMIN') return <Navigate to="/admin/dashboard" replace />
+  if (userScope === 'ORGANIZER') return <Navigate to="/organizer/dashboard" replace />
 
-            showToast({
-                type: 'warning',
-                title: 'Acesso restrito',
-                message: 'Você precisa estar logado para acessar esta seção.',
-            })
-        }
-    }, [isAuth, showToast])
+  return <Outlet />
+}
 
-    if (!isAuth) return <Navigate to="/login" replace />
+/** Rotas exclusivas para organizadores. */
+function OrganizerRoute() {
+  const isAuth = useAuthStore((state) => state.isAuth)
+  const userScope = useAuthStore((state) => state.userScope)
+  const { showToast } = useToast()
 
-    return <Outlet />
+  useEffect(() => {
+    if (!isAuth) {
+      showToast({ type: 'warning', title: 'Acesso restrito', message: 'Você precisa estar logado para acessar esta seção.' })
+    } else if (userScope !== 'ORGANIZER') {
+      showToast({ type: 'error', title: 'Acesso negado', message: 'Você não tem permissão para acessar esta seção.' })
+    }
+  }, [isAuth, userScope, showToast])
+
+  if (!isAuth) return <Navigate to="/login" replace />
+  if (userScope === 'ADMIN') return <Navigate to="/admin/dashboard" replace />
+  if (userScope !== 'ORGANIZER') return <Navigate to="/" replace />
+
+  return <OrganizerLayout><Outlet /></OrganizerLayout>
+}
+
+/** Rotas exclusivas para administradores. */
+function AdminRoute() {
+  const isAuth = useAuthStore((state) => state.isAuth)
+  const userScope = useAuthStore((state) => state.userScope)
+  const { showToast } = useToast()
+
+  useEffect(() => {
+    if (!isAuth) {
+      showToast({ type: 'warning', title: 'Acesso restrito', message: 'Você precisa estar logado para acessar esta seção.' })
+    } else if (userScope !== 'ADMIN') {
+      showToast({ type: 'error', title: 'Acesso negado', message: 'Você não tem permissão para acessar esta seção.' })
+    }
+  }, [isAuth, userScope, showToast])
+
+  if (!isAuth) return <Navigate to="/login" replace />
+  if (userScope === 'ORGANIZER') return <Navigate to="/organizer/dashboard" replace />
+  if (userScope !== 'ADMIN') return <Navigate to="/" replace />
+
+  return <AdminLayout><Outlet /></AdminLayout>
 }
 
 function AppContent() {
   const isAuth = useAuthStore((state) => state.isAuth)
+  const userScope = useAuthStore((state) => state.userScope)
+
+  const loginRedirect = !isAuth ? null :
+    userScope === 'ADMIN' ? <Navigate to="/admin/dashboard" replace /> :
+    userScope === 'ORGANIZER' ? <Navigate to="/organizer/dashboard" replace /> :
+    <Navigate to="/home" replace />
 
   return (
     <SmoothScroll>
       <Routes>
         <Route path="/" element={<Home />} />
 
-        <Route path="/login" element={isAuth ? <Navigate to="/home" replace /> : <Login />} />
-        <Route path="/cadastro" element={isAuth ? <Navigate to="/home" replace /> : <SignUp />} />
+        <Route path="/login" element={loginRedirect ?? <Login />} />
+        <Route path="/cadastro" element={loginRedirect ?? <SignUp />} />
 
         <Route path="/home" element={<Home />} />
         <Route path="/busca/:searchTerm" element={<MainLayout><BuscaPage /></MainLayout>} />
         <Route path="/categorias" element={<MainLayout><CategoriasIndexPage /></MainLayout>} />
         <Route path="/categoria/:slug" element={<MainLayout><CategoriaPage /></MainLayout>} />
         <Route path="/evento/:eventId" element={<MainLayout><EventPage /></MainLayout>} />
-        <Route element={<ProtectedRoute />}>
+        <Route path="/quem-somos" element={<QuemSomos />} />
+
+        <Route element={<ProtectedClientRoute />}>
           <Route path="/evento/:eventId/data/:eventDateId/ingressos" element={<MainLayout><EventDateTicketsPage /></MainLayout>} />
           <Route path="/checkout" element={<MainLayout><CheckoutPage /></MainLayout>} />
           <Route path="/pedidos/:orderId" element={<MainLayout><OrderTrackingPage /></MainLayout>} />
-        </Route>
-        <Route path="/quem-somos" element={<QuemSomos />} />
 
-        <Route path="/minha-conta" element={<MyAccountLayout><Outlet /></MyAccountLayout>}>
-          <Route index element={<Navigate to="perfil" replace />} />
-          <Route path="perfil" element={<MyAccountProfilePage />} />
-          <Route path="endereco" element={<MyAccountAddressPage />} />
-          <Route path="seguranca" element={<MyAccountSecurityPage />} />
-          <Route path="pedidos" element={<MyAccountOrdersPage />} />
+          <Route path="/minha-conta" element={<MyAccountLayout><Outlet /></MyAccountLayout>}>
+            <Route index element={<Navigate to="perfil" replace />} />
+            <Route path="perfil" element={<MyAccountProfilePage />} />
+            <Route path="endereco" element={<MyAccountAddressPage />} />
+            <Route path="seguranca" element={<MyAccountSecurityPage />} />
+            <Route path="pedidos" element={<MyAccountOrdersPage />} />
+          </Route>
         </Route>
 
-        <Route path="/admin" element={<AdminLayout><Outlet /></AdminLayout>}>
+        <Route path="/admin" element={<AdminRoute />}>
           <Route index element={<Navigate to="dashboard" replace />} />
-          
+
           <Route path="dashboard" element={<AdminDashboard />} />
-          
+
           <Route path="eventos" element={<AdminEventos />} />
           <Route path="eventos/:eventId" element={<AdminEditarEvento />} />
           <Route path="eventos/:eventId/configurar" element={<AdminConfigurarEvento />} />
-          
+
           <Route path="espacos" element={<AdminEspacos />} />
-          <Route path="new-venue" element={<AdminNewVenue />} />
           <Route path="espacos/:venueId" element={<AdminEditarEspaco />} />
-          
+          <Route path="new-venue" element={<AdminNewVenue />} />
+
           <Route path="clientes" element={<AdminClientes />} />
           <Route path="clientes/:clientId" element={<AdminEditarCliente />} />
-          
+
           <Route path="organizadores" element={<AdminOrganizadores />} />
           <Route path="organizadores/:organizerId" element={<AdminEditarOrganizador />} />
-          
+
           <Route path="categorias" element={<AdminCategorias />} />
           <Route path="categorias/:categoryId" element={<AdminEditarCategoria />} />
-          
-          <Route path="vendas" element={<AdminVendas />} />
 
+          <Route path="vendas" element={<AdminVendas />} />
           <Route path="configuracoes" element={<AdminConfiguracoes />} />
         </Route>
 
-        <Route path="/organizer" element={<OrganizerLayout><Outlet /></OrganizerLayout>}>
+        <Route path="/organizer" element={<OrganizerRoute />}>
           <Route index element={<Navigate to="dashboard" replace />} />
 
           <Route path="dashboard" element={<OrganizerDashboard />} />
 
           <Route path="eventos" element={<OrganizerEventosList />} />
           <Route path="eventos/:eventId" element={<OrganizerEditarEvento />} />
+          <Route path="eventos/:eventId/configurar" element={<OrganizerConfigurarEvento />} />
 
           <Route path="novo-evento" element={<OrganizerNovoEvento />} />
-          <Route path="eventos/:eventId/configurar" element={<OrganizerConfigurarEvento />} />
         </Route>
       </Routes>
     </SmoothScroll>
@@ -161,4 +206,3 @@ function App() {
 }
 
 export default App
-
