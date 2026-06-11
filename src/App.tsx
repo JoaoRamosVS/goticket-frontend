@@ -31,6 +31,8 @@ import AdminEditarEspaco from '@/pages/admin/espacos/EditarEspaco';
 import AdminNewVenue from '@/pages/admin/espacos/NewVenue';
 import AdminCategorias from '@/pages/admin/categorias/CategoriasList';
 import AdminEditarCategoria from '@/pages/admin/categorias/EditarCategoria';
+import AdminPedidos from '@/pages/admin/pedidos/PedidosList';
+import AdminPedidoDetalhe from '@/pages/admin/pedidos/PedidoDetalhe';
 
 import OrganizerLayout from '@/layouts/OrganizerLayout';
 import OrganizerDashboard from '@/pages/organizer/Dashboard';
@@ -174,6 +176,9 @@ function AppContent() {
 
           <Route path="categorias" element={<AdminCategorias />} />
           <Route path="categorias/:categoryId" element={<AdminEditarCategoria />} />
+
+          <Route path="pedidos" element={<AdminPedidos />} />
+          <Route path="pedidos/:orderId" element={<AdminPedidoDetalhe />} />
 
           <Route path="vendas" element={<AdminVendas />} />
           <Route path="configuracoes" element={<AdminConfiguracoes />} />

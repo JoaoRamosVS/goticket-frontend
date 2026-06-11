@@ -9,6 +9,7 @@ import {
     ChevronRight,
     Building2,
     Tags,
+    ShoppingBag,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -28,6 +29,7 @@ const NAV_ITEMS: NavItem[] = [
     { to: "/admin/espacos", label: "Espaços", icon: Building2 },
     { to: "/admin/clientes", label: "Clientes", icon: Users },
     { to: "/admin/organizadores", label: "Organizadores", icon: UserCog },
+    { to: "/admin/pedidos", label: "Pedidos", icon: ShoppingBag },
 ];
 
 const SECONDARY_ITEMS: NavItem[] = [
