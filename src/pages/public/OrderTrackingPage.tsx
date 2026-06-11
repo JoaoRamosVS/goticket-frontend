@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useParams, useLocation, Link } from "react-router-dom";
 import type { PlaceOrderResponse } from "@/features/checkout/types/order-api.types";
 import useOrder from "@/features/order-tracking/hooks/useOrder";
@@ -42,6 +43,16 @@ export default function OrderTrackingPage() {
   const { order: fetchedOrder, isLoading, error } = useOrder(parsedOrderId, initialOrder);
   const { order, isPolling } = useOrderPolling(parsedOrderId, fetchedOrder);
   const { summary, isLoading: summaryLoading } = useOrderSummary(parsedOrderId);
+
+  const itemsWithQrTokens = useMemo(() => {
+    if (!order) return [];
+    if (!summary?.items?.length) return order.items;
+    const qrMap = new Map(summary.items.map((s) => [s.orderItemId, s.qrToken]));
+    return order.items.map((item) => ({
+      ...item,
+      qrToken: qrMap.get(item.orderItemId) ?? null,
+    }));
+  }, [order, summary]);
 
   if (isLoading || (!order && !error)) {
     return (
@@ -96,7 +107,7 @@ export default function OrderTrackingPage() {
             </div>
           )}
 
-          {order.items.length > 0 && <OrderItemsList items={order.items} />}
+          {itemsWithQrTokens.length > 0 && <OrderItemsList items={itemsWithQrTokens} />}
 
           {clientSecret && publishableKey && order.status === "PENDING_PAYMENT" && (
             <StripePaymentArea clientSecret={clientSecret} publishableKey={publishableKey} />

@@ -44,6 +44,7 @@ export interface OrderItemResponse {
   unitPrice: number;
   feeAmount: number;
   ticketId: string | null;
+  qrToken: string | null;
 }
 
 export interface OrderResponse {

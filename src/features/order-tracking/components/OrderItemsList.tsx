@@ -14,8 +14,8 @@ interface OrderItemCardProps {
 
 function OrderItemCard({ item }: OrderItemCardProps) {
   const [open, setOpen] = useState(false);
-  const qrUrl = item.ticketId
-    ? `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(item.ticketId)}&format=png`
+  const qrUrl = item.qrToken
+    ? `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(item.qrToken)}&format=png`
     : null;
 
   return (
@@ -73,7 +73,7 @@ function OrderItemCard({ item }: OrderItemCardProps) {
               <div className="rounded-4xl border border-border bg-white/30 p-4 shadow-xl">
                 <img
                   src={qrUrl}
-                  alt={`QR Code do ingresso ${item.ticketId}`}
+                  alt={`QR Code do ingresso de ${item.holderName}`}
                   width={240}
                   height={240}
                   className="block rounded-2xl"
