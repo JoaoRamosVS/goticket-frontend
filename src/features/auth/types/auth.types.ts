@@ -24,6 +24,14 @@ export interface RegisterResponse {
     expiresIn: number;
 }
 
+export interface OrganizerRegisterRequest {
+    email: string;
+    password: string;
+    organizerName: string;
+    legalName: string;
+    CNPJ: string;
+}
+
 type RoleValue = "ADMIN" | "ORGANIZER" | "CLIENT";
 type StatusValue = "ACTIVE" | "INACTIVE";
 

@@ -2,6 +2,7 @@ import goTicketApi from "@/services/api";
 import type {
     LoginRequest,
     LoginResponse,
+    OrganizerRegisterRequest,
     RegisterRequest,
     RegisterResponse,
     UserDTO,
@@ -24,6 +25,11 @@ const login = async (loginData: LoginRequest): Promise<LoginResponse> => {
 
 const register = async (registerData: RegisterRequest): Promise<RegisterResponse> => {
     const response = await goTicketApi.post("/clients", registerData);
+    return response.data as RegisterResponse;
+};
+
+const registerOrganizer = async (data: OrganizerRegisterRequest): Promise<RegisterResponse> => {
+    const response = await goTicketApi.post("/organizers", data);
     return response.data as RegisterResponse;
 };
 
@@ -68,4 +74,4 @@ const listActiveUsers = async (
     return response.data;
 };
 
-export default { login, register, getUser, listAllUsers, listActiveUsers };
+export default { login, register, registerOrganizer, getUser, listAllUsers, listActiveUsers };

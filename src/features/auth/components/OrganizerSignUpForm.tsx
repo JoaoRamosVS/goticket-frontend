@@ -1,68 +1,49 @@
-import { Mail, Lock, User, Calendar, FileText, Loader2, AlertCircle } from "lucide-react";
+import { Mail, Lock, Store, Building, FileText, Loader2, AlertCircle } from "lucide-react";
 
-type SignUpFormProps = {
+type OrganizerSignUpFormProps = {
     email: string;
     password: string;
-    fullName: string;
-    sex: number;
-    identityDocument: string;
-    birthDate: string;
+    organizerName: string;
+    legalName: string;
+    cnpj: string;
     isLoading: boolean;
     signUpError: string;
     onEmailChange: (value: string) => void;
     onPasswordChange: (value: string) => void;
-    onFullNameChange: (value: string) => void;
-    onSexChange: (value: number) => void;
-    onIdentityDocumentChange: (value: string) => void;
-    onBirthDateChange: (value: string) => void;
+    onOrganizerNameChange: (value: string) => void;
+    onLegalNameChange: (value: string) => void;
+    onCnpjChange: (value: string) => void;
     onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 };
 
 const base =
-    "h-11 w-full rounded-2xl border border-white/70 bg-white/60 px-4 text-sm text-[#00334d] placeholder:text-[#5e6c87]/60 shadow-[0_2px_8px_-4px_rgba(0,46,71,0.06)] backdrop-blur-xl outline-none transition-all duration-300 focus:border-[#2a8fd4]/50 focus:bg-white/90 focus:shadow-[0_0_0_4px_rgba(42,143,212,0.12)]";
+    "h-11 w-full rounded-2xl border border-white/70 bg-white/60 px-4 text-sm text-[#00334d] placeholder shadow-[0_2px_8px_-4px_rgba(0,46,71,0.06)] backdrop-blur-xl outline-none transition-all duration-300 focus:border-[#2a8fd4]/50 focus:bg-white/90 focus:shadow-[0_0_0_4px_rgba(42,143,212,0.12)]";
 
-const SignUpForm = ({
+const OrganizerSignUpForm = ({
     email,
     password,
-    fullName,
-    sex,
-    identityDocument,
-    birthDate,
+    organizerName,
+    legalName,
+    cnpj,
     isLoading,
     signUpError,
     onEmailChange,
     onPasswordChange,
-    onFullNameChange,
-    onSexChange,
-    onIdentityDocumentChange,
-    onBirthDateChange,
+    onOrganizerNameChange,
+    onLegalNameChange,
+    onCnpjChange,
     onSubmit,
-}: SignUpFormProps) => {
+}: OrganizerSignUpFormProps) => {
     return (
         <form className="space-y-5" onSubmit={onSubmit}>
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                <div className="flex flex-col gap-1.5 md:col-span-2">
-                    <FieldLabel required>Nome completo</FieldLabel>
-                    <div className="relative">
-                        <User className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#5e6c87]/60" />
-                        <input
-                            type="text"
-                            placeholder="João Silva"
-                            value={fullName}
-                            required
-                            onChange={(e) => onFullNameChange(e.target.value)}
-                            className={`${base} pl-11`}
-                        />
-                    </div>
-                </div>
-
                 <div className="flex flex-col gap-1.5">
                     <FieldLabel required>E-mail</FieldLabel>
                     <div className="relative">
-                        <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#5e6c87]/60" />
+                        <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-blue-500" />
                         <input
                             type="email"
-                            placeholder="seu@email.com"
+                            placeholder="contato@empresa.com"
                             value={email}
                             required
                             onChange={(e) => onEmailChange(e.target.value.toLowerCase())}
@@ -74,7 +55,7 @@ const SignUpForm = ({
                 <div className="flex flex-col gap-1.5">
                     <FieldLabel required>Senha</FieldLabel>
                     <div className="relative">
-                        <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#5e6c87]/60" />
+                        <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2" />
                         <input
                             type="password"
                             placeholder="••••••••"
@@ -86,47 +67,51 @@ const SignUpForm = ({
                     </div>
                 </div>
 
-                <div className="flex flex-col gap-1.5">
-                    <FieldLabel required>CPF</FieldLabel>
+                <div className="flex flex-col gap-1.5 md:col-span-2">
+                    <FieldLabel required>Nome fantasia</FieldLabel>
                     <div className="relative">
-                        <FileText className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#5e6c87]/60" />
+                        <Store className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2" />
                         <input
                             type="text"
-                            placeholder="000.000.000-00"
-                            value={identityDocument}
+                            placeholder="Nome comercial da empresa"
+                            value={organizerName}
                             required
-                            maxLength={14}
-                            onChange={(e) => onIdentityDocumentChange(e.target.value)}
-                            className={`${base} pl-11`}
-                        />
-                    </div>
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                    <FieldLabel required>Data de nascimento</FieldLabel>
-                    <div className="relative">
-                        <Calendar className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#5e6c87]/60" />
-                        <input
-                            type="date"
-                            value={birthDate}
-                            required
-                            onChange={(e) => onBirthDateChange(e.target.value)}
+                            onChange={(e) => onOrganizerNameChange(e.target.value)}
                             className={`${base} pl-11`}
                         />
                     </div>
                 </div>
 
                 <div className="flex flex-col gap-1.5 md:col-span-2">
-                    <FieldLabel required>Sexo</FieldLabel>
-                    <select
-                        value={sex.toString()}
-                        onChange={(e) => onSexChange(Number(e.target.value))}
-                        className={base}
-                    >
-                        <option value="3">Não informado</option>
-                        <option value="1">Masculino</option>
-                        <option value="2">Feminino</option>
-                    </select>
+                    <FieldLabel required>Razão social</FieldLabel>
+                    <div className="relative">
+                        <Building className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2" />
+                        <input
+                            type="text"
+                            placeholder="Razão social registrada"
+                            value={legalName}
+                            required
+                            onChange={(e) => onLegalNameChange(e.target.value)}
+                            className={`${base} pl-11`}
+                        />
+                    </div>
+                </div>
+
+                <div className="flex flex-col gap-1.5 md:col-span-2">
+                    <FieldLabel required>CNPJ</FieldLabel>
+                    <div className="relative">
+                        <FileText className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2" />
+                        <input
+                            type="text"
+                            placeholder="00.000.000/0000-00"
+                            value={cnpj}
+                            required
+                            maxLength={18}
+                            inputMode="numeric"
+                            onChange={(e) => onCnpjChange(e.target.value)}
+                            className={`${base} pl-11`}
+                        />
+                    </div>
                 </div>
             </div>
 
@@ -147,7 +132,7 @@ const SignUpForm = ({
                 }}
             >
                 {isLoading && <Loader2 className="size-4 animate-spin" />}
-                {isLoading ? "Carregando..." : "Criar conta"}
+                {isLoading ? "Carregando..." : "Criar conta de organizador"}
             </button>
         </form>
     );
@@ -160,4 +145,4 @@ const FieldLabel = ({ children, required }: { children: React.ReactNode; require
     </span>
 );
 
-export default SignUpForm;
+export default OrganizerSignUpForm;
