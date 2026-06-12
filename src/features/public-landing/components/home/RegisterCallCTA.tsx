@@ -15,7 +15,7 @@ const RegisterCallCTA = () => {
             />
 
             <div
-                className="relative mx-auto flex max-w-4xl flex-col items-center gap-5 rounded-[48px] border border-white/60 bg-white/30 px-8 text-center backdrop-blur-2xl sm:gap-4 sm:rounded-[64px] sm:px-16"
+                className="relative mx-auto flex max-w-4xl flex-col items-center gap-5 rounded-[48px] border border-white/60 bg-white/60 px-8 py-12 text-center backdrop-blur-2xl shadow-2xs sm:gap-4 sm:rounded-[64px] sm:px-16"
             >
                 <h2 className="text-2xl font-extrabold sm:text-3xl md:text-5xl">
                     Transforme seus Eventos!

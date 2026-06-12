@@ -50,7 +50,7 @@ const VenueMapSidebar = ({
                         key={sector.localId}
                         type="button"
                         onClick={() => onSelectSector(sector.localId)}
-                        className={`mb-2 w-full rounded-xl cursor-pointer border px-3 py-2 text-left shadow-md text-sm border-white/70 bg-white/70 transition-all duration-200 hover:scale-[0.97] hover:shadow-lg`}
+                        className={`mb-2 w-full rounded-lg cursor-pointer border px-3 py-4 text-left shadow-md text-md border-white/70 bg-white/70 transition-all duration-200 hover:scale-[0.97] hover:shadow-lg`}
                         style={
                             isSelectedSector
                                 ? { background: "linear-gradient(135deg, #4db8e8 0%, #2a8fd4 50%, #1c6fb5 100%)",
@@ -59,8 +59,7 @@ const VenueMapSidebar = ({
                                 : undefined
                         }
                     >
-                        <p className={`font-semibold ${isSelectedSector ? "text-white" : "text-[#00334d]"}`}>{sector.name}</p>
-                        <p className={`text-xs ${isSelectedSector ? "text-white/70" : "text-[#5e6c87]"}`}>{sector.mapElementId}</p>
+                        <p className={`font-medium ${isSelectedSector ? "text-white" : "text-[#00334d]"}`}>{sector.name}</p>
                     </button>
                 );
             })}
@@ -79,13 +78,6 @@ const VenueMapSidebar = ({
                         value={selectedSector.description}
                         onChange={(value) => onUpdateSelectedSector({ description: value })}
                     />
-                    {allowSectorCrud && (
-                        <Field
-                            label="Map Element ID"
-                            value={selectedSector.mapElementId}
-                            onChange={(value) => onUpdateSelectedSector({ mapElementId: value })}
-                        />
-                    )}
                     <Field
                         label="Capacidade"
                         value={String(selectedSector.maxCapacity)}

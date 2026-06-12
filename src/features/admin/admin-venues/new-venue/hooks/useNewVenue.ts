@@ -19,6 +19,10 @@ import {
     refreshVenueDetail,
 } from "@/features/admin/admin-venues/new-venue/services/newVenue.service";
 import { normalizeCnpjDigits } from "@/features/admin/admin-venues/new-venue/utils/cnpj";
+import {
+    deriveMapElementId,
+    slugifySectorName,
+} from "@/features/admin/admin-venues/components/venue-map-editor/VenueMapEditor.helper";
 import { maskCnpj, maskCep, stripMask } from "@/utils/validation";
 import { fetchCep } from "@/services/cep.service";
 
@@ -30,13 +34,13 @@ const FIELD_MASKS: Partial<Record<keyof NewVenueFormState, MaskFn>> = {
 };
 
 function newDraftSector(index: number): NewVenueDraftSector {
-    const slug = crypto.randomUUID().replace(/-/g, "").slice(0, 10);
+    const name = `Setor ${index + 1}`;
     return {
         key: crypto.randomUUID(),
-        name: `Setor ${index + 1}`,
+        name,
         description: "Descrição do setor",
         maxCapacity: 100,
-        mapElementId: `poly-${slug}`,
+        mapElementId: slugifySectorName(name),
     };
 }
 
@@ -121,7 +125,6 @@ export function useNewVenue() {
                 if (draftSectors.length === 0) return "Adicione ao menos um setor.";
                 for (const sec of draftSectors) {
                     if (!sec.name.trim()) return "Cada setor precisa de um nome.";
-                    if (!sec.mapElementId.trim()) return "Cada setor precisa de um ID de mapa.";
                     if (sec.maxCapacity < 1) return "Capacidade mínima de 1 por setor.";
                 }
             }
@@ -329,7 +332,20 @@ export function useNewVenue() {
     }, [step, validateStep, form, createdVenue, draftSectors, bumpMax]);
 
     const addDraftSector = useCallback(() => {
-        setDraftSectors((prev) => [...prev, newDraftSector(prev.length)]);
+        setDraftSectors((prev) => {
+            const name = `Setor ${prev.length + 1}`;
+            const otherIds = prev.map((s) => s.mapElementId);
+            return [
+                ...prev,
+                {
+                    key: crypto.randomUUID(),
+                    name,
+                    description: "Descrição do setor",
+                    maxCapacity: 100,
+                    mapElementId: deriveMapElementId(name, otherIds),
+                },
+            ];
+        });
     }, []);
 
     const removeDraftSector = useCallback((key: string) => {
@@ -337,9 +353,17 @@ export function useNewVenue() {
     }, []);
 
     const updateDraftSector = useCallback((key: string, patch: Partial<NewVenueDraftSector>) => {
-        setDraftSectors((prev) =>
-            prev.map((s) => (s.key === key ? { ...s, ...patch } : s))
-        );
+        setDraftSectors((prev) => {
+            const otherIds = prev.filter((s) => s.key !== key).map((s) => s.mapElementId);
+            return prev.map((s) => {
+                if (s.key !== key) return s;
+                const merged = { ...s, ...patch };
+                if ("name" in patch) {
+                    merged.mapElementId = deriveMapElementId(merged.name, otherIds);
+                }
+                return merged;
+            });
+        });
     }, []);
 
     const onMapSaved = useCallback(() => {

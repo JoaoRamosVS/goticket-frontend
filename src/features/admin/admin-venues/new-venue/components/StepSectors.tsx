@@ -16,8 +16,7 @@ export function StepSectors({ sectors, onAdd, onRemove, onUpdate }: Props) {
     return (
         <div className="flex flex-col gap-4">
             <p className="text-xs leading-relaxed text-[#5e6c87]">
-                Defina nome, descrição, capacidade e um{" "}
-                <strong className="text-[#00334d]">ID estável</strong> para cada polígono no SVG.
+                Defina nome, descrição e capacidade de cada setor.
                 Na próxima etapa você posicionará os polígonos sobre a imagem base.
             </p>
 
@@ -88,16 +87,6 @@ export function StepSectors({ sectors, onAdd, onRemove, onUpdate }: Props) {
                                     value={s.description}
                                     onChange={(e) =>
                                         onUpdate(s.key, { description: e.target.value })
-                                    }
-                                />
-                            </label>
-                            <label className="flex flex-col gap-1 text-[11px] font-bold uppercase text-[#5e6c87] sm:col-span-2">
-                                ID no mapa (polígono)
-                                <input
-                                    className={`${inputClass} h-10 font-mono text-xs`}
-                                    value={s.mapElementId}
-                                    onChange={(e) =>
-                                        onUpdate(s.key, { mapElementId: e.target.value })
                                     }
                                 />
                             </label>

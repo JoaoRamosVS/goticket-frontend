@@ -138,6 +138,27 @@ export function fromVenueSector(
     };
 }
 
+export function slugifySectorName(name: string): string {
+    const diacritics = new RegExp("[\\u0300-\\u036f]", "g");
+    return (
+        name
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(diacritics, "")
+            .replace(/[^a-z0-9\s]/g, " ")
+            .trim()
+            .replace(/\s+/g, "-") || "sector"
+    );
+}
+
+export function deriveMapElementId(name: string, otherIds: string[]): string {
+    const base = slugifySectorName(name);
+    if (!otherIds.includes(base)) return base;
+    let i = 2;
+    while (otherIds.includes(`${base}-${i}`)) i++;
+    return `${base}-${i}`;
+}
+
 export function getErrorMessage(err: unknown, fallback: string): string {
     if (axios.isAxiosError(err)) {
         const errors = err.response?.data?.errors;

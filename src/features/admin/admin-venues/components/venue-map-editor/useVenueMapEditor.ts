@@ -13,6 +13,7 @@ import {
     DEFAULT_MAP_HEIGHT,
     DEFAULT_MAP_WIDTH,
     defaultSquare,
+    deriveMapElementId,
     fromSvgPoints,
     fromVenueSector,
     getErrorMessage,
@@ -172,12 +173,14 @@ export const useVenueMapEditor = ({
     };
 
     const addSector = () => {
+        const name = `Setor ${sectors.length + 1}`;
+        const otherIds = sectors.map((s) => s.mapElementId);
         const newSector: EditableSector = {
             localId: crypto.randomUUID(),
-            name: `Setor ${sectors.length + 1}`,
+            name,
             description: "Novo setor",
             maxCapacity: 100,
-            mapElementId: `sector-${Date.now()}`,
+            mapElementId: deriveMapElementId(name, otherIds),
             points: defaultSquare(mapSize.w, mapSize.h),
             color: randomColor(),
         };
@@ -187,11 +190,19 @@ export const useVenueMapEditor = ({
 
     const updateSelectedSector = (patch: Partial<EditableSector>) => {
         if (!selectedSectorId) return;
-        setSectors((prev) =>
-            prev.map((sector) =>
-                sector.localId === selectedSectorId ? { ...sector, ...patch } : sector
-            )
-        );
+        setSectors((prev) => {
+            const otherIds = prev
+                .filter((s) => s.localId !== selectedSectorId)
+                .map((s) => s.mapElementId);
+            return prev.map((sector) => {
+                if (sector.localId !== selectedSectorId) return sector;
+                const merged = { ...sector, ...patch };
+                if ("name" in patch) {
+                    merged.mapElementId = deriveMapElementId(merged.name, otherIds);
+                }
+                return merged;
+            });
+        });
     };
 
     const removeSelectedSector = () => {
