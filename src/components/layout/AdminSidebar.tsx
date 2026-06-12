@@ -111,7 +111,7 @@ const AdminSidebar = () => {
 
                 <nav className="relative flex-1 overflow-y-auto px-4 py-5">
                     <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-[#5e6c87]/70">
-                        Entidades
+                        Visualizações
                     </p>
                     <ul className="flex flex-col gap-1.5">
                         {NAV_ITEMS.map((item) => (

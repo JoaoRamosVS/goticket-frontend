@@ -11,7 +11,7 @@ type LoginFormProps = {
 };
 
 const base =
-    "h-11 w-full rounded-2xl border border-white/70 bg-white/60 px-4 text-sm text-[#00334d] placeholder:text-[#5e6c87]/60 shadow-[0_2px_8px_-4px_rgba(0,46,71,0.06)] backdrop-blur-xl outline-none transition-all duration-300 focus:border-[#2a8fd4]/50 focus:bg-white/90 focus:shadow-[0_0_0_4px_rgba(42,143,212,0.12)]";
+    "h-11 w-full rounded-2xl border border-white/70 bg-white/60 px-4 text-sm text-[#00334d] placeholder:text-[#5e6c87]/60 shadow-xs backdrop-blur-xl outline-none transition-all duration-300 focus:border-[#2a8fd4]/50 focus:bg-white/90 focus:shadow-[0_0_0_4px_rgba(42,143,212,0.12)]";
 
 const LoginForm = ({
     email,
@@ -64,7 +64,7 @@ const LoginForm = ({
             <button
                 type="submit"
                 disabled={isLoading}
-                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl py-3 text-sm font-bold text-white transition-all duration-300 hover:brightness-105 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl py-3 text-xl font-bold text-white transition-all duration-300 hover:brightness-105 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
                 style={{
                     background: "linear-gradient(135deg, #4db8e8 0%, #2a8fd4 50%, #1c6fb5 100%)",
                     boxShadow:

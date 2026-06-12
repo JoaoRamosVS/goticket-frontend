@@ -29,30 +29,28 @@ export default function Login() {
 
             {/* Glass card */}
             <div
-                className="relative z-10 w-full max-w-md rounded-4xl border border-white/70 bg-white/25 p-8 backdrop-blur-xl"
+                className="relative z-10 w-full max-w-md rounded-[48px] border border-white/70 bg-white/25 px-8 py-12 backdrop-blur-xl"
                 style={{
                     boxShadow:
                         "0 8px 40px -12px rgba(0,46,71,0.14), inset 0 1px 0 0 rgba(255,255,255,0.9)",
                 }}
             >
                 {/* Brand header */}
-                <div className="mb-8 flex flex-col items-center text-center">
+                <div className="mb-8 flex items-center gap-8 text-center border-b border-b-blue-500/10 pb-8">
                     <div
-                        className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl"
+                        className="flex p-4 items-center justify-center rounded-2xl"
                         style={{
                             background: "linear-gradient(135deg, #4db8e8 0%, #1c6fb5 100%)",
                             boxShadow:
-                                "0 6px 20px -4px rgba(42,143,212,0.6), inset 0 1px 0 0 rgba(255,255,255,0.25)",
+                                "0 6px 18px -4px rgba(42,143,212,0.55), inset 0 1px 0 0 rgba(255,255,255,0.25)",
                         }}
                     >
-                        <Ticket className="size-8 text-white" strokeWidth={2.2} />
+                        <Ticket className="size-12 text-white" strokeWidth={2.2} />
                     </div>
-                    <h1 className="text-2xl font-bold tracking-tight text-[#00334d]">
-                        Bem-vindo de volta
-                    </h1>
-                    <p className="mt-1.5 text-sm text-[#5e6c87]">
-                        Entre com suas credenciais para continuar
-                    </p>
+                    <div>
+                        <h1 className="text-4xl font-extrabold tracking-tight text-left">Olá novamente</h1>
+                        <p className="mt-1 text-sm text-[#5e6c87] text-left">Entre com suas credenciais para continuar</p>
+                    </div>
                 </div>
 
                 <LoginForm
