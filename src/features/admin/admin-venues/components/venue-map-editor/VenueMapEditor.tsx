@@ -61,7 +61,8 @@ export const VenueMapEditor = ({
                         <button
                             type="button"
                             onClick={vm.addSector}
-                            className="cursor-pointer shadow-md rounded-xl border border-white/70 bg-white/70 px-3 py-2 text-xs font-semibold text-[#00334d] transition-all duration-300 hover:bg-accent/50 hover:scale-95 hover:shadow-xl"
+                            disabled={!vm.baseImage}
+                            className="cursor-pointer shadow-md rounded-xl border border-white/70 bg-white/70 px-3 py-2 text-xs font-semibold text-[#00334d] transition-all duration-300 hover:bg-accent/50 hover:scale-95 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-40"
                         >
                             Adicionar setor
                         </button>

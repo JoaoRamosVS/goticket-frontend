@@ -146,7 +146,14 @@ export const useVenueMapEditor = ({
         if (pendingIntrinsicSizeRef.current) {
             pendingIntrinsicSizeRef.current = false;
             mapSizeFromSvgRef.current = false;
-            setMapSize({ w: baseImage.naturalWidth, h: baseImage.naturalHeight });
+            const newW = baseImage.naturalWidth;
+            const newH = baseImage.naturalHeight;
+            setMapSize({ w: newW, h: newH });
+            // Reset every sector polygon to a centered square in the new image coordinate space
+            // so no polygon ever starts outside the visible canvas after an upload.
+            setSectors((prev) =>
+                prev.map((sector) => ({ ...sector, points: defaultSquare(newW, newH) }))
+            );
             return;
         }
         if (!mapSizeFromSvgRef.current) {
