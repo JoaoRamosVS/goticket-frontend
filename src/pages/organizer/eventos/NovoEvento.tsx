@@ -6,6 +6,7 @@ import { useToast } from "@/components/ui/toast";
 
 import { StepDates } from "@/features/organizer/organizer-new-event/components/StepDates";
 import { StepDetails } from "@/features/organizer/organizer-new-event/components/StepDetails";
+import { StepImages } from "@/features/organizer/organizer-new-event/components/StepImages";
 import { StepReview } from "@/features/organizer/organizer-new-event/components/StepReview";
 import { StepVenue } from "@/features/organizer/organizer-new-event/components/StepVenue";
 import { useNewOrganizerEvent } from "@/features/organizer/organizer-new-event/hooks/useNewOrganizerEvent";
@@ -55,8 +56,8 @@ const OrganizerNovoEvento = () => {
     };
 
     const nextLabel =
-        flow.step === 3 ? "Enviar para aprovação" : "Continuar";
-    const NextIcon = flow.step === 3 ? Send : ArrowRight;
+        flow.step === 4 ? "Enviar para aprovação" : "Continuar";
+    const NextIcon = flow.step === 4 ? Send : ArrowRight;
 
     return (
         <div className="pb-12">
@@ -171,10 +172,19 @@ const OrganizerNovoEvento = () => {
                         />
                     )}
                     {flow.step === 3 && (
+                        <StepImages
+                            images={flow.images}
+                            onAdd={flow.addImages}
+                            onRemove={flow.removeImage}
+                            onMove={flow.moveImage}
+                        />
+                    )}
+                    {flow.step === 4 && (
                         <StepReview
                             form={flow.form}
                             categories={flow.categories}
                             venues={flow.venues}
+                            images={flow.images}
                         />
                     )}
                 </div>

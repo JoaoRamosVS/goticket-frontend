@@ -1,4 +1,5 @@
-import { CalendarDays, Hourglass } from "lucide-react";
+import { useEffect, useState } from "react";
+import { CalendarDays, Hourglass, Images } from "lucide-react";
 
 import type { EventCategoryDTO } from "@/features/admin/admin-categories/types/category.types";
 import type { VenueMinDTO } from "@/features/admin/admin-venues/types/venue.types";
@@ -8,6 +9,7 @@ type StepReviewProps = {
     form: NewEventFormState;
     categories: EventCategoryDTO[];
     venues: VenueMinDTO[];
+    images: File[];
 };
 
 const DATE_FORMATTER = new Intl.DateTimeFormat("pt-BR", {
@@ -26,11 +28,19 @@ function formatLocal(value: string): string {
     return DATE_FORMATTER.format(date);
 }
 
-export const StepReview = ({ form, categories, venues }: StepReviewProps) => {
+export const StepReview = ({ form, categories, venues, images }: StepReviewProps) => {
     const category =
         categories.find((c) => String(c.categoryId) === form.categoryId) ?? null;
     const venue =
         venues.find((v) => String(v.venueId) === form.venueId) ?? null;
+
+    const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+
+    useEffect(() => {
+        const urls = images.map((f) => URL.createObjectURL(f));
+        setPreviewUrls(urls);
+        return () => urls.forEach((u) => URL.revokeObjectURL(u));
+    }, [images]);
 
     return (
         <div className="flex flex-col gap-4">
@@ -108,6 +118,43 @@ export const StepReview = ({ form, categories, venues }: StepReviewProps) => {
                             </li>
                         ))}
                     </ul>
+                )}
+            </SummaryCard>
+
+            <SummaryCard title="Imagens">
+                {images.length === 0 ? (
+                    <div className="flex items-center gap-2 text-sm text-[#5e6c87]">
+                        <Images className="size-4 shrink-0 opacity-50" strokeWidth={1.8} />
+                        <span>Nenhuma imagem selecionada.</span>
+                    </div>
+                ) : (
+                    <div className="flex flex-col gap-3">
+                        <p className="text-xs text-[#5e6c87]">
+                            {images.length} {images.length === 1 ? "imagem" : "imagens"} — a primeira será usada como capa.
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                            {previewUrls.map((url, index) => (
+                                <div
+                                    key={url}
+                                    className="relative overflow-hidden rounded-xl border border-white/70"
+                                    style={{
+                                        boxShadow: "inset 0 1px 0 0 rgba(255,255,255,0.85)",
+                                    }}
+                                >
+                                    <img
+                                        src={url}
+                                        alt={images[index]?.name}
+                                        className="size-16 object-cover"
+                                    />
+                                    {index === 0 && (
+                                        <span className="absolute bottom-0 left-0 right-0 bg-amber-400/85 py-0.5 text-center text-[9px] font-bold text-amber-900">
+                                            Capa
+                                        </span>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 )}
             </SummaryCard>
         </div>

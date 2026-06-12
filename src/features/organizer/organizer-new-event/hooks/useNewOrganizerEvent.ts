@@ -29,6 +29,7 @@ export const useNewOrganizerEvent = (onCreated: (eventId: number) => void) => {
     const [step, setStep] = useState<NewEventStepIndex>(0);
     const [maxStepReached, setMaxStepReached] = useState<NewEventStepIndex>(0);
     const [form, setForm] = useState<NewEventFormState>(EMPTY_NEW_EVENT_FORM);
+    const [images, setImages] = useState<File[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -109,6 +110,23 @@ export const useNewOrganizerEvent = (onCreated: (eventId: number) => void) => {
         setError(null);
     }, []);
 
+    const addImages = useCallback((files: File[]) => {
+        setImages((prev) => [...prev, ...files]);
+    }, []);
+
+    const removeImage = useCallback((index: number) => {
+        setImages((prev) => prev.filter((_, i) => i !== index));
+    }, []);
+
+    const moveImage = useCallback((from: number, to: number) => {
+        setImages((prev) => {
+            const next = [...prev];
+            const [item] = next.splice(from, 1);
+            next.splice(to, 0, item);
+            return next;
+        });
+    }, []);
+
     const goToStep = useCallback(
         (target: NewEventStepIndex) => {
             if (target > maxStepReached) return;
@@ -130,7 +148,7 @@ export const useNewOrganizerEvent = (onCreated: (eventId: number) => void) => {
             return;
         }
 
-        if (step === 3) {
+        if (step === 4) {
             const categoryIdNumber = Number(form.categoryId);
             const venueIdNumber = Number(form.venueId);
             const ageRestriction = Number(form.ageRestriction);
@@ -155,6 +173,9 @@ export const useNewOrganizerEvent = (onCreated: (eventId: number) => void) => {
             setError(null);
             try {
                 const eventId = await newEventService.createEvent(payload);
+                if (images.length > 0) {
+                    await newEventService.uploadEventImages(eventId, images);
+                }
                 onCreated(eventId);
             } catch (err: unknown) {
                 const message =
@@ -183,6 +204,7 @@ export const useNewOrganizerEvent = (onCreated: (eventId: number) => void) => {
         steps: NEW_EVENT_STEPS,
         stepMeta,
         form,
+        images,
         error,
         isSubmitting,
         categories,
@@ -193,6 +215,9 @@ export const useNewOrganizerEvent = (onCreated: (eventId: number) => void) => {
         addEventDate,
         updateEventDate,
         removeEventDate,
+        addImages,
+        removeImage,
+        moveImage,
         goToStep,
         goBack,
         goNext,

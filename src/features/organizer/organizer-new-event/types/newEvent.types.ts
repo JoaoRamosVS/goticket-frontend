@@ -25,7 +25,7 @@ export interface CreateEventPayload {
     eventDates: EventDateInputDTO[];
 }
 
-export type NewEventStepIndex = 0 | 1 | 2 | 3;
+export type NewEventStepIndex = 0 | 1 | 2 | 3 | 4;
 
 export const NEW_EVENT_STEPS: Array<{
     id: NewEventStepIndex;
@@ -49,6 +49,11 @@ export const NEW_EVENT_STEPS: Array<{
     },
     {
         id: 3,
+        title: "Imagens",
+        subtitle: "Adicione fotos para ilustrar o evento.",
+    },
+    {
+        id: 4,
         title: "Revisão",
         subtitle: "Confira todos os dados e envie para aprovação.",
     },
