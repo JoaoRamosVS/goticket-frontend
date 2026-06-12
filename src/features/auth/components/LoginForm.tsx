@@ -64,9 +64,11 @@ const LoginForm = ({
             <button
                 type="submit"
                 disabled={isLoading}
-                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl py-3 text-xl font-bold text-white transition-all duration-300 hover:brightness-105 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-4xl py-3 text-xl font-bold text-white transition-all 
+                    duration-300 hover:brightness-105 hover:scale-95 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-80
+                    bg-linear-to-r from-primary to-[#2959b9]
+                "
                 style={{
-                    background: "linear-gradient(135deg, #4db8e8 0%, #2a8fd4 50%, #1c6fb5 100%)",
                     boxShadow:
                         "0 6px 18px -4px rgba(42,143,212,0.45), inset 0 1px 0 0 rgba(255,255,255,0.2)",
                 }}

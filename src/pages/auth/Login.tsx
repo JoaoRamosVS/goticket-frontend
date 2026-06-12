@@ -36,19 +36,16 @@ export default function Login() {
                 }}
             >
                 {/* Brand header */}
-                <div className="mb-8 flex items-center gap-8 text-center border-b border-b-blue-500/10 pb-8">
-                    <div
-                        className="flex p-4 items-center justify-center rounded-2xl"
-                        style={{
-                            background: "linear-gradient(135deg, #4db8e8 0%, #1c6fb5 100%)",
-                            boxShadow:
-                                "0 6px 18px -4px rgba(42,143,212,0.55), inset 0 1px 0 0 rgba(255,255,255,0.25)",
-                        }}
-                    >
-                        <Ticket className="size-12 text-white" strokeWidth={2.2} />
-                    </div>
+                <div className="mb-8 flex items-center justify-start gap-4 text-center border-b border-b-blue-500/10 pb-6">
+                    <img
+                        src="/goticket_logo.svg"
+                        width={82}
+                        height={82}
+                        alt="GoTicket"
+                        className="drop-shadow-2xl"
+                    />
                     <div>
-                        <h1 className="text-4xl font-extrabold tracking-tight text-left">Olá novamente</h1>
+                        <h1 className="text-4xl font-extrabold tracking-tight text-left">Olá novamente.</h1>
                         <p className="mt-1 text-sm text-[#5e6c87] text-left">Entre com suas credenciais para continuar</p>
                     </div>
                 </div>
