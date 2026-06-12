@@ -274,7 +274,7 @@ export const useVenueForm = (venueId?: string) => {
             showToast({
                 type: "update",
                 message:
-                    next === "ACTIVE" ? "Espaço reativado." : "Espaço desativado.",
+                    next === "ACTIVE" ? "Espaço ativado." : "Espaço desativado.",
             });
         } catch (err) {
             const message = getAxiosErrorMessage(
