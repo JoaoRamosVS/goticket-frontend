@@ -14,11 +14,14 @@ async function quoteOrder(request: QuoteRequest, signal?: AbortSignal): Promise<
 
 async function placeOrder(
   request: PlaceOrderRequest,
-  idempotencyKey: string
+  idempotencyKey: string,
+  queueToken?: string | null
 ): Promise<PlaceOrderResponse> {
-  const { data } = await goTicketApi.post<PlaceOrderResponse>("/orders", request, {
-    headers: { "Idempotency-Key": idempotencyKey },
-  });
+  const headers: Record<string, string> = { "Idempotency-Key": idempotencyKey };
+  if (queueToken) {
+    headers["X-Queue-Token"] = queueToken;
+  }
+  const { data } = await goTicketApi.post<PlaceOrderResponse>("/orders", request, { headers });
   return data;
 }
 

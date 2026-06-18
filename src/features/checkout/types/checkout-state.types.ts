@@ -10,4 +10,6 @@ export interface CheckoutNavigationState {
   venueCity: string;
   sectorName: string;
   lines: SelectedTicketLine[];
+  /** Token de admissão da fila virtual (header X-Queue-Token no POST /orders). Ausente em eventos sem fila. */
+  admissionToken?: string | null;
 }

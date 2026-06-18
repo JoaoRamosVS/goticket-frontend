@@ -10,7 +10,7 @@ interface UsePlaceOrderResult {
   isSubmitting: boolean;
 }
 
-export default function usePlaceOrder(): UsePlaceOrderResult {
+export default function usePlaceOrder(admissionToken?: string | null): UsePlaceOrderResult {
   // Chave criada uma vez por mount — sobrevive a re-renders e a retentativas
   const idempotencyKey = useRef<string>(createIdempotencyKey());
   const [isSubmitting, setSubmitting] = useState(false);
@@ -19,7 +19,7 @@ export default function usePlaceOrder(): UsePlaceOrderResult {
     setSubmitting(true);
     try {
       const payload = buildPlaceOrderPayload(form);
-      return await checkoutService.placeOrder(payload, idempotencyKey.current);
+      return await checkoutService.placeOrder(payload, idempotencyKey.current, admissionToken);
     } finally {
       setSubmitting(false);
     }

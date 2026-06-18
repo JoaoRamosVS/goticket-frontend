@@ -1,24 +1,36 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import type { CheckoutNavigationState } from "../types/checkout-state.types";
+import { loadPurchaseContext } from "../utils/purchase-context";
+
+function isValidSelection(
+  value: CheckoutNavigationState | null
+): value is CheckoutNavigationState {
+  return (
+    value !== null &&
+    typeof value === "object" &&
+    Array.isArray(value.lines) &&
+    value.lines.length > 0 &&
+    typeof value.eventDateId === "number"
+  );
+}
 
 export default function useCheckoutSelection(): CheckoutNavigationState | null {
   const location = useLocation();
   const navigate = useNavigate();
-  const state = location.state as CheckoutNavigationState | null;
 
-  const isValid =
-    state !== null &&
-    typeof state === "object" &&
-    Array.isArray(state.lines) &&
-    state.lines.length > 0 &&
-    typeof state.eventDateId === "number";
+  // Resolve uma vez: location.state (fluxo normal vindo da fila) ?? sessionStorage (reload).
+  const [selection] = useState<CheckoutNavigationState | null>(() => {
+    const fromState = location.state as CheckoutNavigationState | null;
+    if (isValidSelection(fromState)) return fromState;
+    return loadPurchaseContext();
+  });
 
   useEffect(() => {
-    if (!isValid) {
+    if (!isValidSelection(selection)) {
       navigate("/", { replace: true });
     }
-  }, [isValid, navigate]);
+  }, [selection, navigate]);
 
-  return isValid ? state : null;
+  return isValidSelection(selection) ? selection : null;
 }

@@ -11,6 +11,7 @@ import BackToSelectionLink from "@/features/checkout/components/BackToSelectionL
 import HoldersForm from "@/features/checkout/components/HoldersForm";
 import QuoteSummaryCard from "@/features/checkout/components/QuoteSummaryCard";
 import CheckoutSubmitButton from "@/features/checkout/components/CheckoutSubmitButton";
+import { clearPurchaseContext } from "@/features/checkout/utils/purchase-context";
 import type { CheckoutFormData } from "@/features/checkout/types/checkout-form.types";
 
 export default function CheckoutPage() {
@@ -28,7 +29,7 @@ export default function CheckoutPage() {
     eventDateId: selection?.eventDateId ?? 0,
     lines: selection?.lines ?? [],
   });
-  const { submit, isSubmitting } = usePlaceOrder();
+  const { submit, isSubmitting } = usePlaceOrder(selection?.admissionToken ?? null);
 
   if (!selection) {
     return (
@@ -41,15 +42,25 @@ export default function CheckoutPage() {
   const handleSubmit = async (data: CheckoutFormData) => {
     try {
       const response = await submit(data);
+      clearPurchaseContext();
       navigate(`/pedidos/${response.orderId}`, {
         state: response,
         replace: true,
       });
     } catch (err: unknown) {
+      const status = (err as { response?: { status?: number } })?.response?.status;
       const apiErrors = (err as { response?: { data?: { errors?: string[] } } })?.response?.data?.errors;
       const message = Array.isArray(apiErrors) && apiErrors.length > 0
         ? apiErrors[0]
         : "Não foi possível finalizar o pedido. Tente novamente.";
+
+      // 403 = admissão de fila exigida/expirada → reenvia o usuário para a fila do evento.
+      if (status === 403) {
+        showToast({ type: "warning", message });
+        navigate(`/evento/${selection.eventId}/fila`, { state: selection });
+        return;
+      }
+
       showToast({ type: "error", message });
     }
   };

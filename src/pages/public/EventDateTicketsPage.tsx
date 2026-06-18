@@ -62,7 +62,7 @@ const EventDateTicketsPage = () => {
 
     const handleConfirm = () => {
         if (totals.totalQuantity <= 0) return;
-        navigate("/checkout", {
+        navigate(`/evento/${data!.eventId}/fila`, {
             state: {
                 eventId: data!.eventId,
                 eventTitle: data!.eventTitle,

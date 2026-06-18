@@ -46,6 +46,7 @@ import BuscaPage from '@/pages/public/BuscaPage';
 import CategoriaPage from '@/pages/public/CategoriaPage';
 import CategoriasIndexPage from '@/pages/public/CategoriasIndexPage';
 import CheckoutPage from '@/pages/public/CheckoutPage';
+import WaitingRoomPage from '@/pages/public/WaitingRoomPage';
 import OrderTrackingPage from '@/pages/public/OrderTrackingPage';
 
 import MyAccountLayout from '@/layouts/MyAccountLayout';
@@ -143,6 +144,7 @@ function AppContent() {
 
         <Route element={<ProtectedClientRoute />}>
           <Route path="/evento/:eventId/data/:eventDateId/ingressos" element={<MainLayout><EventDateTicketsPage /></MainLayout>} />
+          <Route path="/evento/:eventId/fila" element={<MainLayout><WaitingRoomPage /></MainLayout>} />
           <Route path="/checkout" element={<MainLayout><CheckoutPage /></MainLayout>} />
           <Route path="/pedidos/:orderId" element={<MainLayout><OrderTrackingPage /></MainLayout>} />
 
