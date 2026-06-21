@@ -24,7 +24,6 @@ import AdminClientes from '@/pages/admin/clientes/ClientesList';
 import AdminEditarCliente from '@/pages/admin/clientes/EditarCliente';
 import AdminOrganizadores from '@/pages/admin/organizadores/OrganizadoresList';
 import AdminEditarOrganizador from '@/pages/admin/organizadores/EditarOrganizador';
-import AdminVendas from '@/pages/admin/Vendas';
 import AdminConfiguracoes from '@/pages/admin/Configuracoes';
 import AdminEspacos from '@/pages/admin/espacos/EspacosList';
 import AdminEditarEspaco from '@/pages/admin/espacos/EditarEspaco';
@@ -181,8 +180,6 @@ function AppContent() {
 
           <Route path="pedidos" element={<AdminPedidos />} />
           <Route path="pedidos/:orderId" element={<AdminPedidoDetalhe />} />
-
-          <Route path="vendas" element={<AdminVendas />} />
           <Route path="configuracoes" element={<AdminConfiguracoes />} />
         </Route>
 
