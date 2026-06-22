@@ -265,7 +265,7 @@ const Navbar = () => {
 						className="flex items-center gap-2 shrink-0 hover:scale-95 transition-transform duration-300"
 					>
 						<img src="/goticket_logo.svg" width={42} height={42} />
-						<span className="hidden md:block text-2xl font-bold tracking-tight bg-linear-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+						<span className="hidden md:block text-2xl font-extrabold tracking-tight bg-linear-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
 							GoTicket
 						</span>
 					</Link>

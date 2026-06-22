@@ -22,9 +22,11 @@ export default function MyAccountProfilePage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-bold text-[#00334d]">Dados pessoais</h2>
-        <p className="text-sm text-[#5e6c87] mt-0.5">CPF e data de nascimento não podem ser alterados.</p>
+      <div className="flex items-start gap-3.5 bg-linear-to-b from-primary to-[#2959b9] rounded-2xl p-6 shadow-2xl">
+        <div>
+          <h2 className="text-4xl font-extrabold text-card">Dados pessoais</h2>
+          <p className="text-sm font-light text-card mt-3">CPF e data de nascimento não podem ser alterados.</p>
+        </div>
       </div>
       <ProfileForm profile={profile} onSaved={refetch} />
     </div>

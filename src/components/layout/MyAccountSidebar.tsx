@@ -29,9 +29,9 @@ const MyAccountSidebar = () => {
     .join("");
 
   return (
-    <aside className="fixed left-0 top-0 bottom-0 z-40 w-72 p-4">
+    <aside className="sticky top-10 w-60 shrink-0 self-start">
       <div
-        className="flex h-full flex-col overflow-hidden rounded-[32px] border border-white/60 bg-white/55 backdrop-blur-2xl"
+        className="relative flex flex-col overflow-hidden rounded-[28px] border border-white/60 bg-white/55 backdrop-blur-2xl"
         style={{
           boxShadow:
             "0 12px 40px -12px rgba(0,46,71,0.18), 0 2px 8px -2px rgba(0,46,71,0.08), inset 0 1px 0 0 rgba(255,255,255,0.8)",
@@ -56,29 +56,18 @@ const MyAccountSidebar = () => {
 
         <div className="relative px-6 pt-7 pb-5">
           <Link
-            to="/minha-conta"
+            to="/"
             className="group flex items-center gap-2.5 transition-all duration-300 hover:gap-1.5"
           >
             <img
               src="/goticket_logo.svg"
-              width={38}
-              height={38}
+              width={42}
+              height={42}
               alt="GoTicket"
-              className="drop-shadow-md transition-transform duration-300 group-hover:scale-95"
+              className="transition-transform duration-300 group-hover:scale-105"
             />
             <div className="flex flex-col leading-tight">
-              <span className="text-xl font-bold tracking-tight text-[#00334d]">GoTicket</span>
-              <span
-                className="text-[10px] font-bold uppercase tracking-[0.18em]"
-                style={{
-                  background: "linear-gradient(135deg, #4db8e8 0%, #2a8fd4 50%, #1c6fb5 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}
-              >
-                Minha Conta
-              </span>
+              <span className="text-3xl font-extrabold tracking-tight text-[#00334d]/80">GoTicket</span>
             </div>
           </Link>
         </div>

@@ -49,7 +49,11 @@ export default function ProfileForm({ profile, onSaved }: Props) {
       <div className="grid gap-5 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor="fullName">Nome completo</Label>
-          <Input id="fullName" {...register("fullName")} />
+          <Input
+            id="fullName"
+            {...register("fullName")}
+            className="bg-white/80 rounded-xl"
+          />
           {errors.fullName && (
             <p className="text-xs text-destructive">{errors.fullName.message}</p>
           )}
@@ -60,7 +64,7 @@ export default function ProfileForm({ profile, onSaved }: Props) {
           <select
             id="sex"
             {...register("sex")}
-            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            className="flex h-9 w-full rounded-xl border border-[#c8e2f5] bg-white/80 px-3 py-1 text-sm text-[#00334d] shadow-xs transition-colors outline-none focus:ring-[3px] focus:ring-[#2a8fd4]/20 focus:border-[#2a8fd4]/60"
           >
             <option value={1}>{SEX_LABELS[1]}</option>
             <option value={2}>{SEX_LABELS[2]}</option>
@@ -72,17 +76,33 @@ export default function ProfileForm({ profile, onSaved }: Props) {
 
         <div className="space-y-1.5">
           <Label>CPF</Label>
-          <Input value={profile.identityDocument} readOnly className="bg-muted/40 text-muted-foreground cursor-not-allowed" />
+          <Input
+            value={profile.identityDocument}
+            readOnly
+            className="bg-white/50 rounded-xl text-muted-foreground cursor-not-allowed"
+          />
         </div>
 
         <div className="space-y-1.5">
           <Label>Data de nascimento</Label>
-          <Input value={profile.birthDate} readOnly className="bg-muted/40 text-muted-foreground cursor-not-allowed" />
+          <Input
+            value={profile.birthDate}
+            readOnly
+            className="bg-white/50 rounded-xl text-muted-foreground cursor-not-allowed"
+          />
         </div>
       </div>
 
       <div className="flex justify-end">
-        <Button type="submit" disabled={isLoading || !isDirty}>
+        <Button
+          type="submit"
+          disabled={isLoading || !isDirty}
+          className="rounded-xl px-6 text-white transition-all duration-300 hover:opacity-90"
+          style={{
+            background: "linear-gradient(135deg, #4db8e8 0%, #2a8fd4 50%, #1c6fb5 100%)",
+            boxShadow: "0 8px 22px -8px rgba(42,143,212,0.45), inset 0 1px 0 0 rgba(255,255,255,0.25)",
+          }}
+        >
           {isLoading ? "Salvando..." : "Salvar alterações"}
         </Button>
       </div>

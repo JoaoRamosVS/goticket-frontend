@@ -38,10 +38,15 @@ export default function PasswordForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 max-w-md">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-1.5">
         <Label htmlFor="currentPassword">Senha atual</Label>
-        <Input id="currentPassword" type="password" {...register("currentPassword")} />
+        <Input
+          id="currentPassword"
+          type="password"
+          {...register("currentPassword")}
+          className="bg-white/80 rounded-xl"
+        />
         {errors.currentPassword && (
           <p className="text-xs text-destructive">{errors.currentPassword.message}</p>
         )}
@@ -49,7 +54,12 @@ export default function PasswordForm() {
 
       <div className="space-y-1.5">
         <Label htmlFor="newPassword">Nova senha</Label>
-        <Input id="newPassword" type="password" {...register("newPassword")} />
+        <Input
+          id="newPassword"
+          type="password"
+          {...register("newPassword")}
+          className="bg-white/80 rounded-xl"
+        />
         {errors.newPassword && (
           <p className="text-xs text-destructive">{errors.newPassword.message}</p>
         )}
@@ -57,14 +67,27 @@ export default function PasswordForm() {
 
       <div className="space-y-1.5">
         <Label htmlFor="confirmPassword">Confirmar nova senha</Label>
-        <Input id="confirmPassword" type="password" {...register("confirmPassword")} />
+        <Input
+          id="confirmPassword"
+          type="password"
+          {...register("confirmPassword")}
+          className="bg-white/80 rounded-xl"
+        />
         {errors.confirmPassword && (
           <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>
         )}
       </div>
 
       <div className="flex justify-end">
-        <Button type="submit" disabled={isLoading}>
+        <Button
+          type="submit"
+          disabled={isLoading}
+          className="rounded-xl px-6 text-white transition-all duration-300 hover:opacity-90"
+          style={{
+            background: "linear-gradient(135deg, #4db8e8 0%, #2a8fd4 50%, #1c6fb5 100%)",
+            boxShadow: "0 8px 22px -8px rgba(42,143,212,0.45), inset 0 1px 0 0 rgba(255,255,255,0.25)",
+          }}
+        >
           {isLoading ? "Alterando..." : "Alterar senha"}
         </Button>
       </div>

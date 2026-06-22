@@ -63,7 +63,12 @@ export default function AddressForm({ profile, onSaved }: Props) {
       <div className="grid gap-5 sm:grid-cols-2">
         <div className="space-y-1.5 sm:col-span-2">
           <Label htmlFor="streetAddress">Logradouro</Label>
-          <Input id="streetAddress" placeholder="Rua, Avenida..." {...register("streetAddress")} />
+          <Input
+            id="streetAddress"
+            placeholder="Rua, Avenida..."
+            {...register("streetAddress")}
+            className="bg-white/80 rounded-xl"
+          />
           {errors.streetAddress && (
             <p className="text-xs text-destructive">{errors.streetAddress.message}</p>
           )}
@@ -71,37 +76,73 @@ export default function AddressForm({ profile, onSaved }: Props) {
 
         <div className="space-y-1.5">
           <Label htmlFor="streetAddressNumber">Número</Label>
-          <Input id="streetAddressNumber" placeholder="123" {...register("streetAddressNumber")} />
+          <Input
+            id="streetAddressNumber"
+            placeholder="123"
+            {...register("streetAddressNumber")}
+            className="bg-white/80 rounded-xl"
+          />
         </div>
 
         <div className="space-y-1.5">
           <Label htmlFor="neighborhood">Bairro</Label>
-          <Input id="neighborhood" {...register("neighborhood")} />
+          <Input
+            id="neighborhood"
+            {...register("neighborhood")}
+            className="bg-white/80 rounded-xl"
+          />
         </div>
 
         <div className="space-y-1.5">
           <Label htmlFor="city">Cidade</Label>
-          <Input id="city" {...register("city")} />
+          <Input
+            id="city"
+            {...register("city")}
+            className="bg-white/80 rounded-xl"
+          />
         </div>
 
         <div className="space-y-1.5">
           <Label htmlFor="state">Estado</Label>
-          <Input id="state" placeholder="SP" {...register("state")} />
+          <Input
+            id="state"
+            placeholder="SP"
+            {...register("state")}
+            className="bg-white/80 rounded-xl"
+          />
         </div>
 
         <div className="space-y-1.5">
           <Label htmlFor="zipCode">CEP</Label>
-          <Input id="zipCode" placeholder="00000-000" {...register("zipCode")} />
+          <Input
+            id="zipCode"
+            placeholder="00000-000"
+            {...register("zipCode")}
+            className="bg-white/80 rounded-xl"
+          />
         </div>
 
         <div className="space-y-1.5">
           <Label htmlFor="country">País</Label>
-          <Input id="country" placeholder="Brasil" {...register("country")} />
+          <Input
+            id="country"
+            placeholder="Brasil"
+            {...register("country")}
+            className="bg-white/80 rounded-xl"
+          />
         </div>
       </div>
 
       <div className="flex justify-end">
-        <Button type="submit" disabled={isLoading || !isDirty}>
+        <Button
+          type="submit"
+          disabled={isLoading || !isDirty}
+          className="rounded-xl px-6 text-white transition-all duration-300 hover:opacity-90"
+          style={{
+            background: "linear-gradient(135deg, #4db8e8 0%, #2a8fd4 50%, #1c6fb5 100%)",
+            boxShadow: "0 8px 22px -8px rgba(42,143,212,0.45), inset 0 1px 0 0 rgba(255,255,255,0.25)",
+          }}
+        >
           {isLoading ? "Salvando..." : "Salvar endereço"}
         </Button>
       </div>
