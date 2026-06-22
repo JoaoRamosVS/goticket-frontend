@@ -3,7 +3,6 @@ import EventInfo from "@/features/event-details/components/EventInfo";
 import TicketSelector from "@/features/event-details/components/TicketSelector";
 import EventDescription from "@/features/event-details/components/EventDescription";
 import EventLocation from "@/features/event-details/components/EventLocation";
-import EventPolicies from "@/features/event-details/components/EventPolicies";
 import FaqSection from "@/features/public-landing/components/FAQSection/FAQSection";
 import ShareAndSave from "@/features/event-details/components/ShareAndSave";
 import useEventDetails from "@/features/event-details/hooks/useEventDetails";
@@ -58,8 +57,6 @@ const EventPage = () => {
             />
 
             <EventLocation venue={event.venue} />
-
-            <EventPolicies policies={event.policies} />
           </div>
 
           <aside className="hidden lg:flex flex-col gap-6">

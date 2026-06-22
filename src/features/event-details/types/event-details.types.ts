@@ -166,10 +166,6 @@ export interface EventOrganizerProps {
   organizer: EventOrganizerInfo;
 }
 
-export interface EventPoliciesProps {
-  policies: EventPolicy[];
-}
-
 export interface TicketSelectorProps {
   eventId: string;
   dates: EventDateSummary[];

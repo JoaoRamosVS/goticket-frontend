@@ -32,16 +32,10 @@ export default function MyAccountOrdersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start gap-3.5">
-        <span
-          aria-hidden
-          className="mt-0.5 block h-9 w-1 shrink-0 rounded-full"
-          style={{ background: "linear-gradient(180deg, #4db8e8 0%, #1c6fb5 100%)" }}
-        />
+      <div className="flex items-start gap-3.5 bg-linear-to-b from-primary to-[#2959b9] rounded-2xl p-6 shadow-2xl">
         <div>
-          <h2 className="text-xl font-bold text-[#00334d]">Meus pedidos</h2>
-          <p className="text-sm text-[#5e6c87] mt-0.5">
-            {data?.totalElements ?? 0}{" "}
+          <h2 className="text-4xl font-extrabold text-card">Meus pedidos</h2>
+          <p className="text-sm font-light text-card mt-3">{data?.totalElements ?? 0}{" "}
             {(data?.totalElements ?? 0) === 1 ? "pedido encontrado" : "pedidos encontrados"}
           </p>
         </div>
