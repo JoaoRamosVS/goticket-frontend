@@ -21,11 +21,11 @@ const Home = () => {
                 <SearchBar />
                 <HighlightEvents title="Em destaque para você" events={highlightEvents} />
                 <CategoriesGrid />
-                <EventsCarousel title="Esportes" events={events} />
-                <EventsCarousel title="Música" events={events} />
+                <EventsCarousel title="Esportes" events={events.slice(0,8)} />
+                <EventsCarousel title="Música" events={events.slice(4,12)} />
                 <RegisterCallCTA />
-                <EventsCarousel title="Festivais" events={events} />
-                <EventsCarousel title="Perto de você" events={events} />
+                <EventsCarousel title="Festivais" events={events.slice(8,16)} />
+                <EventsCarousel title="Perto de você" events={events.slice(12,20)} />
                 <FAQSection />
             </div>
         </MainLayout>
