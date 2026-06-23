@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import EventDateHeader from "@/features/ticket-purchase/components/EventDateHeader";
 import SectorList from "@/features/ticket-purchase/components/SectorList";
 import SectorMapViewer from "@/features/ticket-purchase/components/SectorMapViewer";
@@ -8,9 +8,18 @@ import useSectorMap from "@/features/ticket-purchase/hooks/useSectorMap";
 import useTicketSelection from "@/features/ticket-purchase/hooks/useTicketSelection";
 import type { CheckoutNavigationState } from "@/features/checkout/types/checkout-state.types";
 
+/** State recebido da WaitingRoomPage após admissão na fila. */
+interface TicketsPageLocationState {
+  admissionToken?: string | null;
+}
+
 const EventDateTicketsPage = () => {
     const { eventId, eventDateId } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Token de admissão da fila virtual, recebido via state da WaitingRoomPage.
+    const admissionToken = (location.state as TicketsPageLocationState | null)?.admissionToken ?? null;
     const { data, isLoading, error } = useEventDateTickets(eventId, eventDateId);
     const sectors = data?.sectors ?? [];
     const {
@@ -62,7 +71,9 @@ const EventDateTicketsPage = () => {
 
     const handleConfirm = () => {
         if (totals.totalQuantity <= 0) return;
-        navigate(`/evento/${data!.eventId}/fila`, {
+
+        // A fila já foi passada antes de chegar aqui — vai direto para o checkout.
+        navigate("/checkout", {
             state: {
                 eventId: data!.eventId,
                 eventTitle: data!.eventTitle,
@@ -73,6 +84,7 @@ const EventDateTicketsPage = () => {
                 venueCity: data!.venueCity,
                 sectorName: selectedSector?.name ?? "",
                 lines: totals.lines,
+                admissionToken,
             } satisfies CheckoutNavigationState,
         });
     };

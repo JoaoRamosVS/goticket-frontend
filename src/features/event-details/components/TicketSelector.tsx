@@ -83,7 +83,8 @@ const TicketSelector = ({ eventId, dates }: TicketSelectorProps) => {
           return (
             <Link
               key={date.eventDateId}
-              to={`/evento/${eventId}/data/${date.eventDateId}/ingressos`}
+              to={`/evento/${eventId}/fila`}
+              state={{ eventDateId: date.eventDateId }}
               className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xl"
             >
               {card}
